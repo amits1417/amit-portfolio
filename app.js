@@ -5086,7 +5086,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (savedText) { try { textDb = JSON.parse(savedText); } catch(e) {} }
 
             function isInsideCMS(el) {
-                return el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader');
+                return el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader') || el.closest('#contact');
             }
 
             function shouldSkip(el) {
@@ -5157,11 +5157,11 @@ document.addEventListener('DOMContentLoaded', () => {
             var allEls = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, span, div, label, strong, em, b, i, u, a, button, td, th, blockquote, cite, code, pre, small, sub, sup');
             for (var i = 0; i < allEls.length; i++) {
                 var el = allEls[i];
-                if (el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader')) continue;
+                if (el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader') || el.closest('#contact')) continue;
                 var t = el.tagName.toLowerCase();
-                // Skip form elements and interactive controls
-                if (t === 'input' || t === 'textarea' || t === 'select') continue;
-                if (el.closest('.form-group')) continue;
+                // Skip form elements and interactive controls - set explicit false to override parent inheritance
+                if (t === 'input' || t === 'textarea' || t === 'select') { el.contentEditable = 'false'; continue; }
+                if (el.closest('.form-group')) { el.contentEditable = 'false'; continue; }
                 if (t === 'button' && (el.id === 'studio-toggle-btn' || el.classList.contains('hamburger') || el.closest('.hamburger') || el.classList.contains('back-to-top') || el.closest('.back-to-top') || el.classList.contains('video-modal-close') || el.classList.contains('close-btn') || el.classList.contains('lightbox-nav-btn') || el.classList.contains('console-btn') || el.closest('.filter-btn'))) continue;
                 if (t === 'a' && el.classList.contains('social-link')) continue;
                 el.contentEditable = active ? 'true' : 'false';
