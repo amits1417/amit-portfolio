@@ -5070,71 +5070,71 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initInlineTextCMS() {
-        const savedText = localStorage.getItem('amit_portfolio_cms_text');
-        let textDb = {};
-        if (savedText) {
-            try {
-                textDb = JSON.parse(savedText);
-            } catch(e) {}
-        }
+        try {
+            const savedText = localStorage.getItem('amit_portfolio_cms_text');
+            let textDb = {};
+            if (savedText) { try { textDb = JSON.parse(savedText); } catch(e) {} }
 
-        function isInsideCMS(el) {
-            return el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader');
-        }
-
-        function shouldSkip(el) {
-            const tag = el.tagName.toLowerCase();
-            if (tag === 'button') {
-                // Skip interactive buttons
-                if (el.closest('.filter-btn') || el.id === 'studio-toggle-btn' || el.closest('.hamburger') || el.closest('.theme-mode-toggle') || el.closest('.back-to-top') || el.closest('.video-modal-close') || el.closest('.close-btn') || el.closest('.lightbox-nav-btn') || el.closest('.console-btn')) return true;
+            function isInsideCMS(el) {
+                return el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader');
             }
-            if (tag === 'a' && el.classList.contains('social-link')) return true;
-            return false;
-        }
 
-        function makeEditable() {
-            const isActive = document.body.classList.contains('editor-active');
-            const selector = 'h1, h2, h3, h4, h5, h6, p, li, span, div, label, strong, em, b, i, u, a, button, td, th, blockquote, cite, code, pre, small, sub, sup';
-            document.querySelectorAll(selector).forEach(el => {
-                if (isInsideCMS(el)) return;
-                if (shouldSkip(el)) return;
-                if (el.children.length === 0 || el.innerText.trim().length > 0 || el.querySelectorAll('*').length > 0) {
-                    el.contentEditable = isActive ? "true" : "false";
+            function shouldSkip(el) {
+                var t = el.tagName.toLowerCase();
+                if (t === 'button') {
+                    if (el.id === 'studio-toggle-btn' || el.classList.contains('hamburger') || el.closest('.hamburger') || el.classList.contains('back-to-top') || el.closest('.back-to-top') || el.classList.contains('video-modal-close') || el.classList.contains('close-btn') || el.classList.contains('lightbox-nav-btn') || el.classList.contains('console-btn') || el.closest('.filter-btn')) return true;
                 }
-            });
-        }
+                if (t === 'a' && el.classList.contains('social-link')) return true;
+                return false;
+            }
 
-        const selector = 'h1, h2, h3, h4, h5, h6, p, li, span, div, label, strong, em, b, i, u, a, button, td, th, blockquote, cite, code, pre, small, sub, sup';
-        document.querySelectorAll(selector).forEach((el, index) => {
-            if (isInsideCMS(el)) return;
-            if (shouldSkip(el)) return;
-            let key = el.getAttribute('data-cms-key');
-            if (!key) {
-                const sec = el.closest('section') || el.closest('header') || el.closest('footer') || el.closest('#hero');
-                const secId = sec ? sec.id || 'body' : 'body';
-                const tagName = el.tagName.toLowerCase();
-                key = `cms-${secId}-${tagName}-${index}`;
-                el.setAttribute('data-cms-key', key);
-            }
-            if (textDb[key] !== undefined) {
-                el.innerHTML = textDb[key];
-            }
-            if (!el.dataset.cmsInitialized) {
-                el.dataset.cmsInitialized = "true";
-                el.addEventListener('blur', () => {
-                    if (document.body.classList.contains('editor-active')) {
-                        const newContent = el.innerHTML;
-                        textDb[key] = newContent;
-                        localStorage.setItem('amit_portfolio_cms_text', JSON.stringify(textDb));
-                        appendConsoleLog(`> Saved inline edit for: [${key}]`);
+            var allTextTags = 'h1, h2, h3, h4, h5, h6, p, li, span, div, label, strong, em, b, i, u, a, button, td, th, blockquote, cite, code, pre, small, sub, sup';
+
+            // First pass: restore saved text + attach blur listeners
+            document.querySelectorAll(allTextTags).forEach(function(el, idx) {
+                try {
+                    if (isInsideCMS(el)) return;
+                    if (shouldSkip(el)) return;
+                    var key = el.getAttribute('data-cms-key');
+                    if (!key) {
+                        var sec = el.closest('section') || el.closest('header') || el.closest('footer') || el.closest('#hero');
+                        var secId = sec ? (sec.id || 'body') : 'body';
+                        key = 'cms-' + secId + '-' + el.tagName.toLowerCase() + '-' + idx;
+                        el.setAttribute('data-cms-key', key);
                     }
-                });
-            }
-        });
-
-        window.addEventListener('cms-mode-change', makeEditable);
-        makeEditable();
+                    if (textDb[key] !== undefined) {
+                        el.innerHTML = textDb[key];
+                    }
+                    if (!el.dataset.cmsInitialized) {
+                        el.dataset.cmsInitialized = 'true';
+                        el.addEventListener('blur', function() {
+                            if (document.body.classList.contains('editor-active')) {
+                                textDb[key] = el.innerHTML;
+                                localStorage.setItem('amit_portfolio_cms_text', JSON.stringify(textDb));
+                                appendConsoleLog('> Saved inline edit for: [' + key + ']');
+                            }
+                        });
+                    }
+                } catch(e) {}
+            });
+        } catch(e) { console.error('initInlineTextCMS error:', e); }
     }
+
+    // Apply contentEditable on CMS mode toggle via direct class-based approach
+    window.addEventListener('cms-mode-change', function() {
+        var isActive = document.body.classList.contains('editor-active');
+        try {
+            var allEls = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, span, div, label, strong, em, b, i, u, a, button, td, th, blockquote, cite, code, pre, small, sub, sup');
+            for (var i = 0; i < allEls.length; i++) {
+                var el = allEls[i];
+                if (el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader')) continue;
+                var t = el.tagName.toLowerCase();
+                if (t === 'button' && (el.id === 'studio-toggle-btn' || el.classList.contains('hamburger') || el.closest('.hamburger') || el.classList.contains('back-to-top') || el.closest('.back-to-top') || el.classList.contains('video-modal-close') || el.classList.contains('close-btn') || el.classList.contains('lightbox-nav-btn') || el.classList.contains('console-btn') || el.closest('.filter-btn'))) continue;
+                if (t === 'a' && el.classList.contains('social-link')) continue;
+                el.contentEditable = isActive ? 'true' : 'false';
+            }
+        } catch(e) { console.error('cms-mode-change apply error:', e); }
+    });
 
     // Listen for mobile back button navigation (hashchange) to close player overlay smoothly
     window.addEventListener('hashchange', () => {
