@@ -4340,6 +4340,14 @@ document.addEventListener('DOMContentLoaded', () => {
         renderProjects();
         renderDynamicSoftware();
         renderDynamicServices();
+        // Reset text edit toggle when entering CMS mode
+        isTextEditActive = false;
+        var teBtn = document.getElementById('btn-toggle-text-edit');
+        if (teBtn) {
+            teBtn.querySelector('span').textContent = 'Enable Text Edit';
+            teBtn.style.borderColor = 'var(--border-color)';
+            teBtn.style.color = 'var(--text-muted)';
+        }
         window.dispatchEvent(new CustomEvent('cms-mode-change', { detail: { active: true } }));
     }
 
@@ -5132,21 +5140,34 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch(e) { console.error('initInlineTextCMS error:', e); }
     }
 
-    // Apply contentEditable on CMS mode toggle via direct class-based approach
+    var isTextEditActive = false;
+
+    // Apply contentEditable on text-edit toggle
     window.addEventListener('cms-mode-change', function() {
         var isActive = document.body.classList.contains('editor-active');
+        if (!isActive) {
+            isTextEditActive = false;
+        }
+        applyContentEditable();
+    });
+
+    function applyContentEditable() {
+        var active = isTextEditActive && document.body.classList.contains('editor-active');
         try {
             var allEls = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, span, div, label, strong, em, b, i, u, a, button, td, th, blockquote, cite, code, pre, small, sub, sup');
             for (var i = 0; i < allEls.length; i++) {
                 var el = allEls[i];
                 if (el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader')) continue;
                 var t = el.tagName.toLowerCase();
+                // Skip form elements and interactive controls
+                if (t === 'input' || t === 'textarea' || t === 'select') continue;
+                if (el.closest('.form-group')) continue;
                 if (t === 'button' && (el.id === 'studio-toggle-btn' || el.classList.contains('hamburger') || el.closest('.hamburger') || el.classList.contains('back-to-top') || el.closest('.back-to-top') || el.classList.contains('video-modal-close') || el.classList.contains('close-btn') || el.classList.contains('lightbox-nav-btn') || el.classList.contains('console-btn') || el.closest('.filter-btn'))) continue;
                 if (t === 'a' && el.classList.contains('social-link')) continue;
-                el.contentEditable = isActive ? 'true' : 'false';
+                el.contentEditable = active ? 'true' : 'false';
             }
-        } catch(e) { console.error('cms-mode-change apply error:', e); }
-    });
+        } catch(e) { console.error('contentEditable apply error:', e); }
+    }
 
     // Listen for mobile back button navigation (hashchange) to close player overlay smoothly
     window.addEventListener('hashchange', () => {
@@ -5632,6 +5653,20 @@ document.addEventListener('DOMContentLoaded', () => {
     initClientsEditor();
     initCvDownloadAnimation();
     initGraphicsGallery();
+
+    // Text Edit Toggle Button Handler
+    var textEditBtn = document.getElementById('btn-toggle-text-edit');
+    if (textEditBtn) {
+        textEditBtn.addEventListener('click', function() {
+            if (!document.body.classList.contains('editor-active')) return;
+            isTextEditActive = !isTextEditActive;
+            textEditBtn.querySelector('span').textContent = isTextEditActive ? 'Disable Text Edit' : 'Enable Text Edit';
+            textEditBtn.style.borderColor = isTextEditActive ? 'var(--accent-cyan)' : 'var(--border-color)';
+            textEditBtn.style.color = isTextEditActive ? 'var(--accent-cyan)' : 'var(--text-muted)';
+            applyContentEditable();
+            appendConsoleLog('> Inline text editing ' + (isTextEditActive ? 'enabled' : 'disabled') + '.');
+        });
+    }
 
     // Expose to window so inline script can access them
     window.extractYouTubeId = extractYouTubeId;
