@@ -1202,6 +1202,13 @@
                             <input type="file" id="console-import-file" accept=".json" class="hidden">
                         </div>
                     </div>
+                    <!-- Inline Text Edit Toggle -->
+                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05);">
+                        <button type="button" id="btn-toggle-text-edit" class="console-btn btn-secondary" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; background: transparent; color: var(--text-muted); cursor: pointer; font-size: 0.7rem; font-weight: 600; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            <i data-lucide="edit-3"></i>
+                            <span>Enable Text Edit</span>
+                        </button>
+                    </div>
                     <!-- Firebase Cloud Sync Controls -->
                     <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 8px;">
                         <div style="display: flex; flex-direction: column; gap: 4px;">
@@ -1241,16 +1248,6 @@
                     <div id="console-layout-list" style="max-height: 120px; overflow-y: auto; border: 1px solid rgba(255, 255, 255, 0.05); padding: 6px; border-radius: 4px; display: flex; flex-direction: column; gap: 4px;">
                         <!-- Sections list with reorder buttons -->
                     </div>
-                </div>
-
-                <!-- Column 5: Inline Text Edit Toggle -->
-                <div class="console-column" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
-                    <h4 class="console-col-title">Inline Text Edit</h4>
-                    <button type="button" id="btn-toggle-text-edit" class="console-btn" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: transparent; color: var(--text-muted); cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                        <i data-lucide="edit-3"></i>
-                        <span>Enable Text Edit</span>
-                    </button>
-                    <p style="font-size: 0.6rem; color: var(--text-muted); text-align: center; opacity: 0.6;">Click any text on the page to edit. Changes save automatically.</p>
                 </div>
 
                 <!-- Restore Points (auto-saved on changes) -->
