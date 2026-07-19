@@ -1,0 +1,6 @@
+assets/uploads/*.mp4
+server.ps1
+convert.js
+*.zip
+.git/
+.env.local

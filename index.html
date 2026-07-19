@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Amit Sharma - Senior Video Editor, Digital YouTube Studio Manager, and Mechanical Engineer. Premium portfolio showcasing software walkthroughs, motion graphics, and MLM/Crypto explainer animations.">
+    <meta name="author" content="Amit Sharma">
+    <title>Amit Sharma | Senior Video Editor &amp; YouTube Studio Manager</title>
+    
+    <!-- Neue Montreal (primary) via Fontshare -->
+    <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+    <link href="https://api.fontshare.com/v2/css?f[]=neue-montreal@400,500,600,700&display=swap" rel="stylesheet">
+    <!-- Google Fonts: fallback (Montserrat & DM Sans) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
+    <link rel="stylesheet" href="style.css?v=4.2">
+    <!-- Inline SVG Favicon with AMIT logo -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%2265%22 x=%2250%22 font-size=%2232%22 font-weight=%22900%22 font-family=%22system-ui, -apple-system, sans-serif%22 fill=%22white%22 text-anchor=%22middle%22 letter-spacing=%220.05em%22&gt;AMIT&lt;/text&gt;&lt;/svg&gt;">
+</head>
+<body>
+    <script>
+        (function() {
+            const savedTheme = 'neon-cyber';
+            document.body.classList.add('theme-' + savedTheme);
+        })();
+    </script>
+    <!-- Parallax Video Editing Timeline Background -->
+    <div id="parallax-timeline-bg"></div>
+
+    <!-- Premium Loading Screen -->
+    <div id="loader" class="loader-container">
+        <div class="loader-content">
+            <div class="loader-logo">
+                <span class="logo-accent">A</span>MIT<span class="logo-dot">.</span>
+            </div>
+            <div class="loader-progress-bg">
+                <div id="loader-progress-bar" class="loader-progress-bar"></div>
+            </div>
+            <div class="loader-percentage-container">
+                <span class="loader-label">LOADING PORTFOLIO</span>
+                <span id="loader-percentage" class="loader-percentage">00</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Cursor Glow -->
+    <div id="custom-cursor" class="custom-cursor"></div>
+    <div id="custom-cursor-glow" class="custom-cursor-glow"></div>
+
+    <!-- Sticky Navigation Bar -->
+    <header id="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                <span>AMIT</span><span class="logo-dot">.</span>
+            </a>
+            
+            <nav class="nav-menu" id="nav-menu">
+                <a href="#hero" class="nav-link active">Home</a>
+                <a href="#portfolio" class="nav-link">Portfolio</a>
+                <a href="#about" class="nav-link">About Me</a>
+                <a href="#services" class="nav-link">Services</a>
+                <a href="./assets/Amit_Sharma_CV.pdf" download class="nav-cv-ring-btn" title="Download CV"><span>CV</span></a>
+                <a href="#contact" class="nav-link nav-cta">Contact</a>
+            </nav>
+            
+            <div class="mobile-header-ctas">
+                <a href="./assets/Amit_Sharma_CV.pdf" download class="nav-cv-ring-btn" title="Download CV">
+                    <span>CV</span>
+                </a>
+                <a href="https://wa.me/918866414870" target="_blank" rel="noopener noreferrer" class="mobile-header-cta-btn btn-wa-header" title="WhatsApp">
+                    <i data-lucide="message-circle" style="width: 14px; height: 14px;"></i>
+                    <span>WhatsApp</span>
+                </a>
+            </div>
+            
+            <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </div>
+        <!-- Mobile Sticky Navigation Tabs -->
+        <div class="mobile-sections-tabs" id="mobile-sections-tabs">
+            <a href="#hero" class="mobile-nav-tab active" data-target="hero">Home</a>
+            <a href="#portfolio" class="mobile-nav-tab" data-target="portfolio">Portfolio</a>
+            <a href="#about" class="mobile-nav-tab" data-target="about">About Me</a>
+            <a href="#services" class="mobile-nav-tab" data-target="services">Services</a>
+            <a href="#contact" class="mobile-nav-tab" data-target="contact">Contact</a>
+        </div>
+        <!-- Header Scroll Progress Bar (Premiere Pro Timeline Style) -->
+        <div class="header-scroll-progress-container" id="header-scroll-progress-container">
+            <div class="header-scroll-progress-ruler"></div>
+            <div class="header-scroll-progress-bar" id="header-scroll-progress-bar"></div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main>
+        
+        <!-- Hero Section -->
+        <section id="hero">
+            <!-- Animated Particle Background -->
+            <canvas id="hero-canvas"></canvas>
+            
+            <div class="hero-container container">
+                <div class="hero-content-split">
+                    <!-- Left: Text content -->
+                    <div class="hero-left">
+                        <div class="hero-badge">
+                            <span class="badge-dot"></span>
+                            <span class="badge-text">AVAILABLE FOR FULL-TIME WORK ONLY • SURAT &amp; REMOTE</span>
+                        </div>
+                        <h1 class="hero-title" id="hero-headline" style="line-height: 1.1; font-weight: 900; letter-spacing: -0.01em; margin-bottom: 0; margin-top: 15px; text-transform: uppercase;">
+                            AMIT SHARMA
+                        </h1>
+                        <div class="hero-title-underline"></div>
+                        <p class="hero-subheading" style="font-weight: 700; font-size: 1.15rem; color: var(--text-primary); margin: 18px 0 12px 0;">
+                            Senior Video Editor • AI Video &amp; Graphics Expert • YouTube Studio Manager
+                        </p>
+                        <p class="hero-tagline" style="font-size: 0.95rem; color: var(--text-secondary); margin: 12px 0 0 0; font-weight: 500;">
+                            Specialist in SaaS Explainers • MLM/Crypto Animations • AI Talking Head Videos
+                        </p>
+                    </div>
+                    
+                    <!-- Right: Stacked Buttons -->
+                    <div class="hero-right">
+                        <a href="#portfolio" class="btn btn-primary magnetic hero-cta-btn" id="hero-btn-portfolio">
+                            <span>View Portfolio</span>
+                            <i data-lucide="arrow-up-right"></i>
+                        </a>
+                        <a href="#contact" class="btn btn-secondary magnetic hero-cta-btn" id="hero-btn-contact">
+                            <span>Let's Connect</span>
+                            <i data-lucide="message-square"></i>
+                        </a>
+                        <a href="./assets/Amit_Sharma_CV.pdf" download class="btn btn-outline magnetic hero-cta-btn" id="hero-btn-cv" style="border-radius: 50px; padding: 12px 28px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); color: var(--text-primary); transition: all 0.3s;">
+                            <i data-lucide="download" style="width: 14px; height: 14px; color: var(--accent-cyan);"></i> <span>Download CV</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Featured Showreel Container (Embedded directly under hero text) -->
+                <div class="showreel-container">
+                    <div class="showreel-viewport" id="showreel-viewport">
+                        <div class="showreel-glow-backdrop"></div>
+                        
+                        <div class="showreel-frame">
+                            <img src="./assets/showreel.png" alt="Showreel Video Cover" class="showreel-img">
+                            
+                            <!-- Showreel Edit Overlay -->
+                            <div class="showreel-edit-overlay">
+                                <button type="button" class="card-hud-btn btn-edit-hud" data-id="showreel" id="btn-edit-showreel">
+                                    <i data-lucide="edit-2"></i> Edit Showreel
+                                </button>
+                            </div>
+                            
+                            <!-- Audio visualizer simulation overlay -->
+                            <canvas id="waveform-canvas" class="waveform-canvas"></canvas>
+                            
+                            <div class="showreel-overlay">
+                                <!-- Trigger Modal Video Player -->
+                                <button class="play-btn-circle magnetic video-trigger-card" data-video-id="u6KTFBKMP8M" id="play-showreel-btn" aria-label="Play Showreel">
+                                    <div class="play-btn-pulse"></div>
+                                    <i data-lucide="play" class="play-btn-icon"></i>
+                                </button>
+                                <span class="play-btn-label">STREAM SHOWREEL</span>
+                            </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            
+            <!-- Scroll Indicator -->
+            <a href="#portfolio" class="scroll-indicator" aria-label="Scroll to Portfolio">
+                <span class="scroll-text">SCROLL TO DISCOVER</span>
+                <div class="scroll-mouse">
+                    <span class="scroll-wheel"></span>
+                </div>
+            </a>
+        </section>
+
+        <!-- Dynamic Stats Strip -->
+        <section id="stats-strip" class="stats-strip-container redesign-only">
+            <div class="container">
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <h3 class="stat-number">4+</h3>
+                        <p class="stat-label">YEARS EXPERIENCE</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3 class="stat-number">500+</h3>
+                        <p class="stat-label">VIDEOS EDITED</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3 class="stat-number">4+</h3>
+                        <p class="stat-label">CHANNELS MANAGED</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3 class="stat-number">10+</h3>
+                        <p class="stat-label">AI TOOLS MASTERED</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Infinite Skills Marquee -->
+        <section id="skills-marquee-section">
+            <div class="marquee-container">
+                <div class="marquee-content">
+                    <span>VIDEO EDITING</span><span class="marquee-dot"></span>
+                    <span>MOTION GRAPHICS</span><span class="marquee-dot"></span>
+                    <span>AI TALKING HEADS</span><span class="marquee-dot"></span>
+                    <span>MLM &amp; CRYPTO EXPLAINERS</span><span class="marquee-dot"></span>
+                    <span>SOFTWARE DEMOS</span><span class="marquee-dot"></span>
+                    <span>YOUTUBE MANAGEMENT</span><span class="marquee-dot"></span>
+                    <span>GRAPHICS DESIGN</span><span class="marquee-dot"></span>
+                    
+                    <!-- Duplicate for infinite effect -->
+                    <span>VIDEO EDITING</span><span class="marquee-dot"></span>
+                    <span>MOTION GRAPHICS</span><span class="marquee-dot"></span>
+                    <span>AI TALKING HEADS</span><span class="marquee-dot"></span>
+                    <span>MLM &amp; CRYPTO EXPLAINERS</span><span class="marquee-dot"></span>
+                    <span>SOFTWARE DEMOS</span><span class="marquee-dot"></span>
+                    <span>YOUTUBE MANAGEMENT</span><span class="marquee-dot"></span>
+                    <span>GRAPHICS DESIGN</span><span class="marquee-dot"></span>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- Dynamic Sections Wrapper for Reordering -->
+        <div id="dynamic-sections-container">
+        
+        <!-- Interactive Portfolio Showcase -->
+        <section id="portfolio" class="section">
+            <div class="container">
+                
+                <div class="section-header">
+                    <div class="section-badge">SELECTED ARCHIVES</div>
+                    <h2 class="section-title">Video Editing Showcase</h2>
+                    <p class="section-desc">A premium portfolio gallery displaying actual creations built for <strong>Code Elevator</strong>, <strong>MLM World</strong>, and <strong>Gujarat Career Academy</strong>, streaming directly from YouTube.</p>
+                </div>
+                
+                <!-- Category Filter -->
+                <div class="portfolio-filters" id="portfolio-filters">
+                    <button class="filter-btn active" data-filter="all">All Creations</button>
+                    <button class="filter-btn" data-filter="long">Landscape Videos</button>
+                    <button class="filter-btn" data-filter="shorts">Shorts &amp; Reels</button>
+                    <button class="filter-btn" data-filter="graphics">Graphics &amp; Design</button>
+                </div>
+                
+                <!-- Restructured Video Editing Showcase -->
+                <div id="portfolio-grids-container">
+                <!-- ==========================================
+                     LONG FORM VIDEOS SECTION (16:9 Landscape - 3 Columns)
+                     ========================================== -->
+                <div class="portfolio-grid grid-16-9" id="long-videos-grid">
+                    
+                    <!-- Item 1: nV6XN3XC7bA (long) -->
+                    <div class="portfolio-item show-item" data-category="long" id="project-long-1">
+                        <div class="project-card video-trigger-card" data-video-id="nV6XN3XC7bA">
+                            <div class="project-media aspect-16-9">
+                                <img src="https://img.youtube.com/vi/nV6XN3XC7bA/hqdefault.jpg" alt="Professional Video Editing Portfolio">
+                                <canvas class="preview-canvas"></canvas>
+                                <div class="project-overlay-glow"></div>
+                                <div class="project-view-badge">
+                                    <i data-lucide="play" class="play-icon"></i>
+                                    <span>STREAM SHOWCASE</span>
+                                </div>
+                            </div>
+                            <div class="project-details">
+                                <span class="project-category">Long Video / Portfolio Reel</span>
+                                <h3 class="project-title">Amit's Primary Edit Reel</h3>
+                                <p class="project-desc">Amit Sharma's premier video portfolio highlights reel, showcasing advanced sound engineering, recurrent zoom corrections, and cinematic rec.709 color grading.</p>
+                                <div class="project-meta">
+                                    <span>Client: Self / Studio</span>
+                                    <span>Year: 2026</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 2: BGVhstPnexk (long) -->
+                    <div class="portfolio-item show-item" data-category="long" id="project-long-2">
+                        <div class="project-card video-trigger-card" data-video-id="BGVhstPnexk">
+                            <div class="project-media aspect-16-9">
+                                <img src="https://img.youtube.com/vi/BGVhstPnexk/hqdefault.jpg" alt="Binary MLM SaaS Walkthrough">
+                                <canvas class="preview-canvas"></canvas>
+                                <div class="project-overlay-glow"></div>
+                                <div class="project-view-badge">
+                                    <i data-lucide="play" class="play-icon"></i>
+                                    <span>STREAM DEMO</span>
+                                </div>
+                            </div>
+                            <div class="project-details">
+                                <span class="project-category">Long Video / Software Demos</span>
+                                <h3 class="project-title">Binary MLM SaaS Walkthrough</h3>
+                                <p class="project-desc">A polished walkthrough video mapping user dash panels, admin control structures, wallet histories, and binary network hierarchy updates.</p>
+                                <div class="project-meta">
+                                    <span>Client: Code Elevator</span>
+                                    <span>Year: 2026</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 3: yrEBDO4mW6s (long) -->
+                    <div class="portfolio-item show-item" data-category="long" id="project-long-3">
+                        <div class="project-card video-trigger-card" data-video-id="yrEBDO4mW6s">
+                            <div class="project-media aspect-16-9">
+                                <img src="https://img.youtube.com/vi/yrEBDO4mW6s/hqdefault.jpg" alt="Autopool Matrix Plan Explainer">
+                                <canvas class="preview-canvas"></canvas>
+                                <div class="project-overlay-glow"></div>
+                                <div class="project-view-badge">
+                                    <i data-lucide="sparkles" class="play-icon"></i>
+                                    <span>PLAY ANIMATION</span>
+                                </div>
+                            </div>
+                            <div class="project-details">
+                                <span class="project-category">Long Video / 2D Explainers</span>
+                                <h3 class="project-title">Autopool Matrix Plan Explainer</h3>
+                                <p class="project-desc">Engaging animated explainers mapping out smart contract structures, ledger distribution, and network levels with fluid typography elements.</p>
+                                <div class="project-meta">
+                                    <span>Client: MLM World</span>
+                                    <span>Year: 2025</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 4: 83O2G6EsLbo (long) -->
+                    <div class="portfolio-item show-item" data-category="long" id="project-long-4">
+                        <div class="project-card video-trigger-card" data-video-id="83O2G6EsLbo">
+                            <div class="project-media aspect-16-9">
+                                <img src="https://img.youtube.com/vi/83O2G6EsLbo/hqdefault.jpg" alt="Crypto Autopool System Demo">
+                                <canvas class="preview-canvas"></canvas>
+                                <div class="project-overlay-glow"></div>
+                                <div class="project-view-badge">
+                                    <i data-lucide="sparkles" class="play-icon"></i>
+                                    <span>PLAY ANIMATION</span>
+                                </div>
+                            </div>
+                            <div class="project-details">
+                                <span class="project-category">Long Video / 2D Explainers</span>
+                                <h3 class="project-title">Crypto Autopool System Demo</h3>
+                                <p class="project-desc">A polished 2D explainer sequence clarifying distributor levels, team commission structures, and ledger calculations for onboarding videos.</p>
+                                <div class="project-meta">
+                                    <span>Client: MLM World</span>
+                                    <span>Year: 2025</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 5: zMYfgGn5UTA (long) -->
+                    <div class="portfolio-item show-item" data-category="long" id="project-long-5">
+                        <div class="project-card video-trigger-card" data-video-id="zMYfgGn5UTA">
+                            <div class="project-media aspect-16-9">
+                                <img src="https://img.youtube.com/vi/zMYfgGn5UTA/hqdefault.jpg" alt="Crypto Exchange Backend Walkthrough">
+                                <canvas class="preview-canvas"></canvas>
+                                <div class="project-overlay-glow"></div>
+                                <div class="project-view-badge">
+                                    <i data-lucide="play" class="play-icon"></i>
+                                    <span>PLAY INTRO</span>
+                                </div>
+                            </div>
+                            <div class="project-details">
+                                <span class="project-category">Long Video / Branding &amp; Intros</span>
+                                <h3 class="project-title">Crypto Exchange Backend Walkthrough</h3>
+                                <p class="project-desc">High-octane YouTube intro sequence highlighting core logo vectors and text templates, synchronized to a dynamic custom sound foley layout.</p>
+                                <div class="project-meta">
+                                    <span>Client: Code Elevator</span>
+                                    <span>Year: 2025</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 6: bY1eIanc6_E (long) -->
+                    <div class="portfolio-item show-item" data-category="long" id="project-long-6">
+                        <div class="project-card video-trigger-card" data-video-id="bY1eIanc6_E">
+                            <div class="project-media aspect-16-9">
+                                <img src="https://img.youtube.com/vi/bY1eIanc6_E/hqdefault.jpg" alt="How MLM Software Works Demo">
+                                <canvas class="preview-canvas"></canvas>
+                                <div class="project-overlay-glow"></div>
+                                <div class="project-view-badge">
+                                    <i data-lucide="play" class="play-icon"></i>
+                                    <span>PLAY HIGHLIGHTS</span>
+                                </div>
+                            </div>
+                            <div class="project-details">
+                                <span class="project-category">Long Video / Event Highlight Edit</span>
+                                <h3 class="project-title">How MLM Software Works Demo</h3>
+                                <p class="project-desc">A fast-paced conference recap video combining multicamera footage, voice layers, and stylized transitions to deliver maximum audience interest.</p>
+                                <div class="project-meta">
+                                    <span>Client: Gujarat Career Academy</span>
+                                    <span>Year: 2025</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- ==========================================
+                     SHORTS & REELS SECTION (9:16 Portrait - 4 Columns)
+                     ========================================== -->
+                <div class="portfolio-grid grid-9-16" id="shorts-reels-grid">
+                    
+                    <!-- Item 1: XyK-5-t_nkw (shorts) -->
+                    <div class="portfolio-item show-item" data-category="shorts" id="project-shorts-1">
+                        <div class="project-card video-trigger-card" data-video-id="XyK-5-t_nkw">
+                            <div class="project-media aspect-9-16">
+                                <img src="https://img.youtube.com/vi/XyK-5-t_nkw/hqdefault.jpg" alt="SaaS App Launch Reel">
+                                <canvas class="preview-canvas"></canvas>
+                                <div class="project-overlay-glow"></div>
+                                <div class="project-view-badge">
+                                    <i data-lucide="play" class="play-icon"></i>
+                                    <span>STREAM SHORT</span>
+                                </div>
+                            </div>
+                            <div class="project-details">
+                                <span class="project-category">Shorts &amp; Reels / App Promos</span>
+                                <h3 class="project-title">SaaS App Launch Reel</h3>
+                                <p class="project-desc">Vertical promotional video detailing application metrics, user setups, and live tracking widgets with kinetic caption layouts.</p>
+                                <div class="project-meta">
+                                    <span>Client: Code Elevator</span>
+                                    <span>Year: 2026</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 2: iG9_Hw-bKms (shorts) -->
+                    <div class="portfolio-item show-item" data-category="shorts" id="project-shorts-2">
+                        <div class="project-card video-trigger-card" data-video-id="iG9_Hw-bKms">
+                            <div class="project-media aspect-9-16">
+                                <img src="https://img.youtube.com/vi/iG9_Hw-bKms/hqdefault.jpg" alt="Crypto Wallet Features Short">
+                                <canvas class="preview-canvas"></canvas>
+                                <div class="project-overlay-glow"></div>
+                                <div class="project-view-badge">
+                                    <i data-lucide="play" class="play-icon"></i>
+                                    <span>STREAM SHORT</span>
+                                </div>
+                            </div>
+                            <div class="project-details">
+                                <span class="project-category">Shorts &amp; Reels / Crypto Explainer</span>
+                                <h3 class="project-title">Crypto Wallet Features Short</h3>
+                                <p class="project-desc">Portrait reel explainer outlining how users check decentralized balances and manage wallet sync sequences securely.</p>
+                                <div class="project-meta">
+                                    <span>Client: MLM World</span>
+                                    <span>Year: 2025</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 3: q_6zS9x9kAw (shorts) -->
+                    <div class="portfolio-item show-item" data-category="shorts" id="project-shorts-3">
+                        <div class="project-card video-trigger-card" data-video-id="q_6zS9x9kAw">
+                            <div class="project-media aspect-9-16">
+                                <img src="https://img.youtube.com/vi/q_6zS9x9kAw/hqdefault.jpg" alt="Mobile Dashboard walkthrough">
+                                <canvas class="preview-canvas"></canvas>
+                                <div class="project-overlay-glow"></div>
+                                <div class="project-view-badge">
+                                    <i data-lucide="play" class="play-icon"></i>
+                                    <span>STREAM SHORT</span>
+                                </div>
+                            </div>
+                            <div class="project-details">
+                                <span class="project-category">Shorts &amp; Reels / App Promos</span>
+                                <h3 class="project-title">Mobile Dashboard Walkthrough</h3>
+                                <p class="project-desc">Vertical walkthrough of administrative metrics panels on mobile, showcasing dynamic text outlines and grid layouts.</p>
+                                <div class="project-meta">
+                                    <span>Client: Code Elevator</span>
+                                    <span>Year: 2026</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 4: yvD3Fw-bUwk (shorts) -->
+                    <div class="portfolio-item show-item" data-category="shorts" id="project-shorts-4">
+                        <div class="project-card video-trigger-card" data-video-id="yvD3Fw-bUwk">
+                            <div class="project-media aspect-9-16">
+                                <img src="https://img.youtube.com/vi/yvD3Fw-bUwk/hqdefault.jpg" alt="Binary Tree Visualizer Short">
+                                <canvas class="preview-canvas"></canvas>
+                                <div class="project-overlay-glow"></div>
+                                <div class="project-view-badge">
+                                    <i data-lucide="play" class="play-icon"></i>
+                                    <span>STREAM SHORT</span>
+                                </div>
+                            </div>
+                            <div class="project-details">
+                                <span class="project-category">Shorts &amp; Reels / UI UX Walkthrough</span>
+                                <h3 class="project-title">Binary Tree Visualizer Short</h3>
+                                <p class="project-desc">Vertical promotional showcase of a binary genealogy chart rendering dynamically on phone screens, with zoom adjustments.</p>
+                                <div class="project-meta">
+                                    <span>Client: Code Elevator</span>
+                                    <span>Year: 2026</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 5: r-E0Z8G3Gms (shorts) -->
+                    <div class="portfolio-item show-item" data-category="shorts" id="project-shorts-5">
+                        <div class="project-card video-trigger-card" data-video-id="r-E0Z8G3Gms">
+                            <div class="project-media aspect-9-16">
+                                <img src="https://img.youtube.com/vi/r-E0Z8G3Gms/hqdefault.jpg" alt="OBS Streaming Setup Reel">
+                                <canvas class="preview-canvas"></canvas>
+                                <div class="project-overlay-glow"></div>
+                                <div class="project-view-badge">
+                                    <i data-lucide="play" class="play-icon"></i>
+                                    <span>STREAM SHORT</span>
+                                </div>
+                            </div>
+                            <div class="project-details">
+                                <span class="project-category">Shorts &amp; Reels / Studio Walkthrough</span>
+                                <h3 class="project-title">OBS Streaming Setup Reel</h3>
+                                <p class="project-desc">Vertical tutorial outlining custom audio filter gates, broadcast latency syncing, and layout presets configured inside OBS Studio.</p>
+                                <div class="project-meta">
+                                    <span>Client: Gujarat Career Academy</span>
+                                    <span>Year: 2025</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 6: TzS_JszG9dE (shorts) -->
+                    <div class="portfolio-item show-item" data-category="shorts" id="project-shorts-6">
+                        <div class="project-card video-trigger-card" data-video-id="TzS_JszG9dE">
+                            <div class="project-media aspect-9-16">
+                                <img src="https://img.youtube.com/vi/TzS_JszG9dE/hqdefault.jpg" alt="e-Learning Dashboard UI Walkthrough">
+                                <canvas class="preview-canvas"></canvas>
+                                <div class="project-overlay-glow"></div>
+                                <div class="project-view-badge">
+                                    <i data-lucide="play" class="play-icon"></i>
+                                    <span>STREAM SHORT</span>
+                                </div>
+                            </div>
+                            <div class="project-details">
+                                <span class="project-category">Shorts &amp; Reels / UI UX Walkthrough</span>
+                                <h3 class="project-title">e-Learning Portal Short</h3>
+                                <p class="project-desc">Portrait reel showing the student dash interfaces, video folders, and quiz widgets optimized for Yuva Upnishad.</p>
+                                <div class="project-meta">
+                                    <span>Client: Yuva Upnishad Foundation</span>
+                                    <span>Year: 2024</span>
+                                </div>
+                    </div>
+                    
+                </div>
+
+                <!-- ==========================================
+                     GRAPHICS & DESIGN SECTION (4:3 Aspect - 4 Columns)
+                     ========================================== -->
+                <div class="portfolio-grid grid-graphics" id="graphics-grid">
+                    <!-- Loaded dynamically via app.js -->
+                </div>
+
+                </div> <!-- Close #portfolio-grids-container -->
+            </div>
+        </section>
+        
+        <!-- Services Section --> -->
+        <section id="services" class="section section-dark-bg">
+            <div class="container">
+                
+                <div class="section-header">
+                    <div class="section-badge">SERVICES DECK</div>
+                    <h2 class="section-title">Expert Offerings</h2>
+                    <p class="section-desc">Combining video production, animated motion graphics, and channel management to scale digital brands and YouTube ecosystems.</p>
+                </div>
+                
+                <div class="services-grid" id="services-grid-container">
+                    
+                    <!-- Card 1: Video Editing -->
+                    <div class="service-card" id="service-1">
+                        <div class="service-glow"></div>
+                        <div class="service-icon-box">
+                            <i data-lucide="video" class="service-icon"></i>
+                        </div>
+                        <h3 class="service-title">Video Editing</h3>
+                        <p class="service-text">High-retention commercial ads, software demos, and corporate videos with seamless pacing, sound mastering, and clean color grading.</p>
+                        <ul class="service-bullets">
+                            <li>Software Demos &amp; Walkthroughs</li>
+                            <li>Audio &amp; Voiceover Mastering</li>
+                            <li>Advanced Color Grading (Rec.709)</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Card 2: Motion Graphics -->
+                    <div class="service-card" id="service-2">
+                        <div class="service-glow"></div>
+                        <div class="service-icon-box">
+                            <i data-lucide="sparkles" class="service-icon"></i>
+                        </div>
+                        <h3 class="service-title">Motion Graphics</h3>
+                        <p class="service-text">Interactive 2D animated explainers, compensation structure visualizations, kinetic typography, and premium branding assets.</p>
+                        <ul class="service-bullets">
+                            <li>2D Explainers &amp; Visualizers</li>
+                            <li>Kinetic Typography Promos</li>
+                            <li>Custom Vector Asset Design</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Card 3: Graphic Design -->
+                    <div class="service-card" id="service-3">
+                        <div class="service-glow"></div>
+                        <div class="service-icon-box">
+                            <i data-lucide="palette" class="service-icon"></i>
+                        </div>
+                        <h3 class="service-title">Graphic Design</h3>
+                        <p class="service-text">Conversion-optimized social media banners, advertisement layouts, and digital branding assets designed to drive leads and sales.</p>
+                        <ul class="service-bullets">
+                            <li>High-CTR Marketing Ads</li>
+                            <li>Brand Identity Assets</li>
+                            <li>Social Media Campaign Visuals</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Card 4: AI Content Production -->
+                    <div class="service-card" id="service-4">
+                        <div class="service-glow"></div>
+                        <div class="service-icon-box">
+                            <i data-lucide="cpu" class="service-icon"></i>
+                        </div>
+                        <h3 class="service-title">AI Content Production</h3>
+                        <p class="service-text">Integrating state-of-the-art AI video and audio generation tools to accelerate output speeds while maintaining premium visual quality.</p>
+                        <ul class="service-bullets">
+                            <li>AI Avatar Conversions</li>
+                            <li>Text-to-Video Pipelines</li>
+                            <li>Dynamic Voice Synthesis</li>
+                        </ul>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Toolkit & Statistics -->
+        <section id="expertise" class="section">
+            <div class="container">
+                <div class="expertise-grid">
+                    
+                    <!-- Left: Skills and Tools -->
+                    <div class="expertise-skills">
+                        <div class="section-badge">SOFTWARE TOOLKIT</div>
+                        <h2 class="section-title">Technical Proficiency</h2>
+                        <p class="section-desc">A professional workflow utilizing industry-standard creative programs, live streaming layouts, and state-of-the-art AI design pipelines.</p>
+                        
+                        <div class="software-grid" id="software-skills-grid">
+                            <div class="software-card">
+                                <i data-lucide="video" class="software-icon"></i>
+                                <h4 class="software-name">Adobe Premiere Pro</h4>
+                                <span class="software-tag">Video Editing</span>
+                            </div>
+                            <div class="software-card">
+                                <i data-lucide="sparkles" class="software-icon"></i>
+                                <h4 class="software-name">Adobe After Effects</h4>
+                                <span class="software-tag">Motion Graphics</span>
+                            </div>
+                            <div class="software-card">
+                                <i data-lucide="image" class="software-icon"></i>
+                                <h4 class="software-name">Photoshop &amp; Illustrator</h4>
+                                <span class="software-tag">Graphics Design</span>
+                            </div>
+                            <div class="software-card">
+                                <i data-lucide="cpu" class="software-icon"></i>
+                                <h4 class="software-name">HeyGen &amp; ElevenLabs</h4>
+                                <span class="software-tag">AI Video &amp; Voice</span>
+                            </div>
+                            <div class="software-card">
+                                <i data-lucide="radio" class="software-icon"></i>
+                                <h4 class="software-name">OBS Studio</h4>
+                                <span class="software-tag">Live Stream Setup</span>
+                            </div>
+                            <div class="software-card">
+                                <i data-lucide="pencil-ruler" class="software-icon"></i>
+                                <h4 class="software-name">CorelDraw &amp; Canva</h4>
+                                <span class="software-tag">Layout &amp; Branding</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- About Me & CV Section -->
+        <section id="about" class="section">
+            <div class="container">
+                <div class="about-grid">
+                    
+                    <!-- Left: Bio & Editorial Content -->
+                    <div class="about-bio">
+                        <div class="section-badge">ABOUT AMIT</div>
+                        <h2 class="section-title">Amit Sharma</h2>
+                        <p class="bio-subtitle legacy-only">Senior Video Editor &amp; Motion Designer</p>
+                        <p class="bio-subtitle redesign-only" style="font-weight: 600; color: var(--accent-cyan); margin-bottom: 20px;">Senior Video Editor &amp; AI Video Expert • YouTube Studio Manager</p>
+                        
+                        <div class="bio-features-list legacy-only">
+                            <div class="bio-feature-item">
+                                <div class="bio-feature-icon-wrapper">
+                                    <i data-lucide="video" class="bio-feature-icon"></i>
+                                </div>
+                                <div class="bio-feature-divider"></div>
+                                <p class="bio-feature-text">Over 4 years of professional experience delivering end-to-end creative production, specializing in high-retention video editing, SaaS software demos, and interactive motion graphics.</p>
+                            </div>
+                            <div class="bio-feature-item">
+                                <div class="bio-feature-icon-wrapper">
+                                    <i data-lucide="cpu" class="bio-feature-icon"></i>
+                                </div>
+                                <div class="bio-feature-divider"></div>
+                                <p class="bio-feature-text">Pioneering AI-assisted workflows using Runway, Midjourney, HeyGen, and ElevenLabs to accelerate content output speed while maintaining premium creative design standards.</p>
+                            </div>
+                            <div class="bio-feature-item">
+                                <div class="bio-feature-icon-wrapper">
+                                    <i data-lucide="briefcase" class="bio-feature-icon"></i>
+                                </div>
+                                <div class="bio-feature-divider"></div>
+                                <p class="bio-feature-text">Partnering with marketing teams, digital brands, and international clients to construct scalable video pipelines that drive customer acquisition and user engagement.</p>
+                            </div>
+                        </div>
+
+                        <div class="bio-text-redesign redesign-only" style="margin-bottom: 25px;">
+                            <p style="font-size: 1.05rem; line-height: 1.6; margin-bottom: 15px; color: var(--text-primary);">Creative video editor and studio manager with 4+ years of expertise in motion graphics, AI video production, and high-converting digital content — built for SaaS, MLM, and crypto platforms.</p>
+                            <p style="font-size: 0.95rem; line-height: 1.6; color: #ffffff;">Engineering background gives a unique edge in technical explainer videos — turning complex software and blockchain concepts into visuals audiences actually understand and act on.</p>
+                        </div>
+                        
+                        <!-- Education Subcard -->
+                        <div class="education-box legacy-only">
+                            <h4 class="edu-title"><i data-lucide="graduation-cap" class="edu-icon"></i> Education Background</h4>
+                            <div class="edu-list" id="edu-list-container">
+                                <div class="edu-item">
+                                    <span class="edu-deg">Bachelor of Engineering in Mechanical</span>
+                                    <span class="edu-loc">C.K. Pithawala College of Engineering &amp; Technology, Surat (GTU)</span>
+                                    <span class="edu-meta">2012 - 2015 • CGPA: 7.50</span>
+                                </div>
+                                <div class="edu-item">
+                                    <span class="edu-deg">Diploma in Mechanical Engineering</span>
+                                    <span class="edu-loc">Government Polytechnic, Valsad (GTU)</span>
+                                    <span class="edu-meta">2009 - 2012 • CGPA: 8.47</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footnote Education for Redesign -->
+                        <div class="about-footnote-wrapper redesign-only" style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                            <p class="about-footnote" style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;"><i data-lucide="graduation-cap" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 4px; color: var(--accent-cyan);"></i> B.E. Mechanical Engineering — C.K. Pithawala College, Surat (GTU) • 2012–2015</p>
+                        </div>
+
+                        <!-- Download CV Button in About Section -->
+                        <div class="about-actions redesign-only" style="margin-top: 20px;">
+                            <a href="./assets/Amit_Sharma_CV.pdf" download class="btn btn-primary magnetic" style="border-radius: 50px; padding: 12px 28px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--accent-cyan); box-shadow: none !important;">
+                                <i data-lucide="download" style="width: 14px; height: 14px; color: #ffffff;"></i> <span style="color: #ffffff;">Download CV</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Right: Vertical Timeline -->
+                    <div class="about-timeline" id="experience">
+                        <div class="timeline-title">Career Milestones</div>
+                        
+                        <div class="timeline-container" id="timeline-events-container">
+                            <div class="timeline-line"></div>
+                            
+                            <!-- Timeline Event 1 -->
+                            <div class="timeline-event" id="timeline-event-1">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-card-wrapper">
+                                    <span class="timeline-year">Nov 2025 - Present</span>
+                                    <h4 class="timeline-headline">Senior Video Editor &amp; Motion Designer</h4>
+                                    <span class="timeline-org">Code Elevator, Surat</span>
+                                    <p class="timeline-desc">Produce high-converting promotional videos and SaaS software explainers. Coordinated with marketing teams to build automated talking-head AI avatar workflows, decreasing video production turnaround times by 40%.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Timeline Event 2 -->
+                            <div class="timeline-event" id="timeline-event-2">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-card-wrapper">
+                                    <span class="timeline-year">Sep 2025 - Nov 2025</span>
+                                    <h4 class="timeline-headline">Digital Studio Manager &amp; Video Editor</h4>
+                                    <span class="timeline-org">Gujarat Career Academy, Surat</span>
+                                    <p class="timeline-desc">Managed complete video production cycle for digital ad campaigns. Designed high-CTR YouTube thumbnails, motion graphics sequences, and social media reels that increased click-through rates by 25%.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Timeline Event 3 -->
+                            <div class="timeline-event" id="timeline-event-3">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-card-wrapper">
+                                    <span class="timeline-year">Aug 2022 - Jul 2025</span>
+                                    <h4 class="timeline-headline">Lead Video Editor &amp; Content Strategist</h4>
+                                    <span class="timeline-org">Yuva Upnishad Foundation Online, Surat</span>
+                                    <p class="timeline-desc">Supervised a content team of writers and designers to publish educational video libraries. Coordinated studio recording operations, live broadcasts, and audio mastering pipelines.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Timeline Event 4 -->
+                            <div class="timeline-event" id="timeline-event-4">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-card-wrapper">
+                                    <span class="timeline-year">Feb 2020 - Aug 2022</span>
+                                    <h4 class="timeline-headline">Digital Content &amp; Graphic Designer</h4>
+                                    <span class="timeline-org">Yuva Upnishad Publication, Surat</span>
+                                    <p class="timeline-desc">Designed publication layouts, marketing banners, and visual assets. Coordinated printing production cycles and optimized layout review pipelines.</p>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+
+        <!-- Futuristic Contact Section -->
+        <section id="contact" class="section section-dark-bg">
+            <div class="container">
+                <div class="contact-grid">
+                    
+                    <!-- Left: Contact Details and Instant Booking -->
+                    <div class="contact-details-box">
+                        <div class="section-badge">INQUIRIES</div>
+                        <h2 class="section-title">Let's Work Together</h2>
+                        <p class="section-desc">Discuss a video project, animated explainer sequence, or request assistance managing your studio setup.</p>
+                        
+                        <div class="contact-info-list">
+                            <!-- Email -->
+                            <div class="info-item">
+                                <i data-lucide="mail" class="info-icon"></i>
+                                <div class="info-meta">
+                                    <span class="info-label">EMAIL DIRECT</span>
+                                    <a href="mailto:amits1417@gmail.com" class="info-value">amits1417@gmail.com</a>
+                                </div>
+                            </div>
+                            
+                            <!-- Phone -->
+                            <div class="info-item">
+                                <i data-lucide="phone" class="info-icon"></i>
+                                <div class="info-meta">
+                                    <span class="info-label">PHONE DIRECT</span>
+                                    <a href="tel:+918866414870" class="info-value">+91 88664 14870</a>
+                                </div>
+                            </div>
+                            
+                            <!-- Location -->
+                            <div class="info-item">
+                                <i data-lucide="map-pin" class="info-icon"></i>
+                                <div class="info-meta">
+                                    <span class="info-label">LOCATION</span>
+                                    <span class="info-value">Udhna, Surat, Gujarat, India</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="quick-ctas">
+                            <!-- WhatsApp CTA -->
+                            <a href="https://wa.me/918866414870?text=Hi%20Amit,%20I%20visited%20your%20portfolio%20website%20and%20would%20like%20to%20discuss%20work-related%20projects." target="_blank" rel="noopener noreferrer" class="btn btn-secondary quick-btn magnetic" id="whatsapp-cta">
+                                <i data-lucide="message-square"></i>
+                                <span>WhatsApp Direct chat</span>
+                            </a>
+                         </div>
+                    </div>
+                    
+                    <!-- Right: Futuristic Booking Form -->
+                    <div class="contact-form-box">
+                        <div class="form-glow"></div>
+                        <h3 class="form-title">Send a Message</h3>
+                        <p class="redesign-only" style="font-size: 0.8rem; color: var(--accent-cyan); margin-bottom: 20px; font-weight: 600;"><span class="badge-dot" style="display: inline-block; background-color: var(--accent-cyan); width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; box-shadow: 0 0 8px var(--accent-cyan);"></span>Available for Projects — Surat & Remote</p>
+                        
+                        <form id="project-brief-form" onsubmit="return false;">
+                            
+                            <!-- Name -->
+                            <div class="form-group">
+                                <input type="text" id="form-name" class="form-input" placeholder=" " required>
+                                <label for="form-name" class="form-label">Full Name</label>
+                                <span class="input-line"></span>
+                            </div>
+                            
+                            <!-- Email -->
+                            <div class="form-group">
+                                <input type="email" id="form-email" class="form-input" placeholder=" " required>
+                                <label for="form-email" class="form-label">Email Address</label>
+                                <span class="input-line"></span>
+                            </div>
+                            
+                            <!-- Company Name -->
+                            <div class="form-group">
+                                <input type="text" id="form-company" class="form-input" placeholder=" " required>
+                                <label for="form-company" class="form-label">Company Name</label>
+                                <span class="input-line"></span>
+                            </div>
+                            
+                            <!-- Budget Slider (visible in legacy version) -->
+                            <div class="slider-group legacy-only">
+                                <div class="slider-header">
+                                    <span class="slider-label">Estimated Budget</span>
+                                    <span class="slider-value" id="budget-value">₹50,000</span>
+                                </div>
+                                <input type="range" id="form-budget" class="form-range" min="10000" max="150000" step="5000" value="50000">
+                                <div class="slider-range-labels">
+                                    <span>₹10,000</span>
+                                    <span>₹1,50,000+</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Message -->
+                            <div class="form-group">
+                                <textarea id="form-message" class="form-input form-textarea" placeholder=" " required>Hi Amit, I looked at your portfolio and would like to discuss more.</textarea>
+                                <label for="form-message" class="form-label">Message</label>
+                                <span class="input-line"></span>
+                            </div>
+                            
+                            <!-- Form Actions Group -->
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+                                <button type="submit" class="btn btn-primary form-submit-btn magnetic" id="form-submit-btn" style="width: 100%; justify-content: center; margin: 0;">
+                                    <span>Email Me</span>
+                                    <i data-lucide="send" class="submit-icon"></i>
+                                </button>
+                                <div style="display: flex; gap: 10px; width: 100%;">
+                                    <a href="./assets/Amit_Sharma_CV.pdf" download class="btn btn-secondary magnetic" style="flex: 1; text-align: center; justify-content: center; font-size: 0.85rem; padding: 12px; margin: 0; display: flex; align-items: center; gap: 6px;">
+                                        <i data-lucide="download" style="width: 16px; height: 16px;"></i>
+                                        <span>Download CV</span>
+                                    </a>
+                                    <a href="https://wa.me/918866414870?text=Hi%20Amit,%20I%20visited%20your%20portfolio%20website%20and%20would%20like%20to%20discuss%20work-related%20projects." target="_blank" rel="noopener noreferrer" class="btn btn-secondary magnetic" style="flex: 1; text-align: center; justify-content: center; font-size: 0.85rem; padding: 12px; margin: 0; display: flex; align-items: center; gap: 6px; background: rgba(37, 211, 102, 0.05); border-color: rgba(37, 211, 102, 0.2);">
+                                        <i data-lucide="message-square" style="width: 16px; height: 16px; color: #25D366;"></i>
+                                        <span>WhatsApp</span>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                        </form>
+                        
+                        <!-- Success Message Panel -->
+                        <div id="form-success-panel" class="form-success-panel">
+                            <i data-lucide="shield-check" class="success-icon"></i>
+                            <h4>Message Sent!</h4>
+                            <p>Thank you for reaching out. I will reply within 12 hours.</p>
+                            <button class="btn btn-secondary btn-small" id="reset-form-btn">New Message</button>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+        </div>
+        
+    </main>
+
+    <!-- Video Modal Player overlay -->
+    <div id="video-modal" class="video-modal-overlay">
+        <!-- Navigation Buttons for Lightbox -->
+        <button class="lightbox-nav-btn prev-btn" id="lightbox-prev-btn" aria-label="Previous Graphic" style="display: none;">
+            <i data-lucide="chevron-left"></i>
+        </button>
+        <button class="lightbox-nav-btn next-btn" id="lightbox-next-btn" aria-label="Next Graphic" style="display: none;">
+            <i data-lucide="chevron-right"></i>
+        </button>
+
+        <div class="video-modal-container">
+            <button class="video-modal-close" id="video-modal-close-btn" aria-label="Close Video Player">
+                <i data-lucide="x"></i>
+            </button>
+            <div class="video-modal-iframe-wrapper">
+                <iframe id="video-modal-iframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+        
+        <!-- Bottom Gallery Thumbnail Strip -->
+        <div class="lightbox-gallery-strip" id="lightbox-gallery-strip"></div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="container footer-container">
+            <div class="footer-top">
+                <a href="#" class="footer-logo">
+                    <span>AMIT</span><span class="logo-dot">.</span>
+                </a>
+                
+                <div class="footer-socials">
+                    <a href="https://wa.me/918866414870" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="WhatsApp Direct Chat">
+                        <i data-lucide="message-square"></i>
+                    </a>
+                    <a href="mailto:amits1417@gmail.com" class="social-link" aria-label="Email Address">
+                        <i data-lucide="mail"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p class="copyright legacy-only">&copy; 2026 Amit Sharma Visuals. All Rights Reserved.</p>
+                <p class="copyright redesign-only">&copy; 2026 Amit Sharma Visuals. All Rights Reserved.</p>
+                <a href="#hero" class="back-to-top magnetic" id="back-to-top" aria-label="Back to Top">
+                    <span class="back-text">BACK TO TOP</span>
+                    <i data-lucide="arrow-up" class="back-icon"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Studio Creator Mode Toggle HUD -->
+    <div class="studio-hud-toggle" id="studio-hud-toggle">
+        <div class="studio-hud-glow"></div>
+        <button class="studio-toggle-btn" id="studio-toggle-btn">
+            <i data-lucide="settings" class="studio-icon"></i>
+            <span class="studio-btn-text">STUDIO CREATOR MODE</span>
+        </button>
+        <button class="studio-toggle-btn btn-danger" id="studio-bulk-delete-btn" style="display: none; background: #ea4335 !important; border-color: #ea4335 !important; color: #fff !important; box-shadow: 0 10px 30px rgba(234, 67, 53, 0.3);">
+            <i data-lucide="trash-2" class="studio-icon"></i>
+            <span class="studio-btn-text">DELETE SELECTED</span>
+        </button>
+    </div>
+
+    <!-- Password Prompt Modal (Glassmorphic) -->
+    <div id="password-lock-modal" class="project-editor-modal-overlay">
+        <div class="project-modal-container" style="max-width: 400px; padding: 25px;">
+            <div class="project-modal-header" style="margin-bottom: 15px; padding-bottom: 10px;">
+                <h3>CMS Access Authorization</h3>
+                <button class="project-modal-close" id="password-modal-close-btn" aria-label="Close Modal">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 20px;">Please enter your Studio password to enable Creator editing controls.</p>
+            <form id="password-lock-form" onsubmit="return false;">
+                <div class="modal-form-group" style="margin-bottom: 15px;">
+                    <label for="lock-password-input">Studio Password</label>
+                    <input type="password" id="lock-password-input" required placeholder="Enter password (default: admin123)" style="width: 100%;">
+                </div>
+                <div class="modal-actions" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.05);">
+                    <button type="submit" class="btn btn-primary" id="password-submit-btn" style="width: 100%; padding: 12px;">
+                        <span>Authorize Access</span>
+                        <i data-lucide="shield-alert"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Project Editor Modal (Glassmorphic) -->
+    <div id="project-editor-modal" class="project-editor-modal-overlay">
+        <div class="project-modal-container">
+            <div class="project-modal-header">
+                <h3 id="modal-title-text">Add New Project</h3>
+                <button class="project-modal-close" id="project-modal-close-btn" aria-label="Close Modal">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form id="project-modal-form" onsubmit="return false;">
+                <input type="hidden" id="edit-project-id" value="">
+                <input type="hidden" id="modal-project-category" value="long">
+                
+                <div class="form-group-row">
+                    <div class="modal-form-group" id="modal-title-group">
+                        <label for="modal-project-title">Project Title</label>
+                        <input type="text" id="modal-project-title" placeholder="Leave empty to auto-fetch from YouTube">
+                    </div>
+                </div>
+
+                <div class="form-group-row border-top">
+                    <div class="modal-form-group">
+                        <label for="modal-media-source">Media Stream Source</label>
+                        <select id="modal-media-source">
+                            <option value="link">External URL / YouTube ID</option>
+                            <option value="upload">Upload File (Video / Image)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="modal-form-group" id="media-link-container">
+                        <label for="modal-media-link">YouTube ID or Video Link</label>
+                        <input type="text" id="modal-media-link" placeholder="e.g. nV6XN3XC7bA">
+                    </div>
+                    
+                    <div class="modal-form-group hidden" id="media-upload-container">
+                        <label for="modal-media-file" class="file-upload-label">
+                            <i data-lucide="upload-cloud"></i> Choose Media File
+                        </label>
+                        <input type="file" id="modal-media-file" class="file-upload-input" accept="video/*,image/*">
+                        <span id="media-file-status" class="file-status-text">No file chosen</span>
+                    </div>
+                </div>
+
+                <div class="form-group-row">
+                    <div class="modal-form-group">
+                        <label for="modal-thumb-source">Thumbnail Source</label>
+                        <select id="modal-thumb-source">
+                            <option value="auto">Auto-detect (YouTube) / Link</option>
+                            <option value="upload">Upload Custom Image</option>
+                            <option value="timeline">Select from Video Timeline</option>
+                        </select>
+                    </div>
+                    
+                    <div class="modal-form-group" id="thumb-link-container">
+                        <label for="modal-thumb-link">Thumbnail Image URL</label>
+                        <input type="text" id="modal-thumb-link" placeholder="e.g. https://img.youtube.com/vi/...">
+                    </div>
+                    
+                    <div class="modal-form-group hidden" id="thumb-upload-container">
+                        <label for="modal-thumb-file" class="file-upload-label">
+                            <i data-lucide="image"></i> Choose Thumbnail Image
+                        </label>
+                        <input type="file" id="modal-thumb-file" class="file-upload-input" accept="image/*">
+                        <span id="thumb-file-status" class="file-status-text">No file chosen</span>
+                    </div>
+                    
+                    <div class="modal-form-group hidden" id="thumb-timeline-container" style="grid-column: span 2; width: 100%;">
+                        <label>Select Thumbnail from Video Timeline</label>
+                        <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 8px;">Load a local uploaded video above, then drag the slider to capture the exact frame.</p>
+                        <div style="display: flex; gap: 15px; align-items: center; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 4px; border: 1px solid var(--border-color);">
+                            <div style="width: 120px; height: 68px; background: #000; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;">
+                                <video id="timeline-picker-video" style="width: 100%; height: 100%; object-fit: cover;" muted></video>
+                                <img id="timeline-picker-youtube-img" style="width: 100%; height: 100%; object-fit: cover; display: none;" alt="YouTube Thumbnail Preview">
+                                <span id="timeline-picker-error" style="position: absolute; font-size: 0.6rem; color: #ff3333; text-align: center; display: none;">No Video Loaded</span>
+                            </div>
+                            <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+                                <input type="range" id="timeline-picker-range" min="0" max="100" value="0" style="width: 100%; accent-color: var(--accent-cyan); cursor: pointer;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-muted);">
+                                    <span id="timeline-picker-time">0:00</span>
+                                    <button type="button" id="btn-capture-frame" class="console-btn btn-primary" style="padding: 4px 10px; font-size: 0.7rem; margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i data-lucide="camera" style="width: 12px; height: 12px;"></i> Capture Frame
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="modal-upload-progress-container" class="upload-progress-container hidden">
+                    <div class="progress-bar-label">Uploading: <span id="upload-percent-text">0%</span></div>
+                    <div class="modal-progress-bg">
+                        <div id="modal-upload-progress-bar" class="modal-upload-progress-bar"></div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel-btn" id="modal-cancel-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary modal-save-btn" id="modal-save-btn">
+                        <span>Save Project</span>
+                        <i data-lucide="check"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Floating Vertical Scroll Spy Side Navigation -->
+    <nav class="side-scroll-spy" id="side-scroll-spy">
+        <ul>
+            <li><a href="#hero" class="spy-link active" data-target="hero"><span class="spy-dot-container"><span class="spy-dot"></span></span><span class="spy-label">Home</span></a></li>
+            <li><a href="#portfolio" class="spy-link" data-target="portfolio"><span class="spy-dot-container"><span class="spy-dot"></span></span><span class="spy-label">Showcase</span></a></li>
+            <li><a href="#about" class="spy-link" data-target="about"><span class="spy-dot-container"><span class="spy-dot"></span></span><span class="spy-label">About &amp; CV</span></a></li>
+            <li><a href="#expertise" class="spy-link" data-target="expertise"><span class="spy-dot-container"><span class="spy-dot"></span></span><span class="spy-label">Toolkit</span></a></li>
+            <li><a href="#services" class="spy-link" data-target="services"><span class="spy-dot-container"><span class="spy-dot"></span></span><span class="spy-label">Services</span></a></li>
+            <li><a href="#testimonials" class="spy-link" data-target="testimonials"><span class="spy-dot-container"><span class="spy-dot"></span></span><span class="spy-label">Reviews</span></a></li>
+            <li><a href="#contact" class="spy-link" data-target="contact"><span class="spy-dot-container"><span class="spy-dot"></span></span><span class="spy-label">Contact</span></a></li>
+        </ul>
+    </nav>
+
+    <!-- Studio Console Drawer / Local CMS Admin -->
+    <div id="studio-console-drawer" class="studio-console-drawer">
+        <div class="console-drawer-header" id="console-drawer-trigger">
+            <div class="console-drawer-title" style="display: flex; align-items: center; gap: 10px;">
+                <span class="console-dot-green"></span>
+                <span>STUDIO DEVELOPER HUB / LOCAL CMS</span>
+                <div id="cms-cloud-sync-status" class="cms-sync-status-badge synced" style="font-size: 0.62rem; padding: 2px 7px; border-radius: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; border: 1px solid rgba(16, 185, 129, 0.2); background: rgba(16, 185, 129, 0.1); color: #10b981; transition: all 0.3s ease;">
+                    <span class="sync-status-dot" style="width: 5px; height: 5px; border-radius: 50%; display: inline-block; background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+                    <span class="sync-status-text">Saved</span>
+                </div>
+            </div>
+            <div class="console-drawer-arrow">
+                <i data-lucide="chevron-up" id="console-drawer-arrow-icon"></i>
+            </div>
+        </div>
+        <div class="console-drawer-content">
+            <p class="console-drawer-desc">Direct database administration. All updates sync immediately to client local storage.</p>
+            <div class="console-columns-grid">
+                <!-- Column 1: DB Tools -->
+                <div class="console-column">
+                    <h4 class="console-col-title">Showcase Data Tools</h4>
+                    <div class="console-actions-grid">
+                        <button class="console-btn btn-danger" id="console-reset-btn">
+                            <i data-lucide="rotate-ccw"></i>
+                            <span>Reset Default Showcase</span>
+                        </button>
+                        <button class="console-btn btn-primary" id="console-export-btn">
+                            <i data-lucide="download"></i>
+                            <span>Export JSON Database</span>
+                        </button>
+                        <div class="console-import-wrapper">
+                            <label for="console-import-file" class="console-btn btn-secondary">
+                                <i data-lucide="upload"></i>
+                                <span>Import JSON Database</span>
+                            </label>
+                            <input type="file" id="console-import-file" accept=".json" class="hidden">
+                        </div>
+                    </div>
+                    <!-- Firebase Cloud Sync Controls -->
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <label for="console-firebase-url" style="font-size: 0.55rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Firebase DB URL</label>
+                            <input type="text" id="console-firebase-url" placeholder="https://your-project-default-rtdb.firebaseio.com" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: #fff; padding: 6px; border-radius: 4px; font-size: 0.75rem; outline: none; width: 100%;">
+                        </div>
+                        <button type="button" class="console-btn btn-success" id="console-firebase-sync-btn" style="padding: 8px; width: 100%; margin: 0; background: var(--accent-cyan); color: var(--bg-primary); font-weight: 700; border: none; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 4px; cursor: pointer;">
+                            <i data-lucide="cloud-lightning"></i>
+                            <span>Sync to Cloud</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Column 2: Studio Security Password -->
+                <div class="console-column">
+                    <h4 class="console-col-title">Studio Password Lock</h4>
+                    <form id="console-password-form" onsubmit="return false;" style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <label for="console-pass-current" style="font-size: 0.55rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Current Password</label>
+                            <input type="password" id="console-pass-current" required placeholder="Current password" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: #fff; padding: 6px; border-radius: 4px; font-size: 0.75rem; outline: none;">
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <label for="console-pass-new" style="font-size: 0.55rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">New Password</label>
+                            <input type="password" id="console-pass-new" required placeholder="New password" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: #fff; padding: 6px; border-radius: 4px; font-size: 0.75rem; outline: none;">
+                        </div>
+                        <button type="submit" class="console-btn btn-primary" id="change-pass-submit" style="padding: 8px; margin-top: 4px; width: 100%;">
+                            <i data-lucide="key"></i> Save Password
+                        </button>
+                    </form>
+                </div>
+
+
+
+                <!-- Column 4: Page Sections Layout Reorder -->
+                <div class="console-column">
+                    <h4 class="console-col-title">Page Layout Reorder</h4>
+                    <div id="console-layout-list" style="max-height: 120px; overflow-y: auto; border: 1px solid rgba(255, 255, 255, 0.05); padding: 6px; border-radius: 4px; display: flex; flex-direction: column; gap: 4px;">
+                        <!-- Sections list with reorder buttons -->
+                    </div>
+                </div>
+
+                <!-- Restore Points (auto-saved on changes) -->
+                <div class="console-column">
+                    <h4 class="console-col-title">System Restore Points</h4>
+                    <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 8px; line-height: 1.3;">Auto-saved snapshots. Max 4 latest changes preserved.</p>
+                    <div id="console-restore-points-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto;">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+
+                <!-- Batch YouTube Import -->
+                <div class="console-column">
+                    <h4 class="console-col-title">Batch YouTube Import</h4>
+                    <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 8px; line-height: 1.3;">Paste multiple YouTube links (one per line) to add all at once.</p>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <select id="batch-yt-category" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: #fff; padding: 6px; border-radius: 4px; font-size: 0.75rem; outline: none; width: 100%;">
+                            <option value="long">16:9 Landscape</option>
+                            <option value="shorts">9:16 Shorts</option>
+                            <option value="graphics">4:3 Graphics</option>
+                        </select>
+                        <textarea id="batch-yt-urls" rows="4" placeholder="https://youtube.com/watch?v=...&#10;https://youtu.be/...&#10;https://youtube.com/shorts/..." style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: #fff; padding: 6px; border-radius: 4px; font-size: 0.75rem; outline: none; width: 100%; resize: vertical; font-family: inherit;"></textarea>
+                        <button type="button" class="console-btn btn-success" id="btn-batch-yt-import" style="padding: 8px; width: 100%; margin: 0; background: var(--accent-cyan); color: var(--bg-primary); font-weight: 700; border: none; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 4px; cursor: pointer;">
+                            <i data-lucide="video"></i>
+                            <span>Import All Videos</span>
+                        </button>
+                        <div id="batch-yt-status" style="font-size: 0.65rem; color: var(--accent-cyan); text-align: center; font-weight: 600; min-height: 1.2em;"></div>
+                    </div>
+                </div>
+
+                <!-- Column 7: Custom Theme Color Designer -->
+                <div class="console-column">
+                    <h4 class="console-col-title">Custom Color Designer</h4>
+                    <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 8px; line-height: 1.3;">Customize all site colors, texts, and gradient fills dynamically.</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.7rem;">
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="color" id="picker-bg-primary" value="#06050a" style="border:none; width: 20px; height: 20px; border-radius: 4px; cursor: pointer;">
+                            <label for="picker-bg-primary">BG Primary</label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="color" id="picker-bg-secondary" value="#0c0b12" style="border:none; width: 20px; height: 20px; border-radius: 4px; cursor: pointer;">
+                            <label for="picker-bg-secondary">BG Card</label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="color" id="picker-text-primary" value="#ffffff" style="border:none; width: 20px; height: 20px; border-radius: 4px; cursor: pointer;">
+                            <label for="picker-text-primary">Text Prim</label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="color" id="picker-text-secondary" value="#7c7e90" style="border:none; width: 20px; height: 20px; border-radius: 4px; cursor: pointer;">
+                            <label for="picker-text-secondary">Text Sec</label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="color" id="picker-accent-cyan" value="#00d2ff" style="border:none; width: 20px; height: 20px; border-radius: 4px; cursor: pointer;">
+                            <label for="picker-accent-cyan">Accent Prim</label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="color" id="picker-accent-purple" value="#00f5ff" style="border:none; width: 20px; height: 20px; border-radius: 4px; cursor: pointer;">
+                            <label for="picker-accent-purple">Accent Sec</label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="color" id="picker-grad-start" value="#00d2ff" style="border:none; width: 20px; height: 20px; border-radius: 4px; cursor: pointer;">
+                            <label for="picker-grad-start">Grad Start</label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <input type="color" id="picker-grad-end" value="#0066ff" style="border:none; width: 20px; height: 20px; border-radius: 4px; cursor: pointer;">
+                            <label for="picker-grad-end">Grad End</label>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 6px; margin-top: 8px;">
+                        <button type="button" class="console-btn btn-primary" id="btn-apply-colors" style="flex: 1; padding: 6px; margin: 0; font-size: 0.7rem;">
+                            <i data-lucide="check"></i> Apply
+                        </button>
+                        <button type="button" class="console-btn btn-secondary" id="btn-reset-colors" style="flex: 1; padding: 6px; margin: 0; font-size: 0.7rem;">
+                            <i data-lucide="rotate-ccw"></i> Reset
+                        </button>
+                </div>
+
+
+
+                <!-- Column 9: Graphics Batch Upload -->
+                <div class="console-column">
+                    <h4 class="console-col-title">Graphics Batch Upload</h4>
+                    <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 8px; line-height: 1.3;">Select and upload multiple graphic creation images instantly at once.</p>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label for="console-batch-graphics-file" class="console-btn btn-secondary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; padding: 10px;">
+                            <i data-lucide="images"></i> Select Multiple Images
+                        </label>
+                        <input type="file" id="console-batch-graphics-file" multiple accept="image/*" class="hidden">
+                        <div id="console-batch-status" style="font-size: 0.65rem; color: var(--accent-cyan); text-align: center; font-weight: 600;"></div>
+                        
+                        <!-- Batch progress bar container -->
+                        <div id="console-batch-progress-container" class="upload-progress-container hidden" style="margin-top: 4px; padding: 5px 0;">
+                            <div class="progress-bar-label" style="font-size: 0.65rem; margin-bottom: 4px; color: var(--text-muted); display: flex; justify-content: space-between;">
+                                <span>Processing Files</span>
+                                <span id="console-batch-percent-text">0%</span>
+                            </div>
+                            <div class="modal-progress-bg" style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden;">
+                                <div id="console-batch-progress-bar" class="modal-upload-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple)); transition: width 0.15s ease;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full-Screen Graphics Gallery Modal -->
+    <div id="graphics-gallery-modal" class="project-editor-modal-overlay" style="z-index: 10000; overflow-y: auto;">
+        <div class="project-modal-container" style="max-width: 1200px; width: 95%; padding: 30px; border-radius: 12px; background: rgba(10, 11, 15, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); max-height: 90vh; overflow-y: auto;">
+            <div class="project-modal-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 15px;">
+                <h3 style="font-family: var(--font-heading); color: #fff; font-size: 1.5rem; display: flex; align-items: center; gap: 8px; margin: 0;">
+                    <i data-lucide="palette" style="color: var(--accent-cyan); width: 24px; height: 24px;"></i>
+                    <span>Graphics & Creative Design Gallery</span>
+                </h3>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button type="button" id="modal-select-all-btn" class="console-btn btn-secondary" style="display: none; padding: 6px 12px; font-size: 0.7rem; gap: 6px; align-items: center; margin: 0;">
+                        <i data-lucide="check-square" style="width: 14px; height: 14px;"></i>
+                        <span id="modal-select-all-text">Select All</span>
+                    </button>
+                    <button type="button" id="modal-bulk-delete-btn" class="console-btn btn-danger" style="display: none; padding: 6px 12px; font-size: 0.7rem; gap: 6px; align-items: center; margin: 0;">
+                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                        <span>Delete Selected (<span id="modal-delete-count">0</span>)</span>
+                    </button>
+                    <button type="button" id="modal-graphics-add-btn" class="console-btn btn-primary" style="display: none; padding: 6px 14px; font-size: 0.75rem; gap: 6px; align-items: center; margin: 0 10px 0 0;">
+                        <i data-lucide="upload" style="width: 14px; height: 14px;"></i>
+                        <span>Add Image</span>
+                    </button>
+                    <input type="file" id="modal-graphics-file" accept="image/*" style="display: none;">
+                    <button type="button" id="graphics-gallery-close-btn" style="background: none; border: none; color: var(--text-muted); cursor: pointer; transition: color 0.2s; margin-left: 10px;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-muted)'">
+                        <i data-lucide="x" style="width: 24px; height: 24px;"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4;">
+                Browse the complete archive of marketing layouts, social media posts, UI/UX screens, and brand designs.
+            </p>
+            
+            <div class="portfolio-grid grid-graphics" id="modal-graphics-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px;">
+                <!-- Full grid rendered here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- GSAP CDN Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Lucide Icons Library -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Plyr HTML5/YouTube Custom Player -->
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    
+    <!-- SortableJS drag and drop sorting library -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/plugins/MultiDrag/MultiDrag.min.js"></script>
+    
+    <!-- Baked default portfolio data (cloud projects) -->
+    <script src="data.js?v=1.0"></script>
+    <!-- Custom Application Logic -->
+    <script src="app.js?v=9.0"></script>
+<script>
+// Batch YouTube Import - uses window.* exposed by app.js
+(function() {
+    function attachBatchImport() {
+        var btn = document.getElementById('btn-batch-yt-import');
+        if (!btn) { setTimeout(attachBatchImport, 500); return; }
+        if (btn._batchAttached) return;
+        btn._batchAttached = true;
+        btn.onclick = function() {
+            try {
+                var ta = document.getElementById('batch-yt-urls');
+                var sel = document.getElementById('batch-yt-category');
+                var st = document.getElementById('batch-yt-status');
+                if (!ta || !sel || !st) return;
+                var raw = ta.value.trim();
+                if (!raw) { st.textContent = 'Paste at least one YouTube link.'; return; }
+                var lines = raw.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+                var cat = sel.value;
+                var added = 0, failed = 0;
+                lines.forEach(function(line) {
+                    var ytId = window.extractYouTubeId(line);
+                    if (!ytId) { failed++; return; }
+                    window.projects.push({
+                        id: 'proj_' + Date.now() + '_' + Math.floor(Math.random() * 100000),
+                        title: '',
+                        category: cat,
+                        year: '',
+                        mediaSource: 'link',
+                        mediaLink: 'https://youtu.be/' + ytId,
+                        thumbSource: 'auto',
+                        thumbLink: 'https://img.youtube.com/vi/' + ytId + '/maxresdefault.jpg'
+                    });
+                    added++;
+                    st.textContent = 'Importing... ' + added + ' done';
+                });
+                if (added > 0) {
+                    window.saveDatabase().then(function() {
+                        if (window.appendConsoleLog) window.appendConsoleLog('> Batch import: ' + added + ' videos saved to Firebase.');
+                    }).catch(function(err) {
+                        if (window.appendConsoleLog) window.appendConsoleLog('> Batch import: Firebase save failed: ' + err.message);
+                    });
+                    window.renderProjects();
+                }
+                st.textContent = added > 0
+                    ? '\u2713 ' + added + ' video(s) added.' + (failed ? ' ' + failed + ' invalid skipped.' : '')
+                    : 'No valid YouTube links found.';
+                if (window.appendConsoleLog) window.appendConsoleLog('> Batch import complete: ' + added + ' added, ' + failed + ' failed.');
+                ta.value = '';
+            } catch (err) {
+                var st = document.getElementById('batch-yt-status');
+                if (st) st.textContent = 'Error: ' + err.message;
+                console.error('Batch import error:', err);
+            }
+        };
+    }
+    attachBatchImport();
+})();
+</script>
+</body>
+</html>
