@@ -2198,6 +2198,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         initDragAndDropSorting();
         
+        initInlineTextCMS();
+        
         if (typeof ScrollTrigger !== 'undefined') {
             ScrollTrigger.refresh();
         }
@@ -5107,12 +5109,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     if (!el.dataset.cmsInitialized) {
                         el.dataset.cmsInitialized = 'true';
-                        el.addEventListener('blur', function() {
-                            if (document.body.classList.contains('editor-active')) {
+                        var saveTimer;
+                        function doSave() {
+                            if (!document.body.classList.contains('editor-active')) return;
+                            try {
                                 textDb[key] = el.innerHTML;
                                 localStorage.setItem('amit_portfolio_cms_text', JSON.stringify(textDb));
-                                appendConsoleLog('> Saved inline edit for: [' + key + ']');
-                            }
+                                appendConsoleLog('> Saved: [' + key + ']');
+                            } catch(e) { console.error('save error:', e); }
+                        }
+                        el.addEventListener('input', function() {
+                            clearTimeout(saveTimer);
+                            saveTimer = setTimeout(doSave, 400);
+                        });
+                        el.addEventListener('blur', function() {
+                            clearTimeout(saveTimer);
+                            doSave();
                         });
                     }
                 } catch(e) {}
