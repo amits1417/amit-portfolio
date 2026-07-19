@@ -5070,9 +5070,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initInlineTextCMS() {
-        const selector = 'h1, h2, h3, h4, h5, h6, p, li, span, button:not(.hamburger):not(.theme-mode-toggle):not(.console-btn):not(.lightbox-nav-btn):not(.close-btn):not(.video-modal-close), a.btn:not(.social-link)';
-        const elements = document.querySelectorAll(selector);
-        
         const savedText = localStorage.getItem('amit_portfolio_cms_text');
         let textDb = {};
         if (savedText) {
@@ -5080,12 +5077,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 textDb = JSON.parse(savedText);
             } catch(e) {}
         }
-        
-        elements.forEach((el, index) => {
-            if (el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader')) {
-                return;
+
+        function isInsideCMS(el) {
+            return el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader');
+        }
+
+        function shouldSkip(el) {
+            const tag = el.tagName.toLowerCase();
+            if (tag === 'button') {
+                // Skip interactive buttons
+                if (el.closest('.filter-btn') || el.id === 'studio-toggle-btn' || el.closest('.hamburger') || el.closest('.theme-mode-toggle') || el.closest('.back-to-top') || el.closest('.video-modal-close') || el.closest('.close-btn') || el.closest('.lightbox-nav-btn') || el.closest('.console-btn')) return true;
             }
-            
+            if (tag === 'a' && el.classList.contains('social-link')) return true;
+            return false;
+        }
+
+        function makeEditable() {
+            const isActive = document.body.classList.contains('editor-active');
+            const selector = 'h1, h2, h3, h4, h5, h6, p, li, span, div, label, strong, em, b, i, u, a, button, td, th, blockquote, cite, code, pre, small, sub, sup';
+            document.querySelectorAll(selector).forEach(el => {
+                if (isInsideCMS(el)) return;
+                if (shouldSkip(el)) return;
+                if (el.children.length === 0 || el.innerText.trim().length > 0 || el.querySelectorAll('*').length > 0) {
+                    el.contentEditable = isActive ? "true" : "false";
+                }
+            });
+        }
+
+        const selector = 'h1, h2, h3, h4, h5, h6, p, li, span, div, label, strong, em, b, i, u, a, button, td, th, blockquote, cite, code, pre, small, sub, sup';
+        document.querySelectorAll(selector).forEach((el, index) => {
+            if (isInsideCMS(el)) return;
+            if (shouldSkip(el)) return;
             let key = el.getAttribute('data-cms-key');
             if (!key) {
                 const sec = el.closest('section') || el.closest('header') || el.closest('footer') || el.closest('#hero');
@@ -5094,11 +5116,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 key = `cms-${secId}-${tagName}-${index}`;
                 el.setAttribute('data-cms-key', key);
             }
-            
             if (textDb[key] !== undefined) {
                 el.innerHTML = textDb[key];
             }
-            
             if (!el.dataset.cmsInitialized) {
                 el.dataset.cmsInitialized = "true";
                 el.addEventListener('blur', () => {
@@ -5111,24 +5131,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         });
-        
-        window.addEventListener('cms-mode-change', (e) => {
-            const isEditorActive = e.detail.active;
-            elements.forEach(el => {
-                if (el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container')) {
-                    return;
-                }
-                el.contentEditable = isEditorActive ? "true" : "false";
-            });
-        });
-        
-        const isEditorActive = document.body.classList.contains('editor-active');
-        elements.forEach(el => {
-            if (el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container')) {
-                return;
-            }
-            el.contentEditable = isEditorActive ? "true" : "false";
-        });
+
+        window.addEventListener('cms-mode-change', makeEditable);
+        makeEditable();
     }
 
     // Listen for mobile back button navigation (hashchange) to close player overlay smoothly
