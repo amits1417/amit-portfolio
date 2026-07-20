@@ -5173,6 +5173,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (t === 'a' && el.classList.contains('social-link')) continue;
                 el.contentEditable = active ? 'true' : 'false';
             }
+            // Override CSS user-select:none on portfolio grids when text edit is active
+            document.querySelectorAll('.portfolio-grid').forEach(function(g) {
+                g.style.userSelect = active ? 'text' : '';
+            });
         } catch(e) { console.error('contentEditable apply error:', e); }
     }
 
