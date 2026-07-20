@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Automatic DB version upgrade migration (forces cache clear for new defaults)
         const DB_VERSION_KEY = 'amit_portfolio_db_version';
-        const CURRENT_DB_VERSION = '18';
+        const CURRENT_DB_VERSION = '19';
         const storedVersion = localStorage.getItem(DB_VERSION_KEY);
         if (storedVersion !== CURRENT_DB_VERSION) {
             localStorage.removeItem('amit_portfolio_projects');
