@@ -5194,11 +5194,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Theme on startup
     const savedTheme = localStorage.getItem('amit_portfolio_theme') || 'neon-cyber';
     applyTheme(savedTheme);
-    renderRestorePointsUI();
 
     // --- AUTO-SAVE RESTORE POINT SYSTEM (max 4, timestamped) ---
     const MAX_RESTORE_POINTS = 4;
     const RP_KEY = 'amit_portfolio_restore_points';
+    renderRestorePointsUI();
 
     function captureRestorePoint() {
         try {
