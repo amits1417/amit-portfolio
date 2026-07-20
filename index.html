@@ -1418,20 +1418,25 @@
         if (!btn) { setTimeout(attachBatchImport, 500); return; }
         if (btn._batchAttached) return;
         btn._batchAttached = true;
-        btn.onclick = function() {
+        btn.onclick = async function() {
             try {
                 var ta = document.getElementById('batch-yt-urls');
                 var sel = document.getElementById('batch-yt-category');
                 var st = document.getElementById('batch-yt-status');
                 if (!ta || !sel || !st) return;
+                if (!document.body.classList.contains('editor-active')) {
+                    st.textContent = 'Unlock CMS panel with password first.';
+                    return;
+                }
                 var raw = ta.value.trim();
                 if (!raw) { st.textContent = 'Paste at least one YouTube link.'; return; }
                 var lines = raw.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
                 var cat = sel.value;
                 var added = 0, failed = 0;
-                lines.forEach(function(line) {
+                for (var i = 0; i < lines.length; i++) {
+                    var line = lines[i];
                     var ytId = window.extractYouTubeId(line);
-                    if (!ytId) { failed++; return; }
+                    if (!ytId) { failed++; continue; }
                     window.projects.push({
                         id: 'proj_' + Date.now() + '_' + Math.floor(Math.random() * 100000),
                         title: '',
@@ -1444,19 +1449,24 @@
                     });
                     added++;
                     st.textContent = 'Importing... ' + added + ' done';
-                });
-                if (added > 0) {
-                    window.saveDatabase().then(function() {
-                        if (window.appendConsoleLog) window.appendConsoleLog('> Batch import: ' + added + ' videos saved to Firebase.');
-                    }).catch(function(err) {
-                        if (window.appendConsoleLog) window.appendConsoleLog('> Batch import: Firebase save failed: ' + err.message);
-                    });
-                    window.renderProjects();
                 }
-                st.textContent = added > 0
-                    ? '\u2713 ' + added + ' video(s) added.' + (failed ? ' ' + failed + ' invalid skipped.' : '')
-                    : 'No valid YouTube links found.';
-                if (window.appendConsoleLog) window.appendConsoleLog('> Batch import complete: ' + added + ' added, ' + failed + ' failed.');
+                if (added > 0) {
+                    st.textContent = 'Saving ' + added + ' video(s) to cloud...';
+                    try {
+                        await window.saveDatabase();
+                        if (window.appendConsoleLog) window.appendConsoleLog('> Batch import: ' + added + ' videos saved to Firebase.');
+                    } catch (saveErr) {
+                        if (window.appendConsoleLog) window.appendConsoleLog('> Batch import: Firebase save failed: ' + saveErr.message);
+                        st.textContent = 'Cloud save failed! Data may be lost on refresh.';
+                        ta.value = '';
+                        return;
+                    }
+                    window.renderProjects();
+                    st.textContent = '\u2713 ' + added + ' video(s) added.' + (failed ? ' ' + failed + ' invalid skipped.' : '');
+                    if (window.appendConsoleLog) window.appendConsoleLog('> Batch import complete: ' + added + ' added, ' + failed + ' failed.');
+                } else {
+                    st.textContent = failed > 0 ? 'No valid YouTube links found (' + failed + ' invalid).' : 'No valid YouTube links found.';
+                }
                 ta.value = '';
             } catch (err) {
                 var st = document.getElementById('batch-yt-status');

@@ -41,6 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cleanId.includes('youtu.be/')) {
             return cleanId.split('youtu.be/')[1].split('?')[0].split('&')[0];
         }
+        if (cleanId.includes('/embed/')) {
+            return cleanId.split('/embed/')[1].split('?')[0].split('&')[0];
+        }
+        if (cleanId.includes('/live/')) {
+            return cleanId.split('/live/')[1].split('?')[0].split('&')[0];
+        }
         if (/^[a-zA-Z0-9_-]{11}$/.test(cleanId)) {
             return cleanId;
         }
@@ -5673,5 +5679,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.saveDatabase = saveDatabase;
     window.renderProjects = renderProjects;
     window.appendConsoleLog = appendConsoleLog;
-    Object.defineProperty(window, 'projects', { get: function() { return projects; }, configurable: true });
+    Object.defineProperty(window, 'projects', {
+        get: function() { return projects; },
+        set: function(val) { projects = val; },
+        configurable: true
+    });
 });
