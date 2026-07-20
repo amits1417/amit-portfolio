@@ -2205,6 +2205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initDragAndDropSorting();
         
         initInlineTextCMS();
+        applyContentEditable();
         
         if (typeof ScrollTrigger !== 'undefined') {
             ScrollTrigger.refresh();
