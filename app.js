@@ -4347,14 +4347,8 @@ document.addEventListener('DOMContentLoaded', () => {
         renderProjects();
         renderDynamicSoftware();
         renderDynamicServices();
-        // Reset text edit toggle when entering CMS mode
-        isTextEditActive = false;
-        var teBtn = document.getElementById('btn-toggle-text-edit');
-        if (teBtn) {
-            teBtn.querySelector('span').textContent = 'Enable Text Edit';
-            teBtn.style.borderColor = 'var(--border-color)';
-            teBtn.style.color = 'var(--text-muted)';
-        }
+        // Enable text edit by default in CMS mode
+        isTextEditActive = true;
         window.dispatchEvent(new CustomEvent('cms-mode-change', { detail: { active: true } }));
     }
 
@@ -5665,19 +5659,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initCvDownloadAnimation();
     initGraphicsGallery();
 
-    // Text Edit Toggle Button Handler
-    var textEditBtn = document.getElementById('btn-toggle-text-edit');
-    if (textEditBtn) {
-        textEditBtn.addEventListener('click', function() {
-            if (!document.body.classList.contains('editor-active')) return;
-            isTextEditActive = !isTextEditActive;
-            textEditBtn.querySelector('span').textContent = isTextEditActive ? 'Disable Text Edit' : 'Enable Text Edit';
-            textEditBtn.style.borderColor = isTextEditActive ? 'var(--accent-cyan)' : 'var(--border-color)';
-            textEditBtn.style.color = isTextEditActive ? 'var(--accent-cyan)' : 'var(--text-muted)';
-            applyContentEditable();
-            appendConsoleLog('> Inline text editing ' + (isTextEditActive ? 'enabled' : 'disabled') + '.');
-        });
-    }
+    // Text editing is always active in CMS mode (handled by applyContentEditable)
 
     // Expose to window so inline script can access them
     window.extractYouTubeId = extractYouTubeId;
