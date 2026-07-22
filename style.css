@@ -1229,7 +1229,7 @@ body.hover-interactive .custom-cursor-glow {
 .section-title {
     font-size: 2.8rem;
     margin-bottom: 20px;
-    color: var(--text-primary);
+    color: #ffffff !important;
 }
 
 #about .section-title {
@@ -1238,7 +1238,7 @@ body.hover-interactive .custom-cursor-glow {
 }
 
 .section-desc {
-    color: var(--text-primary);
+    color: #ffffff !important;
     font-size: 1.05rem;
 }
 
@@ -5188,6 +5188,9 @@ body.light-mode .about-badge {
     color: var(--text-primary) !important;
 }
 
+body.light-mode .section-title {
+    color: #1a202c !important;
+}
 body.light-mode .section-desc {
     color: var(--text-primary) !important;
 }
