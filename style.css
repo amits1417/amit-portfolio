@@ -5168,6 +5168,9 @@ body.light-mode .about-badge {
     color: var(--text-primary) !important;
 }
 
+body.light-mode .section-desc {
+    color: var(--text-primary) !important;
+}
 body.light-mode .project-description-short,
 body.light-mode .hero-subheading,
 body.light-mode .about-bio,
