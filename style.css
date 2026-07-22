@@ -5332,12 +5332,7 @@ body.theme-legacy-v100 a.redesign-only.btn {
     }
 }
 
-/* Hide theme switcher button on PC/desktop viewports (screen > 768px) */
-@media (min-width: 769px) {
-    .theme-mode-toggle {
-        display: none !important;
-    }
-}
+/* Theme toggle visible on all viewports */
 
 /* CV Download Loading Ring styles */
 .download-spinner-ring {
