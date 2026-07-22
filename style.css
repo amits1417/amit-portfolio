@@ -5197,6 +5197,53 @@ body.light-mode select {
     color: #000 !important;
 }
 
+/* Light mode fixes for hardcoded white text */
+body.light-mode .hero-title,
+body.light-mode #hero .hero-title {
+    color: var(--text-primary) !important;
+}
+body.light-mode .category-card-header {
+    color: var(--accent-cyan) !important;
+}
+body.light-mode .filter-btn.active {
+    color: #ffffff !important;
+    background: var(--accent-cyan) !important;
+}
+body.light-mode .nav-cta,
+body.light-mode .btn-primary,
+body.light-mode .btn-cv-header,
+body.light-mode .nav-cv-ring-btn span,
+body.light-mode .btn-wa-header {
+    color: #ffffff !important;
+}
+body.light-mode .nav-cta {
+    background: var(--accent-cyan) !important;
+}
+body.light-mode .studio-toggle-btn.active {
+    color: #ffffff !important;
+    background: var(--accent-cyan) !important;
+}
+body.light-mode .mobile-nav-tab.active {
+    color: #ffffff !important;
+    background: var(--accent-cyan) !important;
+}
+body.light-mode .cms-delete-btn,
+body.light-mode .video-overlay-btn,
+body.light-mode .project-like-btn:hover,
+body.light-mode .video-fullscreen-btn,
+body.light-mode .video-fullscreen-btn:hover,
+body.light-mode #hero .play-btn-circle,
+body.light-mode .play-btn-circle,
+body.light-mode .graphics-view-more-btn:hover {
+    color: #ffffff !important;
+}
+body.light-mode .spy-link.active .spy-label {
+    color: var(--accent-cyan) !important;
+}
+body.light-mode .vertical-tool-row:hover .vertical-tool-name {
+    color: var(--accent-cyan) !important;
+}
+
 body.light-mode .studio-console-drawer {
     border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
 }
