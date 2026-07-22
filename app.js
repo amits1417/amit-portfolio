@@ -1438,22 +1438,48 @@ document.addEventListener('DOMContentLoaded', () => {
             gridEl.appendChild(addCard);
         }
 
-        // Graphics: show only 12 items + "View More" button (only on live, not in editor)
-        if (category === 'graphics' && !isEditorActive && catProjects.length > 12) {
-            const items = gridEl.querySelectorAll('.portfolio-item');
-            items.forEach((item, i) => {
-                if (i >= 12) item.classList.add('graphics-extra');
-            });
-            const viewMoreBtn = document.createElement('button');
-            viewMoreBtn.className = 'graphics-view-more-btn';
-            viewMoreBtn.textContent = `View All (${catProjects.length} designs)`;
-            viewMoreBtn.addEventListener('click', () => {
-                document.body.classList.toggle('show-all-graphics');
+        // Graphics: show only 12 items + "View More" button outside grid container
+        if (category === 'graphics') {
+            const existingWrapper = gridEl.parentNode ? gridEl.parentNode.querySelector('.graphics-view-more-wrapper') : null;
+            if (existingWrapper) existingWrapper.remove();
+
+            if (!isEditorActive && catProjects.length > 12) {
+                const items = gridEl.querySelectorAll('.portfolio-item');
+                items.forEach((item, i) => {
+                    if (i >= 12) item.classList.add('graphics-extra');
+                });
+                
+                const viewMoreWrapper = document.createElement('div');
+                viewMoreWrapper.className = 'graphics-view-more-wrapper';
                 const isOpen = document.body.classList.contains('show-all-graphics');
-                viewMoreBtn.textContent = isOpen ? 'Show Less' : `View All (${catProjects.length} designs)`;
-                viewMoreBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            });
-            gridEl.appendChild(viewMoreBtn);
+                
+                viewMoreWrapper.innerHTML = `
+                    <button type="button" class="graphics-view-more-btn">
+                        <span>${isOpen ? 'Show Less' : `View All (${catProjects.length} Designs)`}</span>
+                        <i data-lucide="${isOpen ? 'chevron-up' : 'chevron-down'}"></i>
+                    </button>
+                `;
+                
+                const btn = viewMoreWrapper.querySelector('.graphics-view-more-btn');
+                btn.addEventListener('click', () => {
+                    document.body.classList.toggle('show-all-graphics');
+                    const nowOpen = document.body.classList.contains('show-all-graphics');
+                    const btnSpan = btn.querySelector('span');
+                    const btnIcon = btn.querySelector('i');
+                    if (btnSpan) btnSpan.textContent = nowOpen ? 'Show Less' : `View All (${catProjects.length} Designs)`;
+                    if (btnIcon) btnIcon.setAttribute('data-lucide', nowOpen ? 'chevron-up' : 'chevron-down');
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                    
+                    if (!nowOpen) {
+                        gridEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+
+                if (gridEl.parentNode) {
+                    gridEl.parentNode.appendChild(viewMoreWrapper);
+                }
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
         }
     }
 

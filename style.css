@@ -6064,3 +6064,110 @@ body.light-mode .bio-text-redesign p {
     color: var(--text-primary) !important;
 }
 
+/* ==========================================================================
+   GRAPHICS SECTION 12-ITEM LIMIT, VIEW MORE BUTTON & PREVIEW MODAL FIXES
+   ========================================================================== */
+.portfolio-item.graphics-extra {
+    display: none !important;
+}
+
+body.show-all-graphics .portfolio-item.graphics-extra {
+    display: block !important;
+}
+
+.graphics-view-more-wrapper {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    margin-top: 30px !important;
+    margin-bottom: 10px !important;
+    clear: both !important;
+}
+
+.graphics-view-more-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 14px 36px !important;
+    background: linear-gradient(135deg, rgba(0, 210, 255, 0.12), rgba(168, 85, 247, 0.12)) !important;
+    border: 1.5px solid var(--accent-cyan) !important;
+    border-radius: 50px !important;
+    color: var(--accent-cyan) !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    letter-spacing: 0.03em !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 0 6px 25px rgba(0, 210, 255, 0.15) !important;
+}
+
+.graphics-view-more-btn:hover {
+    background: var(--accent-cyan) !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 30px rgba(0, 210, 255, 0.35) !important;
+    transform: translateY(-2px) !important;
+}
+
+.graphics-view-more-btn * {
+    transition: transform 0.3s ease !important;
+}
+
+body.light-mode .graphics-view-more-btn {
+    background: #ffffff !important;
+    border-color: #168BFF !important;
+    color: #168BFF !important;
+    box-shadow: 0 4px 15px rgba(22, 139, 255, 0.15) !important;
+}
+
+body.light-mode .graphics-view-more-btn:hover {
+    background: #168BFF !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 25px rgba(22, 139, 255, 0.35) !important;
+}
+
+/* Lightbox Modal Graphics Image Preview Fix */
+.video-modal-overlay.is-image-lightbox {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(0, 0, 0, 0.92) !important;
+    backdrop-filter: blur(15px) !important;
+}
+
+.video-modal-overlay.is-image-lightbox .video-modal-container {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    max-width: 95vw !important;
+    max-height: 90vh !important;
+    height: auto !important;
+    width: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    overflow: visible !important;
+}
+
+.video-modal-overlay.is-image-lightbox .video-modal-iframe-wrapper {
+    padding-top: 0 !important;
+    height: auto !important;
+    width: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    max-width: 95vw !important;
+    max-height: 85vh !important;
+}
+
+.video-modal-overlay.is-image-lightbox .video-modal-iframe-wrapper img {
+    max-width: 92vw !important;
+    max-height: 82vh !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    border-radius: 12px !important;
+    box-shadow: 0 25px 65px rgba(0, 0, 0, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
