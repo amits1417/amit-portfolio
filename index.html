@@ -23,9 +23,7 @@
 <body>
     <script>
         (function() {
-            var t;
-            try { t = localStorage.getItem('amit_portfolio_theme'); } catch(e) {}
-            var savedTheme = t || 'neon-cyber';
+            const savedTheme = 'neon-cyber';
             document.body.classList.add('theme-' + savedTheme);
         })();
     </script>
@@ -66,10 +64,6 @@
                 <a href="#services" class="nav-link">Services</a>
                 <a href="./assets/Amit_Sharma_CV.pdf" download class="nav-cv-ring-btn" title="Download CV"><span>CV</span></a>
                 <a href="#contact" class="nav-link nav-cta">Contact</a>
-                <div class="theme-swatches">
-                    <button class="theme-swatch active" data-theme="neon-cyber" title="Neon Cyber (Blue)" aria-label="Neon Cyber theme"></button>
-                    <button class="theme-swatch" data-theme="forex-green" title="Forex Green" aria-label="Forex Green theme"></button>
-                </div>
             </nav>
             
             <div class="mobile-header-ctas">

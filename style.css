@@ -4964,58 +4964,15 @@ body.editor-active {
     }
 }
 
-/* --- PROFESSIONAL THEMES --- */
-/* Theme 1: Neon Cyber (dark blue) — default */
-body.theme-neon-cyber {
-    --bg-primary: var(--background);
-    --bg-secondary: var(--surface);
-    --bg-tertiary: var(--surface-light);
-    --accent-cyan: var(--primary-blue);
-    --accent-cyan-hsl: 211, 100%, 55%;
-    --accent-blue: var(--primary-blue);
-    --accent-purple: var(--primary-blue);
-    --accent-purple-hsl: 211, 100%, 55%;
-    --text-primary: var(--heading);
-    --text-secondary: var(--body-text);
-    --text-muted: var(--muted-text);
-    --border-color: var(--border);
-    --border-glow: rgba(22, 139, 255, 0.10);
-    --glass-bg: rgba(12, 13, 26, 0.82);
-    --accent-glow-shadow: transparent;
-    --accent-glow-hover-shadow: rgba(22, 139, 255, 0.18);
-    --accent-glow-card-shadow: rgba(22, 139, 255, 0.12);
-    --neon-shadow: none;
-    --purple-shadow: none;
-}
-/* Theme 2: Forex Green (dark green — inspired by forex-vps.net) */
-body.theme-forex-green {
-    --bg-primary: #070a08;
-    --bg-secondary: #0c120e;
-    --bg-tertiary: #111a14;
-    --accent-cyan: #00e676;
-    --accent-cyan-hsl: 143, 100%, 45%;
-    --accent-blue: #00e676;
-    --accent-purple: #00c853;
-    --accent-purple-hsl: 143, 100%, 39%;
-    --text-primary: #ffffff;
-    --text-secondary: #b0b0b0;
-    --text-muted: #6b7b71;
-    --border-color: #1a2e20;
-    --border-glow: rgba(0, 230, 118, 0.12);
-    --glass-bg: rgba(7, 10, 8, 0.85);
-    --accent-glow-shadow: transparent;
-    --accent-glow-hover-shadow: rgba(0, 230, 118, 0.20);
-    --accent-glow-card-shadow: rgba(0, 230, 118, 0.12);
-    --neon-shadow: none;
-    --purple-shadow: none;
-}
-/* Legacy theme names → map to neon-cyber */
-body.theme-legacy-v100, body.theme-emerald-corp,
-body.theme-luxury-gold, body.theme-royal-purple,
-body.theme-electric-amber, body.theme-ocean-breeze,
-body.theme-sunset-bronze, body.theme-velvet-rose,
-body.theme-slate-prof, body.theme-carbon-tech,
-body.theme-elegant-divi {
+/* --- PROFESSIONAL THEMES (forced to single Premium Dark Blue theme) --- */
+/* All theme classes (including the default neon-cyber) now use the new
+   premium dark theme so the purple accent is fully removed. */
+body.theme-neon-cyber, body.theme-legacy-v100,
+body.theme-emerald-corp, body.theme-luxury-gold,
+body.theme-royal-purple, body.theme-electric-amber,
+body.theme-ocean-breeze, body.theme-sunset-bronze,
+body.theme-velvet-rose, body.theme-slate-prof,
+body.theme-carbon-tech, body.theme-elegant-divi {
     --bg-primary: var(--background);
     --bg-secondary: var(--surface);
     --bg-tertiary: var(--surface-light);
@@ -5180,40 +5137,6 @@ body:not(.light-mode) .theme-mode-toggle .moon-icon {
     border-color: #fff !important;
     box-shadow: 0 0 10px #fff, 0 0 15px var(--accent-cyan) !important;
     transform: scale(1.15);
-}
-
-/* Theme swatch buttons in header */
-.theme-swatches {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-left: 10px;
-}
-.theme-swatch {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.15);
-    cursor: pointer;
-    transition: all 0.25s ease;
-    position: relative;
-    outline: none;
-    flex-shrink: 0;
-}
-.theme-swatch:hover {
-    transform: scale(1.2);
-    border-color: rgba(255,255,255,0.5);
-}
-.theme-swatch.active {
-    border-color: #fff;
-    box-shadow: 0 0 8px rgba(255,255,255,0.3);
-    transform: scale(1.15);
-}
-.theme-swatch[data-theme="neon-cyber"] {
-    background: #168BFF;
-}
-.theme-swatch[data-theme="forex-green"] {
-    background: #00e676;
 }
 
 /* Global Light Mode Layout Overrides */
