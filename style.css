@@ -5252,9 +5252,28 @@ body.light-mode .console-col-title {
     color: var(--text-primary) !important;
     border-bottom-color: rgba(0, 0, 0, 0.08) !important;
 }
-
-
-
+body.light-mode .service-title,
+body.light-mode .timeline-headline,
+body.light-mode .category-block-title,
+body.light-mode .filter-btn:not(.active) {
+    color: var(--text-primary) !important;
+}
+body.light-mode .category-card-header {
+    color: var(--text-primary) !important;
+    background: var(--bg-tertiary) !important;
+}
+body.light-mode .bio-feature-icon {
+    color: var(--accent-cyan) !important;
+}
+body.light-mode .bio-text-redesign p {
+    color: var(--text-secondary) !important;
+}
+body.light-mode .bio-text-redesign p:first-child {
+    color: var(--text-primary) !important;
+}
+body.light-mode .lightbox-gallery-thumb {
+    border-color: rgba(0,0,0,0.12) !important;
+}
 
 /* --- LIGHTBOX BOTTOM GALLERY THUMBNAIL STRIP --- */
 .lightbox-gallery-strip {
