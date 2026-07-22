@@ -5186,14 +5186,35 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyTheme(themeName) {
         document.body.className = document.body.className.split(' ').filter(c => !c.startsWith('theme-')).join(' ');
         document.body.classList.add('theme-' + themeName);
+        // Sync all toggle pill UIs
+        var pills = document.querySelectorAll('.theme-toggle-pill');
+        var label = themeName === 'forex-pro' ? 'Trading' : 'Default';
+        for (var i = 0; i < pills.length; i++) {
+            pills[i].dataset.active = themeName;
+            var lbl = pills[i].querySelector('.pill-label');
+            if (lbl) lbl.textContent = label;
+        }
+        // Re-apply Lucide icons if loaded
+        if (typeof lucide !== 'undefined') { try { lucide.createIcons(); } catch(e) {} }
     }
     
     // Exposed globally for Firebase startup check
     window.applyTheme = applyTheme;
 
     // Initialize Theme on startup
-    const savedTheme = localStorage.getItem('amit_portfolio_theme') || 'neon-cyber';
+    var savedTheme = localStorage.getItem('amit_portfolio_theme') || 'neon-cyber';
     applyTheme(savedTheme);
+
+    // Theme toggle pill click handler (desktop + mobile)
+    document.addEventListener('click', function(e) {
+        var pill = e.target.closest('.theme-toggle-pill');
+        if (pill) {
+            var current = pill.dataset.active || 'neon-cyber';
+            var next = current === 'forex-pro' ? 'neon-cyber' : 'forex-pro';
+            localStorage.setItem('amit_portfolio_theme', next);
+            applyTheme(next);
+        }
+    });
 
     // --- AUTO-SAVE RESTORE POINT SYSTEM (max 4, timestamped) ---
     const MAX_RESTORE_POINTS = 4;

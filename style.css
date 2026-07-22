@@ -4964,9 +4964,7 @@ body.editor-active {
     }
 }
 
-/* --- PROFESSIONAL THEMES (forced to single Premium Dark Blue theme) --- */
-/* All theme classes (including the default neon-cyber) now use the new
-   premium dark theme so the purple accent is fully removed. */
+/* --- BASE THEME (neon-cyber / default) --- */
 body.theme-neon-cyber, body.theme-legacy-v100,
 body.theme-emerald-corp, body.theme-luxury-gold,
 body.theme-royal-purple, body.theme-electric-amber,
@@ -4992,6 +4990,142 @@ body.theme-carbon-tech, body.theme-elegant-divi {
     --accent-glow-card-shadow: rgba(22, 139, 255, 0.12);
     --neon-shadow: none;
     --purple-shadow: none;
+}
+/* --- FOREX PRO / TRADING DARK THEME --- */
+body.theme-forex-pro {
+    --bg-primary: #0D1210;
+    --bg-secondary: #121815;
+    --bg-tertiary: #181F1B;
+    --accent-cyan: #00E676;
+    --accent-cyan-hsl: 143, 100%, 45%;
+    --accent-blue: #00E676;
+    --accent-purple: #0B5D3B;
+    --accent-purple-hsl: 143, 80%, 20%;
+    --text-primary: #F2F5F3;
+    --text-secondary: #8B9A94;
+    --text-muted: #5A6B62;
+    --border-color: #1E2A23;
+    --border-glow: rgba(0, 230, 118, 0.08);
+    --glass-bg: rgba(13, 18, 16, 0.88);
+    --accent-glow-shadow: transparent;
+    --accent-glow-hover-shadow: rgba(0, 230, 118, 0.20);
+    --accent-glow-card-shadow: rgba(0, 230, 118, 0.10);
+    --neon-shadow: none;
+    --purple-shadow: none;
+}
+
+/* --- FOREX PRO: VISUAL EFFECTS --- */
+body.theme-forex-pro #hero::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80vw;
+    height: 80vh;
+    background: radial-gradient(ellipse at center, rgba(0,230,118,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+body.theme-forex-pro .btn-primary,
+body.theme-forex-pro .nav-cta,
+body.theme-forex-pro .submit-btn,
+body.theme-forex-pro button[type="submit"] {
+    background: linear-gradient(135deg, #00E676 0%, #0B5D3B 100%) !important;
+    color: #0D1210 !important;
+    border: none !important;
+    box-shadow: 0 0 20px rgba(0,230,118,0.15);
+}
+body.theme-forex-pro .btn-primary:hover,
+body.theme-forex-pro .nav-cta:hover,
+body.theme-forex-pro .submit-btn:hover,
+body.theme-forex-pro button[type="submit"]:hover {
+    box-shadow: 0 0 30px rgba(0,230,118,0.30);
+    transform: translateY(-2px);
+}
+body.theme-forex-pro .project-card,
+body.theme-forex-pro .service-card,
+body.theme-forex-pro .pricing-card {
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+body.theme-forex-pro .project-card:hover,
+body.theme-forex-pro .service-card:hover,
+body.theme-forex-pro .pricing-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0,230,118,0.30);
+    box-shadow: 0 8px 30px rgba(0,230,118,0.08);
+}
+body.theme-forex-pro .section-divider,
+body.theme-forex-pro hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,230,118,0.30), transparent);
+}
+body.theme-forex-pro .stat-number,
+body.theme-forex-pro .count-up {
+    color: #00E676;
+    text-shadow: 0 0 10px rgba(0,230,118,0.20);
+}
+body.theme-forex-pro .section-tag,
+body.theme-forex-pro .eyebrow-label {
+    color: #00E676;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+body.theme-forex-pro h1, body.theme-forex-pro h2, body.theme-forex-pro h3,
+body.theme-forex-pro h4, body.theme-forex-pro h5 {
+    letter-spacing: -0.01em;
+}
+
+/* Theme toggle pill in nav */
+.theme-toggle-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px 3px 3px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.03);
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+    user-select: none;
+    white-space: nowrap;
+    line-height: 1;
+}
+.theme-toggle-pill:hover {
+    border-color: rgba(255,255,255,0.20);
+    background: rgba(255,255,255,0.06);
+}
+.theme-toggle-pill .pill-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.10);
+}
+.theme-toggle-pill[data-active="neon-cyber"] .pill-dot {
+    background: #168BFF;
+}
+.theme-toggle-pill[data-active="forex-pro"] .pill-dot {
+    background: #00E676;
+    box-shadow: 0 0 6px rgba(0,230,118,0.30);
+}
+.theme-toggle-pill .pill-label {
+    transition: all 0.2s ease;
+}
+.theme-toggle-pill[data-active="neon-cyber"] .pill-label {
+    color: #8B9A94;
+}
+.theme-toggle-pill[data-active="forex-pro"] .pill-label {
+    color: #00E676;
 }
 
 /* --- LIGHT & DARK MODE OVERRIDES --- */
