@@ -740,11 +740,81 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             }
+
+            // Fetch education from Firebase (null-safe)
+            const eduRes = await fetch(`${url}/education.json`);
+            if (eduRes.ok) {
+                const rawEdu = await eduRes.json();
+                const cloudEdu = firebaseToArray(rawEdu);
+                if (cloudEdu && Array.isArray(cloudEdu) && cloudEdu.length > 0) {
+                    if (JSON.stringify(education) !== JSON.stringify(cloudEdu)) {
+                        education = cloudEdu;
+                        localStorage.setItem('amit_portfolio_education', JSON.stringify(education));
+                        hasChanges = true;
+                    }
+                }
+            }
+
+            // Fetch timeline from Firebase (null-safe)
+            const timelineRes = await fetch(`${url}/timeline.json`);
+            if (timelineRes.ok) {
+                const rawTimeline = await timelineRes.json();
+                const cloudTimeline = firebaseToArray(rawTimeline);
+                if (cloudTimeline && Array.isArray(cloudTimeline) && cloudTimeline.length > 0) {
+                    if (JSON.stringify(timeline) !== JSON.stringify(cloudTimeline)) {
+                        timeline = cloudTimeline;
+                        localStorage.setItem('amit_portfolio_timeline', JSON.stringify(timeline));
+                        hasChanges = true;
+                    }
+                }
+            }
+
+            // Fetch services from Firebase (null-safe)
+            const servicesRes = await fetch(`${url}/services.json`);
+            if (servicesRes.ok) {
+                const rawServices = await servicesRes.json();
+                const cloudServices = firebaseToArray(rawServices);
+                if (cloudServices && Array.isArray(cloudServices) && cloudServices.length > 0) {
+                    if (JSON.stringify(services) !== JSON.stringify(cloudServices)) {
+                        services = cloudServices;
+                        localStorage.setItem('amit_portfolio_services', JSON.stringify(services));
+                        hasChanges = true;
+                    }
+                }
+            }
+
+            // Fetch cms_text from Firebase (null-safe)
+            const cmsTextRes = await fetch(`${url}/cms_text.json`);
+            if (cmsTextRes.ok) {
+                const cloudCmsText = await cmsTextRes.json();
+                if (cloudCmsText && typeof cloudCmsText === 'object' && cloudCmsText !== null && Object.keys(cloudCmsText).length > 0) {
+                    const localCmsTextStr = localStorage.getItem('amit_portfolio_cms_text');
+                    if (localCmsTextStr !== JSON.stringify(cloudCmsText)) {
+                        localStorage.setItem('amit_portfolio_cms_text', JSON.stringify(cloudCmsText));
+                        if (typeof initInlineTextCMS === 'function') {
+                            initInlineTextCMS();
+                        }
+                    }
+                }
+            }
+
              if (hasChanges) {
                 renderProjects();
                 reorderDOMSections();
                 if (typeof renderDynamicSoftware === 'function') {
                     renderDynamicSoftware();
+                }
+                if (typeof renderDynamicEducation === 'function') {
+                    renderDynamicEducation();
+                }
+                if (typeof renderDynamicTimeline === 'function') {
+                    renderDynamicTimeline();
+                }
+                if (typeof renderDynamicServices === 'function') {
+                    renderDynamicServices();
+                }
+                if (typeof initInlineTextCMS === 'function') {
+                    initInlineTextCMS();
                 }
                 appendConsoleLog("> Showcase database synchronized with cloud updates.");
             } else {
@@ -4820,27 +4890,30 @@ document.addEventListener('DOMContentLoaded', () => {
             firebaseSyncBtn.innerHTML = '<span>Uploading...</span>';
             
             try {
-                const pRes = await fetch(`${url}/projects.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(projects)
-                });
-                
-                const sRes = await fetch(`${url}/sections.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(sections)
-                });
+                const now = Date.now();
+                localStorage.setItem('amit_portfolio_last_updated', now);
 
-                const lRes = await fetch(`${url}/layout_order.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(layoutOrder)
-                });
+                const savedCmsTextStr = localStorage.getItem('amit_portfolio_cms_text');
+                let savedCmsText = {};
+                if (savedCmsTextStr) { try { savedCmsText = JSON.parse(savedCmsTextStr); } catch(e){} }
+
+                const p1 = fetch(`${url}/projects.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(projects) });
+                const p2 = fetch(`${url}/sections.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(sections) });
+                const p3 = fetch(`${url}/layout_order.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(layoutOrder) });
+                const p4 = fetch(`${url}/software.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(software) });
+                const p5 = fetch(`${url}/education.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(education) });
+                const p6 = fetch(`${url}/timeline.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(timeline) });
+                const p7 = fetch(`${url}/services.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(services) });
+                const p8 = fetch(`${url}/clients.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(clients) });
+                const p9 = fetch(`${url}/cms_text.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(savedCmsText) });
+                const p10 = fetch(`${url}/last_updated.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(now) });
+
+                const responses = await Promise.all([p1, p2, p3, p4, p5, p6, p7, p8, p9, p10]);
+                const allOk = responses.every(r => r.ok);
                 
-                if (pRes.ok && sRes.ok && lRes.ok) {
-                    appendConsoleLog("> Showcase database synchronized to Firebase Cloud successfully!");
-                    alert("Database pushed to Firebase Cloud successfully!");
+                if (allOk) {
+                    appendConsoleLog("> All portfolio databases & text edits synchronized to Firebase Cloud successfully!");
+                    alert("All portfolio data and text edits pushed to Firebase Cloud successfully!");
                 } else {
                     throw new Error("Cloud save returned error. Check database rules.");
                 }
@@ -5087,7 +5160,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (savedText) { try { textDb = JSON.parse(savedText); } catch(e) {} }
 
             function isInsideCMS(el) {
-                return el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader') || el.closest('#contact');
+                return el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader');
             }
 
             function shouldSkip(el) {
@@ -5124,7 +5197,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             try {
                                 textDb[key] = el.innerHTML;
                                 localStorage.setItem('amit_portfolio_cms_text', JSON.stringify(textDb));
-                                appendConsoleLog('> Saved: [' + key + ']');
+                                const now = Date.now();
+                                localStorage.setItem('amit_portfolio_last_updated', now);
+                                pushToCloud('cms_text', textDb, true);
+                                pushToCloud('last_updated', now, true);
+                                appendConsoleLog('> Saved text: [' + key + ']');
                             } catch(e) { console.error('save error:', e); }
                         }
                         el.addEventListener('input', function() {
