@@ -5199,9 +5199,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.add('light-mode');
     }
 
-    // Light/Dark mode toggle click handler (desktop + mobile)
+    // Light/Dark mode toggle click handler (all buttons: desktop, mobile, floating)
     document.addEventListener('click', function(e) {
-        var btn = e.target.closest('.theme-mode-toggle');
+        var btn = e.target.closest('.theme-mode-toggle, .floating-theme-toggle');
         if (btn) {
             document.body.classList.toggle('light-mode');
             var isLight = document.body.classList.contains('light-mode');

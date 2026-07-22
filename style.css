@@ -5379,6 +5379,46 @@ body.theme-legacy-v100 a.redesign-only.btn {
     }
 }
 
+/* Floating theme toggle (visible on all viewports) */
+.floating-theme-toggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+    backdrop-filter: blur(12px);
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    outline: none;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.30);
+}
+.floating-theme-toggle:hover {
+    background: rgba(255,255,255,0.12);
+    border-color: var(--accent-cyan);
+    transform: scale(1.10);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.40);
+}
+body.light-mode .floating-theme-toggle {
+    background: rgba(0,0,0,0.04);
+    border-color: rgba(0,0,0,0.10);
+}
+body.light-mode .floating-theme-toggle:hover {
+    background: rgba(0,0,0,0.08);
+    border-color: var(--accent-cyan);
+}
+.floating-theme-toggle .sun-icon { display: none; }
+.floating-theme-toggle .moon-icon { display: none; }
+body:not(.light-mode) .floating-theme-toggle .sun-icon { display: block; color: #ffb700; }
+body.light-mode .floating-theme-toggle .moon-icon { display: block; color: #1a202c; }
+
 /* Theme toggle visible on all viewports */
 
 /* CV Download Loading Ring styles */
