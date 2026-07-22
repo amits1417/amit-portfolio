@@ -1229,7 +1229,7 @@ body.hover-interactive .custom-cursor-glow {
 .section-title {
     font-size: 2.8rem;
     margin-bottom: 20px;
-    color: var(--text-primary);
+    color: #FFFFFF !important;
 }
 
 #about .section-title {
@@ -1238,7 +1238,7 @@ body.hover-interactive .custom-cursor-glow {
 }
 
 .section-desc {
-    color: var(--text-secondary);
+    color: #D9D9D9 !important;
     font-size: 1.05rem;
 }
 
