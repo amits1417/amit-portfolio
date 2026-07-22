@@ -5188,7 +5188,7 @@ body.light-mode .about-badge {
     color: var(--text-primary) !important;
 }
 
-body.light-mode .section-title {
+body.light-mode .section-header .section-title {
     color: #1a202c !important;
 }
 body.light-mode .section-desc {
