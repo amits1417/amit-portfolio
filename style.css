@@ -5977,3 +5977,55 @@ body.show-all-graphics .portfolio-item.graphics-extra { display: block !importan
     background: var(--accent-purple) !important;
 }
 
+/* ==========================================================================
+   LIGHT MODE CONTRAST OVERRIDES FOR DARK SECTIONS (#services, #contact, footer)
+   ========================================================================== */
+body.light-mode #services .section-title,
+body.light-mode #contact .section-title,
+body.light-mode .section-dark-bg .section-title,
+body.light-mode #services h2,
+body.light-mode #contact h2,
+body.light-mode .section-dark-bg h2,
+body.light-mode #contact .info-value,
+body.light-mode footer .footer-logo,
+body.light-mode footer h3,
+body.light-mode footer h4 {
+    color: #ffffff !important;
+}
+
+body.light-mode #services .section-desc,
+body.light-mode #contact .section-desc,
+body.light-mode .section-dark-bg .section-desc,
+body.light-mode #contact .info-label,
+body.light-mode #contact .contact-details-box p,
+body.light-mode #contact .contact-details-box span,
+body.light-mode footer p,
+body.light-mode footer span,
+body.light-mode footer .footer-tagline,
+body.light-mode footer .footer-copyright,
+body.light-mode footer a.footer-link,
+body.light-mode footer .footer-links a {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+body.light-mode #services .section-badge,
+body.light-mode #contact .section-badge,
+body.light-mode .section-dark-bg .section-badge {
+    color: #00d2ff !important;
+    background: rgba(0, 210, 255, 0.15) !important;
+    border-color: rgba(0, 210, 255, 0.3) !important;
+}
+
+/* Ensure text inside white cards inside dark sections stays dark & crisp */
+body.light-mode .service-card .service-title,
+body.light-mode .contact-form-box .form-title {
+    color: #1a202c !important;
+}
+
+body.light-mode .service-card .service-text,
+body.light-mode .service-card .service-bullets li,
+body.light-mode .contact-form-box .form-label,
+body.light-mode .contact-form-box p {
+    color: #4a5568 !important;
+}
+
