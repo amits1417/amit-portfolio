@@ -23,9 +23,8 @@
 <body>
     <script>
         (function() {
-            var t;
-            try { t = localStorage.getItem('amit_portfolio_theme'); } catch(e) {}
-            document.body.classList.add('theme-' + (t || 'neon-cyber'));
+            const savedTheme = 'neon-cyber';
+            document.body.classList.add('theme-' + savedTheme);
         })();
     </script>
     <!-- Parallax Video Editing Timeline Background -->
@@ -65,17 +64,9 @@
                 <a href="#services" class="nav-link">Services</a>
                 <a href="./assets/Amit_Sharma_CV.pdf" download class="nav-cv-ring-btn" title="Download CV"><span>CV</span></a>
                 <a href="#contact" class="nav-link nav-cta">Contact</a>
-                <button class="theme-toggle-pill" id="theme-toggle-pill" data-active="neon-cyber" title="Switch theme" aria-label="Switch theme">
-                    <span class="pill-dot"></span>
-                    <span class="pill-label">Theme</span>
-                </button>
             </nav>
             
             <div class="mobile-header-ctas">
-                <button class="theme-toggle-pill" id="theme-toggle-pill-mobile" data-active="neon-cyber" title="Switch theme" aria-label="Switch theme" style="margin-right:4px;">
-                    <span class="pill-dot"></span>
-                    <span class="pill-label">Theme</span>
-                </button>
                 <a href="./assets/Amit_Sharma_CV.pdf" download class="nav-cv-ring-btn" title="Download CV">
                     <span>CV</span>
                 </a>
