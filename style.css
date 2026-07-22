@@ -5202,6 +5202,12 @@ body.light-mode .hero-title,
 body.light-mode #hero .hero-title {
     color: var(--text-primary) !important;
 }
+body.light-mode .btn-secondary,
+body.light-mode .btn-outline {
+    background: rgba(0, 0, 0, 0.05) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    color: var(--text-primary) !important;
+}
 body.light-mode .category-card-header {
     color: var(--accent-cyan) !important;
 }
@@ -5256,6 +5262,12 @@ body.light-mode .service-title,
 body.light-mode .timeline-headline,
 body.light-mode .category-block-title,
 body.light-mode .filter-btn:not(.active) {
+    color: var(--text-primary) !important;
+}
+body.light-mode .btn-secondary,
+body.light-mode .btn-outline {
+    background: rgba(0, 0, 0, 0.05) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
     color: var(--text-primary) !important;
 }
 body.light-mode .category-card-header {
