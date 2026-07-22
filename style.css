@@ -5188,11 +5188,14 @@ body.light-mode .about-badge {
     color: var(--text-primary) !important;
 }
 
-body.light-mode .section-title {
-    color: #1a202c !important;
+body.light-mode .section-header {
+    background: #f8f9fa !important; /* Extremely light background */
+    padding: 20px;
+    border-radius: 12px;
 }
+body.light-mode .section-title,
 body.light-mode .section-desc {
-    color: var(--text-primary) !important;
+    color: #1a202c !important; /* Force dark text */
 }
 body.light-mode .project-description-short,
 body.light-mode .hero-subheading,
