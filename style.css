@@ -6029,3 +6029,38 @@ body.light-mode .contact-form-box p {
     color: #4a5568 !important;
 }
 
+/* Ensure primary action buttons (.btn-primary) have solid blue background and crisp white text in Light Mode */
+body.light-mode .btn-primary,
+body.light-mode a.btn-primary,
+body.light-mode button.btn-primary,
+body.light-mode #hero-btn-portfolio {
+    background: #168BFF !important;
+    background: linear-gradient(135deg, #168BFF 0%, #0878E8 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(22, 139, 255, 0.3) !important;
+}
+
+body.light-mode .btn-primary:hover,
+body.light-mode a.btn-primary:hover,
+body.light-mode button.btn-primary:hover,
+body.light-mode #hero-btn-portfolio:hover {
+    background: #0878E8 !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 20px rgba(22, 139, 255, 0.4) !important;
+    transform: translateY(-2px);
+}
+
+body.light-mode .btn-primary *,
+body.light-mode a.btn-primary *,
+body.light-mode button.btn-primary *,
+body.light-mode #hero-btn-portfolio * {
+    color: #ffffff !important;
+}
+
+/* Ensure both About Me paragraphs use var(--text-primary) in both light and dark modes */
+.bio-text-redesign p,
+body.light-mode .bio-text-redesign p {
+    color: var(--text-primary) !important;
+}
+
