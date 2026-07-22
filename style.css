@@ -5017,6 +5017,16 @@ body.light-mode {
 body.light-mode .btn-primary,
 body.light-mode .nav-cta,
 body.light-mode .service-card,
+body.light-mode .service-card {
+    background: var(--bg-secondary) !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
+}
+body.light-mode .service-card .service-desc {
+    color: var(--text-secondary) !important;
+}
+body.light-mode .service-card .service-title {
+    color: var(--text-primary) !important;
+}
 body.light-mode .project-card,
 body.light-mode .spy-link,
 body.light-mode .software-category-card,
@@ -5144,6 +5154,16 @@ body:not(.light-mode) .theme-mode-toggle .moon-icon {
 body.light-mode header,
 body.light-mode .nav-menu,
 body.light-mode .showreel-viewport,
+body.light-mode .service-card {
+    background: var(--bg-secondary) !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
+}
+body.light-mode .service-card .service-desc {
+    color: var(--text-secondary) !important;
+}
+body.light-mode .service-card .service-title {
+    color: var(--text-primary) !important;
+}
 body.light-mode .project-card,
 body.light-mode .service-card,
 body.light-mode .timeline-item,
