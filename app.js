@@ -5186,6 +5186,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyTheme(themeName) {
         document.body.className = document.body.className.split(' ').filter(c => !c.startsWith('theme-')).join(' ');
         document.body.classList.add('theme-' + themeName);
+        // Update active swatch
+        document.querySelectorAll('.theme-swatch').forEach(function(btn) {
+            btn.classList.toggle('active', btn.dataset.theme === themeName);
+        });
     }
     
     // Exposed globally for Firebase startup check
@@ -5194,6 +5198,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Theme on startup
     const savedTheme = localStorage.getItem('amit_portfolio_theme') || 'neon-cyber';
     applyTheme(savedTheme);
+
+    // Theme selector click handler
+    document.addEventListener('click', function(e) {
+        var swatch = e.target.closest('.theme-swatch');
+        if (swatch) {
+            var theme = swatch.dataset.theme;
+            if (theme) {
+                localStorage.setItem('amit_portfolio_theme', theme);
+                applyTheme(theme);
+            }
+        }
+    });
 
     // --- AUTO-SAVE RESTORE POINT SYSTEM (max 4, timestamped) ---
     const MAX_RESTORE_POINTS = 4;
