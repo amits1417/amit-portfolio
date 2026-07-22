@@ -2298,7 +2298,7 @@ body.editor-active .timeline-desc {
 .info-label {
     font-size: 0.65rem;
     font-weight: 700;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     letter-spacing: 0.05em;
 }
 
