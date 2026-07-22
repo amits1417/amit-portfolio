@@ -5192,8 +5192,23 @@ document.addEventListener('DOMContentLoaded', () => {
     window.applyTheme = applyTheme;
 
     // Initialize Theme on startup
-    const savedTheme = localStorage.getItem('amit_portfolio_theme') || 'neon-cyber';
+    var savedTheme = localStorage.getItem('amit_portfolio_theme') || 'neon-cyber';
     applyTheme(savedTheme);
+    // Initialize Light Mode
+    if (localStorage.getItem('amit_portfolio_light_mode') === 'true') {
+        document.body.classList.add('light-mode');
+    }
+
+    // Light/Dark mode toggle click handler (desktop + mobile)
+    document.addEventListener('click', function(e) {
+        var btn = e.target.closest('.theme-mode-toggle');
+        if (btn) {
+            document.body.classList.toggle('light-mode');
+            var isLight = document.body.classList.contains('light-mode');
+            try { localStorage.setItem('amit_portfolio_light_mode', isLight ? 'true' : 'false'); } catch(err) {}
+            if (typeof lucide !== 'undefined') { try { lucide.createIcons(); } catch(e) {} }
+        }
+    });
 
     // --- AUTO-SAVE RESTORE POINT SYSTEM (max 4, timestamped) ---
     const MAX_RESTORE_POINTS = 4;

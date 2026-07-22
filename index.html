@@ -23,8 +23,12 @@
 <body>
     <script>
         (function() {
-            const savedTheme = 'neon-cyber';
-            document.body.classList.add('theme-' + savedTheme);
+            var t;
+            try { t = localStorage.getItem('amit_portfolio_theme'); } catch(e) {}
+            document.body.classList.add('theme-' + (t || 'neon-cyber'));
+            var lm;
+            try { lm = localStorage.getItem('amit_portfolio_light_mode'); } catch(e) {}
+            if (lm === 'true') document.body.classList.add('light-mode');
         })();
     </script>
     <!-- Parallax Video Editing Timeline Background -->
@@ -64,9 +68,17 @@
                 <a href="#services" class="nav-link">Services</a>
                 <a href="./assets/Amit_Sharma_CV.pdf" download class="nav-cv-ring-btn" title="Download CV"><span>CV</span></a>
                 <a href="#contact" class="nav-link nav-cta">Contact</a>
+                <button class="theme-mode-toggle" id="theme-mode-toggle" title="Toggle light/dark mode" aria-label="Toggle light/dark mode">
+                    <i data-lucide="sun" class="sun-icon" style="width:16px;height:16px;"></i>
+                    <i data-lucide="moon" class="moon-icon" style="width:16px;height:16px;"></i>
+                </button>
             </nav>
             
             <div class="mobile-header-ctas">
+                <button class="theme-mode-toggle" id="theme-mode-toggle-mobile" title="Toggle light/dark mode" aria-label="Toggle light/dark mode" style="width:32px;height:32px;margin-left:0;">
+                    <i data-lucide="sun" class="sun-icon" style="width:14px;height:14px;"></i>
+                    <i data-lucide="moon" class="moon-icon" style="width:14px;height:14px;"></i>
+                </button>
                 <a href="./assets/Amit_Sharma_CV.pdf" download class="nav-cv-ring-btn" title="Download CV">
                     <span>CV</span>
                 </a>
