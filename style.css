@@ -1149,14 +1149,17 @@ body.hover-interactive .custom-cursor-glow {
 }
 
 /* ==========================================================================
-   INFINITE MARQUEE
+   INFINITE MARQUEE STRIP (BLUE IN DARK MODE, DARK GRAY IN LIGHT MODE)
    ========================================================================== */
 #skills-marquee-section {
-    background: var(--bg-secondary);
-    border-top: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
-    padding: 30px 0;
+    background: #1665ff !important; /* Electric Blue Strip in Dark Mode */
+    padding: 15px 0 !important;
     overflow: hidden;
+    position: relative;
+    z-index: 10;
+    border-top: none !important;
+    border-bottom: none !important;
+    transition: background 0.3s ease;
 }
 
 .marquee-container {
@@ -1167,38 +1170,60 @@ body.hover-interactive .custom-cursor-glow {
 
 .marquee-content {
     display: flex;
+    align-items: center;
     white-space: nowrap;
     animation: marqueeScroll 25s linear infinite;
-    gap: 60px;
+    gap: 0;
 }
 
-#skills-marquee-section .marquee-content span,
-.marquee-content span {
-    font-family: var(--font-heading);
-    font-size: 2.2rem;
-    font-weight: 800;
-    letter-spacing: -1px;
-    color: var(--marquee-text-color, #ffffff);
-    -webkit-text-fill-color: var(--marquee-text-color, #ffffff);
-    -webkit-text-stroke: 0px transparent;
-    display: flex;
+.marquee-item {
+    display: inline-flex;
     align-items: center;
-    gap: 60px;
-    transition: var(--transition-fast);
+    gap: 28px;
+    padding-right: 28px;
 }
-#skills-marquee-section .marquee-content span:hover,
-.marquee-content span:hover {
-    color: var(--accent-cyan);
-    -webkit-text-fill-color: var(--accent-cyan);
-    -webkit-text-stroke: 0px transparent;
+
+.marquee-item span:first-child {
+    font-family: var(--font-heading), 'Montserrat', sans-serif;
+    font-size: 1.12rem;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    -webkit-text-stroke: 0px transparent !important;
+    line-height: 1;
 }
 
 .marquee-dot {
-    width: 12px;
-    height: 12px;
-    background-color: var(--accent-cyan);
+    width: 6px;
+    height: 6px;
+    background-color: #ffffff !important;
     border-radius: 50%;
-    box-shadow: var(--neon-shadow);
+    display: inline-block;
+    flex-shrink: 0;
+    opacity: 0.9;
+    box-shadow: none !important;
+}
+
+/* Light Mode Override (Dark Charcoal / Gray Strip as in reference) */
+body.light-mode #skills-marquee-section,
+html.light-mode #skills-marquee-section,
+.light-mode #skills-marquee-section {
+    background: #23242a !important; /* Dark Gray Strip in Light Mode */
+}
+
+body.light-mode .marquee-item span:first-child,
+html.light-mode .marquee-item span:first-child,
+.light-mode .marquee-item span:first-child {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+body.light-mode .marquee-dot,
+html.light-mode .marquee-dot,
+.light-mode .marquee-dot {
+    background-color: #ffffff !important;
 }
 
 /* ==========================================================================
@@ -6329,40 +6354,5 @@ body.light-mode .graphics-view-more-btn:hover {
     display: none !important;
     opacity: 0 !important;
     visibility: hidden !important;
-}
-
-/* Light Mode Marquee Scrolling Text Contrast Fix */
-body.light-mode,
-html.light-mode {
-    --marquee-text-color: #1a202c !important;
-}
-
-body.light-mode #skills-marquee-section,
-html.light-mode #skills-marquee-section,
-.light-mode #skills-marquee-section {
-    background: #ffffff !important;
-    border-color: rgba(0, 0, 0, 0.08) !important;
-}
-
-body.light-mode #skills-marquee-section span,
-html.light-mode #skills-marquee-section span,
-.light-mode #skills-marquee-section span,
-body.light-mode .marquee-content span,
-html.light-mode .marquee-content span,
-.light-mode .marquee-content span {
-    color: #1a202c !important;
-    -webkit-text-fill-color: #1a202c !important;
-    -webkit-text-stroke: 0px transparent !important;
-}
-
-body.light-mode #skills-marquee-section span:hover,
-html.light-mode #skills-marquee-section span:hover,
-.light-mode #skills-marquee-section span:hover,
-body.light-mode .marquee-content span:hover,
-html.light-mode .marquee-content span:hover,
-.light-mode .marquee-content span:hover {
-    color: #168BFF !important;
-    -webkit-text-fill-color: #168BFF !important;
-    -webkit-text-stroke: 0px transparent !important;
 }
 
