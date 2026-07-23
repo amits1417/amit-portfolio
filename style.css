@@ -869,7 +869,7 @@ body.hover-interactive .custom-cursor-glow {
 .category-header-title svg {
     width: 24px;
     height: 24px;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    filter: none !important;
 }
 
 /* Vertical Tools List container */
@@ -920,14 +920,16 @@ body.hover-interactive .custom-cursor-glow {
     width: 22px;
     height: 22px;
     object-fit: contain;
-    filter: drop-shadow(0 0 4px var(--brand-color));
+    filter: none !important;
+    box-shadow: none !important;
     transition: transform 0.3s ease, opacity 0.3s ease;
     color: var(--brand-color);
 }
 
 .vertical-tool-row:hover .vertical-tool-logo {
     transform: scale(1.1) rotate(5deg);
-    filter: drop-shadow(0 0 8px var(--brand-color));
+    filter: none !important;
+    box-shadow: none !important;
 }
 
 .cms-logo-upload-trigger {
@@ -1435,11 +1437,31 @@ body.hover-interactive .custom-cursor-glow {
     transition: var(--transition-smooth);
 }
 
-/* Graphics category thumbnail image containment override */
-.portfolio-item[data-category="graphics"] .project-media img {
-    object-fit: contain;
-    background-color: #0c0b10;
-    image-rendering: auto;
+/* Graphics category thumbnail image containment & 3D coin flip styling */
+.grid-graphics .project-media {
+    perspective: 800px !important;
+    overflow: hidden;
+}
+
+.portfolio-item[data-category="graphics"] .project-media img,
+.grid-graphics .project-media img {
+    object-fit: contain !important;
+    background-color: rgba(10, 11, 15, 0.95) !important;
+    padding: 6px !important;
+    border-radius: 8px !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease !important;
+    backface-visibility: hidden !important;
+}
+
+body.light-mode .portfolio-item[data-category="graphics"] .project-media img,
+body.light-mode .grid-graphics .project-media img {
+    background-color: #f0f2f5 !important;
+}
+
+body.light-mode .portfolio-item[data-category="graphics"] .project-media,
+body.light-mode .grid-graphics .project-media {
+    background-color: #f0f2f5 !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
 }
 .portfolio-item[data-category="graphics"] .project-card:hover .project-media img {
     transform: none !important;
@@ -6169,5 +6191,63 @@ body.light-mode .graphics-view-more-btn:hover {
     border-radius: 12px !important;
     box-shadow: 0 25px 65px rgba(0, 0, 0, 0.85) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Technical Proficiency - Remove all shadows & glows behind icons */
+#expertise .vertical-tool-logo,
+#expertise .category-header-title svg,
+#expertise .software-icon,
+#expertise .vertical-tool-logo-wrapper,
+#expertise .vertical-tool-logo-wrapper img,
+#expertise .vertical-tool-logo-wrapper svg,
+#expertise i,
+#expertise svg,
+#expertise img {
+    filter: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+#expertise .vertical-tool-row:hover .vertical-tool-logo {
+    filter: none !important;
+    box-shadow: none !important;
+}
+
+/* ==========================================================================
+   REMOVE PAUSE BUTTON IN PREVIEW & SHOWREEL FULL PLAYBACK STATE
+   ========================================================================== */
+
+/* Completely hide pause button overlay when playing inline or during video preview */
+.video-custom-overlay.playing,
+.video-custom-overlay.playing .video-overlay-btn,
+.video-custom-overlay.playing:hover .video-overlay-btn,
+.project-card.playing-inline .video-overlay-btn,
+.project-card.playing-inline:hover .video-overlay-btn,
+.project-media:has(.hover-video-preview) .video-overlay-btn,
+.project-media:has(.hover-video-preview) .project-view-badge,
+.showreel-frame.is-playing .video-overlay-btn {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Full playing state for Showreel frame */
+.showreel-frame.is-playing .showreel-overlay,
+.showreel-frame.is-playing .showreel-img,
+.showreel-frame.is-playing .waveform-canvas {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    display: none !important;
+}
+
+.showreel-frame.is-playing .showreel-video-container {
+    z-index: 10 !important;
+    pointer-events: auto !important;
+}
+
+.showreel-frame.is-playing .showreel-video-container iframe,
+.showreel-frame.is-playing .showreel-video-container video {
+    pointer-events: auto !important;
 }
 

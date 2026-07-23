@@ -7,25 +7,21 @@ const CMS_PASSWORD = "DellN5010";
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const hudToggle = document.getElementById('studio-hud-toggle');
+    const lockModal = document.getElementById('password-lock-modal');
     
-    let authorized = false;
-    if (sessionStorage.getItem('cms_authenticated') === 'true') {
-        authorized = true;
-    } else if (urlParams.has('edit')) {
-        const input = prompt('Enter CMS password:');
-        if (input === CMS_PASSWORD) {
-            sessionStorage.setItem('cms_authenticated', 'true');
-            authorized = true;
+    const isEditURL = urlParams.has('edit');
+    let isAuth = localStorage.getItem('cms_authenticated') === 'true';
+
+    if (isEditURL) {
+        if (isAuth) {
+            activateStudioMode();
+        } else if (lockModal) {
+            lockModal.classList.add('active');
         }
     }
 
-    // Auto-enable Studio (edit) mode when authorized via ?edit so edits save reliably
-    if (authorized) {
-        document.body.classList.add('editor-active');
-    }
-    
     if (hudToggle) {
-        hudToggle.style.setProperty('display', authorized ? 'flex' : 'none', 'important');
+        hudToggle.style.setProperty('display', isEditURL ? 'flex' : 'none', 'important');
     }
 
     // Helper to extract YouTube video ID from any link style (including Shorts)
@@ -586,9 +582,9 @@ document.addEventListener('DOMContentLoaded', () => {
         renderDynamicServices();
         renderClientsStrip();
 
-        // Set default password if not exists
-        if (!localStorage.getItem('amit_portfolio_password')) {
-            localStorage.setItem('amit_portfolio_password', 'admin123');
+        // Set default password if not exists or if reset
+        if (!localStorage.getItem('amit_portfolio_password') || localStorage.getItem('amit_portfolio_password') === 'admin123') {
+            localStorage.setItem('amit_portfolio_password', 'DellN5010');
         }
 
         // Initialize Firebase Cloud sync configurations
@@ -1353,11 +1349,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             }
 
+            const isGraphicsCat = (category && category.toLowerCase().includes('graphic')) || (proj.category && proj.category.toLowerCase().includes('graphic'));
             const fallbackThumb = './assets/showreel_cover_compelling.png';
-            let thumbImgSrc = proj.category === 'graphics' ? proj.mediaLink : proj.thumbLink;
+            let thumbImgSrc = isGraphicsCat ? proj.mediaLink : proj.thumbLink;
             if (!thumbImgSrc || thumbImgSrc.trim() === '') {
                 thumbImgSrc = fallbackThumb;
             }
+            const hasDetailsText = (proj.title && proj.title.trim() !== '') || (proj.client && proj.client.trim() !== '') || (proj.role && proj.role.trim() !== '') || (proj.tools && proj.tools.trim() !== '') || (proj.desc && proj.desc.trim() !== '');
+            const hideDetails = !hasDetailsText || category === 'shorts' || isGraphicsCat;
             itemEl.innerHTML = `
                 <div class="project-card video-trigger-card" data-project-id="${proj.id}">
                     <!-- Multi-select delete checkbox overlay (direct child of card, high z-index) -->
@@ -1374,7 +1373,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span>${viewLabel}</span>
                         </div>
                     </div>
-                    <div class="project-details" ${category === 'shorts' || category === 'graphics' ? 'style="display: none !important;"' : ''}>
+                    <div class="project-details" ${hideDetails ? 'style="display: none !important;"' : ''}>
                         <h3 class="project-title">${proj.title}</h3>
                         ${proj.client || proj.role || proj.tools || proj.desc ? `
                             <div class="project-meta-info">
@@ -1439,7 +1438,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Graphics: show only 12 items + "View More" button outside grid container
-        if (category === 'graphics') {
+        if (category && category.toLowerCase().includes('graphic')) {
             const existingWrapper = gridEl.parentNode ? gridEl.parentNode.querySelector('.graphics-view-more-wrapper') : null;
             if (existingWrapper) existingWrapper.remove();
 
@@ -1478,9 +1477,76 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (gridEl.parentNode) {
                     gridEl.parentNode.appendChild(viewMoreWrapper);
                 }
-                if (typeof lucide !== 'undefined') lucide.createIcons();
             }
         }
+        initGraphicsRandomSlideshow();
+    }
+
+    window.graphicsSlideshowTimers = window.graphicsSlideshowTimers || [];
+
+    function initGraphicsRandomSlideshow() {
+        if (window.graphicsSlideshowTimers) {
+            window.graphicsSlideshowTimers.forEach(t => clearTimeout(t));
+            window.graphicsSlideshowTimers = [];
+        }
+
+        if (document.body.classList.contains('editor-active')) return;
+
+        const allGraphics = projects.filter(p => p && p.category && p.category.toLowerCase().includes('graphic') && p.mediaLink && p.mediaLink.trim() !== '');
+        if (allGraphics.length <= 12) return;
+
+        const cardItems = document.querySelectorAll('.grid-graphics .portfolio-item');
+        if (!cardItems || cardItems.length === 0) return;
+
+        cardItems.forEach((itemEl, slotIndex) => {
+            let currentIndex = slotIndex;
+
+            function scheduleNextChange() {
+                const randomDelay = 3500 + Math.floor(Math.random() * 4000);
+                const timer = setTimeout(() => {
+                    if (document.body.classList.contains('editor-active')) return;
+
+                    currentIndex = (currentIndex + 12) % allGraphics.length;
+                    const nextProj = allGraphics[currentIndex];
+                    if (!nextProj) return;
+
+                    const img = itemEl.querySelector('.project-media img');
+                    const videoCard = itemEl.querySelector('.video-trigger-card');
+
+                    if (img) {
+                        img.style.transition = 'transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s ease';
+                        img.style.transform = 'perspective(600px) rotateY(90deg)';
+                        img.style.opacity = '0.3';
+                        
+                        setTimeout(() => {
+                            img.src = normalizeMediaPath(nextProj.mediaLink);
+                            if (videoCard) {
+                                videoCard.setAttribute('data-project-id', nextProj.id);
+                            }
+                            
+                            img.style.transition = 'none';
+                            img.style.transform = 'perspective(600px) rotateY(-90deg)';
+                            
+                            requestAnimationFrame(() => {
+                                requestAnimationFrame(() => {
+                                    img.style.transition = 'transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s ease';
+                                    img.style.transform = 'perspective(600px) rotateY(0deg)';
+                                    img.style.opacity = '1';
+                                });
+                            });
+                        }, 280);
+                    }
+
+                    scheduleNextChange();
+                }, randomDelay);
+
+                window.graphicsSlideshowTimers.push(timer);
+            }
+
+            const initialStartDelay = 500 + Math.floor(Math.random() * 3000);
+            const initTimer = setTimeout(scheduleNextChange, initialStartDelay);
+            window.graphicsSlideshowTimers.push(initTimer);
+        });
     }
 
     function renderConsoleSectionsList() {
@@ -3567,116 +3633,110 @@ document.addEventListener('DOMContentLoaded', () => {
         drawWaveform();
     }
 
-    // Auto-preview showreel muted when section scrolls into view
+    // Auto-preview showreel muted when section scrolls into view & handle full playback
     (function() {
         const viewport = document.getElementById('showreel-viewport');
         if (!viewport) return;
-        const frame = viewport.querySelector('.showreel-frame');
-        // Capture the default (poster) markup so we can restore it later
-        const showreelFrameDefaultHTML = frame ? frame.innerHTML : '';
+        const frame = document.getElementById('showreel-frame');
+        const videoContainer = document.getElementById('showreel-video-container');
+        if (!frame || !videoContainer) return;
+
         let autoPlayed = false;
+        let isFullPlaying = false;
+
+        function playFullShowreel() {
+            if (document.body.classList.contains('editor-active')) return;
+            const playBtn = document.getElementById('play-showreel-btn');
+            const vid = playBtn ? (playBtn.getAttribute('data-video-id') || 'u6KTFBKMP8M') : 'u6KTFBKMP8M';
+            const mediaSource = playBtn ? (playBtn.getAttribute('data-media-source') || 'link') : 'link';
+            const cleanYtId = extractYouTubeId(vid);
+            const isYoutube = !!cleanYtId;
+
+            videoContainer.innerHTML = '';
+            frame.classList.add('is-playing');
+            isFullPlaying = true;
+
+            if (mediaSource === 'upload' && !isYoutube) {
+                const video = document.createElement('video');
+                video.src = normalizeMediaPath(vid);
+                video.controls = true;
+                video.autoplay = true;
+                video.preload = 'auto';
+                video.style.position = 'absolute';
+                video.style.top = '0';
+                video.style.left = '0';
+                video.style.width = '100%';
+                video.style.height = '100%';
+                video.style.border = 'none';
+                videoContainer.appendChild(video);
+            } else {
+                const iframe = document.createElement('iframe');
+                iframe.src = `https://www.youtube.com/embed/${cleanYtId || vid}?autoplay=1&controls=1&rel=0&modestbranding=1&vq=hd1080`;
+                iframe.style.position = 'absolute';
+                iframe.style.top = '0';
+                iframe.style.left = '0';
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.border = 'none';
+                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                iframe.allowFullscreen = true;
+                videoContainer.appendChild(iframe);
+            }
+
+            const waveformEl = document.getElementById('waveform-canvas');
+            if (waveformEl) waveformEl.style.display = 'none';
+            const backdrop = viewport.querySelector('.showreel-glow-backdrop');
+            if (backdrop) backdrop.style.display = 'none';
+            appendConsoleLog('> Main showreel streaming inline (Full Audio)... Active.');
+        }
+
         const autoObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting && !autoPlayed) {
+                if (entry.isIntersecting && !autoPlayed && !isFullPlaying) {
                     if (document.body.classList.contains('editor-active')) return;
                     autoPlayed = true;
                     autoObserver.disconnect();
-                    if (!frame) return;
                     const playBtn = document.getElementById('play-showreel-btn');
                     const vid = playBtn ? (playBtn.getAttribute('data-video-id') || 'u6KTFBKMP8M') : 'u6KTFBKMP8M';
                     const cleanYtId = extractYouTubeId(vid);
                     if (!cleanYtId) return;
-                    frame.innerHTML = '<iframe src="https://www.youtube.com/embed/' + cleanYtId + '?autoplay=1&mute=1&controls=0&loop=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&enablejsapi=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+
+                    // Muted preview with loop=1&playlist=cleanYtId so preview NEVER stops or freezes!
+                    videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${cleanYtId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanYtId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&enablejsapi=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
                     const waveformEl = document.getElementById('waveform-canvas');
                     if (waveformEl) waveformEl.style.display = 'none';
                     wavePlaying = true;
-                    appendConsoleLog('> Showreel auto-preview started (muted).');
+                    appendConsoleLog('> Showreel auto-preview started (muted loop).');
                 }
             });
         }, { threshold: 0.4 });
         autoObserver.observe(viewport);
 
+        // Click event handler on showreel viewport / frame / button to play or replay full video anytime
+        viewport.addEventListener('click', (e) => {
+            if (e.target.closest('#btn-edit-showreel') || e.target.closest('.showreel-edit-overlay')) return;
+            if (document.body.classList.contains('editor-active')) return;
+            playFullShowreel();
+        });
+
         // Stop all video previews (used when entering CMS mode)
         window.stopAllPreviews = function() {
-            // Remove hover/inline previews in portfolio cards
             document.querySelectorAll('.hover-video-preview').forEach(el => el.remove());
             document.querySelectorAll('.project-card.playing-inline').forEach(card => {
                 const media = card.querySelector('.project-media');
                 if (media) media.querySelectorAll('iframe, video').forEach(v => v.remove());
                 card.classList.remove('playing-inline');
             });
-            // Restore showreel frame to poster (stop auto-preview)
-            if (frame && frame.querySelector('iframe')) {
-                frame.innerHTML = showreelFrameDefaultHTML;
-                autoPlayed = false;
-                autoObserver.observe(viewport);
-            }
+            videoContainer.innerHTML = '';
+            frame.classList.remove('is-playing');
+            isFullPlaying = false;
+            autoPlayed = false;
+            autoObserver.observe(viewport);
             const waveformEl = document.getElementById('waveform-canvas');
             if (waveformEl) waveformEl.style.display = '';
             wavePlaying = false;
         };
     })();
-
-    // Play button triggers
-    const playShowreelBtn = document.getElementById('play-showreel-btn');
-    const playBtnIcon = playShowreelBtn ? playShowreelBtn.querySelector('.play-btn-icon') : null;
-    const playBtnLabel = document.querySelector('.play-btn-label');
-    const consoleLogs = document.getElementById('console-logs');
-    
-    if (playShowreelBtn) {
-        playShowreelBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const videoId = playShowreelBtn.getAttribute('data-video-id') || 'u6KTFBKMP8M';
-            const mediaSource = playShowreelBtn.getAttribute('data-media-source') || 'link';
-            const viewport = document.getElementById('showreel-viewport');
-            const frame = viewport ? viewport.querySelector('.showreel-frame') : null;
-            
-            if (frame) {
-                // Clear cover elements and append direct player
-                frame.innerHTML = '';
-                
-                const cleanYtId = extractYouTubeId(videoId);
-                const isYoutube = !!cleanYtId;
-                
-                if (mediaSource === 'upload' && !isYoutube) {
-                    const video = document.createElement('video');
-                    video.src = normalizeMediaPath(videoId);
-                    video.controls = true;
-                    video.autoplay = true;
-                    video.preload = 'auto';
-                    video.style.position = 'absolute';
-                    video.style.top = '0';
-                    video.style.left = '0';
-                    video.style.width = '100%';
-                    video.style.height = '100%';
-                    video.style.border = 'none';
-                    
-                    frame.appendChild(video);
-                } else {
-                    const iframe = document.createElement('iframe');
-                    iframe.src = `https://www.youtube.com/embed/${cleanYtId || videoId}?autoplay=1&rel=0&modestbranding=1&vq=hd1080`;
-                    iframe.style.position = 'absolute';
-                    iframe.style.top = '0';
-                    iframe.style.left = '0';
-                    iframe.style.width = '100%';
-                    iframe.style.height = '100%';
-                    iframe.style.border = 'none';
-                    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-                    iframe.allowFullscreen = true;
-                    
-                    frame.appendChild(iframe);
-                }
-                
-                // Hide glowing backdrop to prevent focus bleed
-                const backdrop = viewport.querySelector('.showreel-glow-backdrop');
-                if (backdrop) backdrop.style.display = 'none';
-                
-                appendConsoleLog('> Main showreel streaming inline... Active.');
-            }
-        });
-    }
     
     // Console log utility
     function appendConsoleLog(text) {
@@ -4101,7 +4161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let currentLightboxIndex = -1;
 
         function isImageProject(proj) {
-            return proj.category === 'graphics';
+            return proj && proj.category && proj.category.toLowerCase().includes('graphic');
         }
 
         function loadProjectInLightbox(proj) {
@@ -4237,7 +4297,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     galleryStrip.innerHTML = '';
                     
                     currentLightboxProjects.forEach((p, idx) => {
-                        const thumbImgSrc = p.category === 'graphics' ? p.mediaLink : p.thumbLink;
+                        const thumbImgSrc = (p.category && p.category.toLowerCase().includes('graphic')) ? p.mediaLink : p.thumbLink;
                         const thumbEl = document.createElement('img');
                         thumbEl.src = normalizeMediaPath(thumbImgSrc);
                         thumbEl.className = 'lightbox-gallery-thumb' + (p.id === proj.id ? ' active' : '');
@@ -4279,7 +4339,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cat = proj.category;
                 
                 // Slide/swipe gallery view should ONLY work for 'shorts' and 'graphics'
-                if (cat === 'shorts' || cat === 'graphics') {
+                if (cat === 'shorts' || (cat && cat.toLowerCase().includes('graphic'))) {
                     // Filter pool to only contain items of the same category
                     currentLightboxProjects = projects.filter(p => p.category === cat);
                     currentLightboxIndex = currentLightboxProjects.findIndex(p => p.id === proj.id);
@@ -4438,6 +4498,10 @@ document.addEventListener('DOMContentLoaded', () => {
         studioToggleBtn.querySelector('.studio-btn-text').textContent = "CLOSE CMS STUDIO";
         const bulkDeleteBtn = document.getElementById('studio-bulk-delete-btn');
         if (bulkDeleteBtn) bulkDeleteBtn.style.display = 'inline-flex';
+        
+        const consoleDrawer = document.getElementById('studio-console-drawer');
+        if (consoleDrawer) consoleDrawer.classList.add('open');
+
         appendConsoleLog("> Local CMS Studio mode active. Use card controls to modify.");
         if (typeof window.stopAllPreviews === 'function') window.stopAllPreviews();
         renderProjects();
@@ -4472,13 +4536,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 studioToggleBtn.querySelector('.studio-btn-text').textContent = "STUDIO CREATOR MODE";
                 const bulkDeleteBtn = document.getElementById('studio-bulk-delete-btn');
                 if (bulkDeleteBtn) bulkDeleteBtn.style.display = 'none';
+                
+                const consoleDrawer = document.getElementById('studio-console-drawer');
+                if (consoleDrawer) consoleDrawer.classList.remove('open');
+
                 appendConsoleLog("> Local CMS Studio mode disabled.");
                 renderProjects();
                 renderDynamicSoftware();
                 renderDynamicServices();
                 window.dispatchEvent(new CustomEvent('cms-mode-change', { detail: { active: false } }));
             } else {
-                activateStudioMode();
+                const correctPass = localStorage.getItem('amit_portfolio_password') || 'DellN5010';
+                if (localStorage.getItem('cms_authenticated') === 'true') {
+                    activateStudioMode();
+                } else if (passwordLockModal) {
+                    passwordLockModal.classList.add('active');
+                } else {
+                    const input = prompt('Enter CMS password:');
+                    if (input === 'DellN5010' || input === correctPass) {
+                        localStorage.setItem('cms_authenticated', 'true');
+                        activateStudioMode();
+                    } else if (input !== null) {
+                        alert("Incorrect password! Access denied.");
+                    }
+                }
             }
         });
     }
@@ -4508,8 +4589,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const inputVal = passInput ? passInput.value : '';
             const correctPass = localStorage.getItem('amit_portfolio_password') || 'DellN5010';
             
-            if (inputVal === correctPass) {
+            if (inputVal === 'DellN5010' || inputVal === correctPass) {
                 isStudioUnlocked = true;
+                localStorage.setItem('cms_authenticated', 'true');
                 if (passwordLockModal) {
                     passwordLockModal.classList.remove('active');
                 }
@@ -4621,7 +4703,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (mediaSrc === 'upload') {
                     const mediaFile = mediaFileEl.files[0];
                     if (mediaFile) {
-                        if (category === 'graphics') {
+                        if (category && category.toLowerCase().includes('graphic')) {
                             progressContainer.classList.remove('hidden');
                             progressBar.style.width = '50%';
                             percentText.textContent = 'Processing image...';
@@ -5186,19 +5268,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (savedText) { try { textDb = JSON.parse(savedText); } catch(e) {} }
 
             function isInsideCMS(el) {
-                return el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader');
+                return el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader') || el.closest('.portfolio-grid') || el.closest('.portfolio-item');
             }
 
             function shouldSkip(el) {
                 var t = el.tagName.toLowerCase();
-                if (t === 'button') {
-                    if (el.id === 'studio-toggle-btn' || el.classList.contains('hamburger') || el.closest('.hamburger') || el.classList.contains('back-to-top') || el.closest('.back-to-top') || el.classList.contains('video-modal-close') || el.classList.contains('close-btn') || el.classList.contains('lightbox-nav-btn') || el.classList.contains('console-btn') || el.closest('.filter-btn')) return true;
-                }
-                if (t === 'a' && el.classList.contains('social-link')) return true;
+                if (t === 'button' || t === 'a' || t === 'input' || t === 'textarea' || t === 'select' || t === 'div') return true;
                 return false;
             }
 
-            var allTextTags = 'h1, h2, h3, h4, h5, h6, p, li, span, div, label, strong, em, b, i, u, a, button, td, th, blockquote, cite, code, pre, small, sub, sup';
+            var allTextTags = 'h1, h2, h3, h4, h5, h6, p, li, span, label, strong, em, b, i, u, small, sub, sup';
 
             // First pass: restore saved text + attach blur listeners
             document.querySelectorAll(allTextTags).forEach(function(el, idx) {
@@ -5213,7 +5292,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         el.setAttribute('data-cms-key', key);
                     }
                     if (textDb[key] !== undefined) {
-                        el.innerHTML = textDb[key];
+                        var cleanVal = String(textDb[key]).replace(/\s*contenteditable=(['"]?)(?:true|false)\1/gi, '');
+                        el.innerHTML = cleanVal;
                     }
                     if (!el.dataset.cmsInitialized) {
                         el.dataset.cmsInitialized = 'true';
@@ -5241,6 +5321,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } catch(e) {}
             });
+            applyContentEditable();
         } catch(e) { console.error('initInlineTextCMS error:', e); }
     }
 
@@ -5256,23 +5337,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function applyContentEditable() {
-        var active = isTextEditActive && document.body.classList.contains('editor-active');
+        var active = document.body.classList.contains('editor-active');
         try {
-            var allEls = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, span, div, label, strong, em, b, i, u, a, button, td, th, blockquote, cite, code, pre, small, sub, sup');
+            if (!active) {
+                document.querySelectorAll('[contenteditable]').forEach(function(el) {
+                    el.removeAttribute('contenteditable');
+                });
+                document.querySelectorAll('.portfolio-grid').forEach(function(g) {
+                    g.style.userSelect = '';
+                });
+                return;
+            }
+            var allEls = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, span, label, strong, em, b, i, u, small, sub, sup');
             for (var i = 0; i < allEls.length; i++) {
                 var el = allEls[i];
-                if (el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader') || el.closest('#contact')) continue;
+                if (el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader') || el.closest('#contact') || el.closest('.portfolio-grid')) continue;
                 var t = el.tagName.toLowerCase();
-                // Skip form elements and interactive controls - set explicit false to override parent inheritance
-                if (t === 'input' || t === 'textarea' || t === 'select') { el.contentEditable = 'false'; continue; }
-                if (el.closest('.form-group')) { el.contentEditable = 'false'; continue; }
-                if (t === 'button' && (el.id === 'studio-toggle-btn' || el.classList.contains('hamburger') || el.closest('.hamburger') || el.classList.contains('back-to-top') || el.closest('.back-to-top') || el.classList.contains('video-modal-close') || el.classList.contains('close-btn') || el.classList.contains('lightbox-nav-btn') || el.classList.contains('console-btn') || el.closest('.filter-btn'))) continue;
-                if (t === 'a' && el.classList.contains('social-link')) continue;
-                el.contentEditable = active ? 'true' : 'false';
+                if (t === 'input' || t === 'textarea' || t === 'select' || t === 'button' || t === 'a' || t === 'div') continue;
+                el.contentEditable = 'true';
             }
-            // Override CSS user-select:none on portfolio grids when text edit is active
             document.querySelectorAll('.portfolio-grid').forEach(function(g) {
-                g.style.userSelect = active ? 'text' : '';
+                g.style.userSelect = 'text';
             });
         } catch(e) { console.error('contentEditable apply error:', e); }
     }

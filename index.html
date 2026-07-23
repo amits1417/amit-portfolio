@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
-    <link rel="stylesheet" href="style.css?v=4.5">
+    <link rel="stylesheet" href="style.css?v=5.7">
     <!-- Inline SVG Favicon with AMIT logo -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%2265%22 x=%2250%22 font-size=%2232%22 font-weight=%22900%22 font-family=%22system-ui, -apple-system, sans-serif%22 fill=%22white%22 text-anchor=%22middle%22 letter-spacing=%220.05em%22&gt;AMIT&lt;/text&gt;&lt;/svg&gt;">
 </head>
@@ -162,7 +162,8 @@
                     <div class="showreel-viewport" id="showreel-viewport">
                         <div class="showreel-glow-backdrop"></div>
                         
-                        <div class="showreel-frame">
+                        <div class="showreel-frame" id="showreel-frame">
+                            <div class="showreel-video-container" id="showreel-video-container" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;overflow:hidden;border-radius:16px;"></div>
                             <img src="./assets/showreel.png" alt="Showreel Video Cover" class="showreel-img">
                             
                             <!-- Showreel Edit Overlay -->
@@ -175,7 +176,7 @@
                             <!-- Audio visualizer simulation overlay -->
                             <canvas id="waveform-canvas" class="waveform-canvas"></canvas>
                             
-                            <div class="showreel-overlay">
+                            <div class="showreel-overlay" id="showreel-overlay">
                                 <!-- Trigger Modal Video Player -->
                                 <button class="play-btn-circle magnetic video-trigger-card" data-video-id="u6KTFBKMP8M" id="play-showreel-btn" aria-label="Play Showreel">
                                     <div class="play-btn-pulse"></div>
@@ -183,7 +184,7 @@
                                 </button>
                                 <span class="play-btn-label">STREAM SHOWREEL</span>
                             </div>
-                    </div>
+                        </div>
                 </div>
             </div>
             </div>
@@ -1049,7 +1050,7 @@
             <form id="password-lock-form" onsubmit="return false;">
                 <div class="modal-form-group" style="margin-bottom: 15px;">
                     <label for="lock-password-input">Studio Password</label>
-                    <input type="password" id="lock-password-input" required placeholder="Enter password (default: admin123)" style="width: 100%;">
+                    <input type="password" id="lock-password-input" required placeholder="Enter password (default: DellN5010)" style="width: 100%;">
                 </div>
                 <div class="modal-actions" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.05);">
                     <button type="submit" class="btn btn-primary" id="password-submit-btn" style="width: 100%; padding: 12px;">
@@ -1419,7 +1420,7 @@
     <!-- Baked default portfolio data (cloud projects) -->
     <script src="data.js?v=1.0"></script>
     <!-- Custom Application Logic -->
-    <script src="app.js?v=9.7"></script>
+    <script src="app.js?v=11.0"></script>
 <script>
 // Batch YouTube Import - uses window.* exposed by app.js
 (function() {
