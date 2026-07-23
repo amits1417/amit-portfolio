@@ -3495,71 +3495,69 @@ document.addEventListener('DOMContentLoaded', () => {
     function initPreviewCanvases() {
         const projectCards = document.querySelectorAll('.project-card');
         
-        // Intersection Observer: Auto-play silent video previews on scroll/viewport visibility (both desktop and mobile)
+        function loadCardPreview(card) {
+            const mediaContainer = card.querySelector('.project-media');
+            if (!mediaContainer) return;
+
+            const projectId = card.getAttribute('data-project-id');
+            const proj = projects.find(p => p.id === projectId);
+            if (!proj) return;
+
+            // If it is static design category, ignore
+            if (proj.mediaSource === 'upload') {
+                const isVideo = (proj.category === 'long' || proj.category === 'shorts');
+                if (!isVideo) return;
+            }
+
+            if (document.body.classList.contains('editor-active')) return;
+            const isAnyPlaying = document.querySelector('.project-card.playing-inline') || 
+                                 (document.getElementById('video-modal') && document.getElementById('video-modal').classList.contains('active'));
+            if (isAnyPlaying) return;
+
+            // Check if a preview is already playing inside this card
+            if (mediaContainer.querySelector('.hover-video-preview')) return;
+
+            let previewEl;
+            if (proj.mediaSource === 'upload') {
+                previewEl = document.createElement('video');
+                previewEl.src = normalizeMediaPath(proj.mediaLink);
+                previewEl.muted = true;
+                previewEl.loop = true;
+                previewEl.autoplay = true;
+                previewEl.preload = 'auto';
+                previewEl.setAttribute('muted', '');
+                previewEl.setAttribute('playsinline', '');
+                previewEl.playsInline = true;
+                previewEl.className = 'hover-video-preview loaded';
+                
+                mediaContainer.appendChild(previewEl);
+            } else {
+                const cleanId = extractYouTubeId(proj.mediaLink);
+                if (!cleanId) return;
+                previewEl = document.createElement('iframe');
+                previewEl.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&enablejsapi=1&playsinline=1&vq=hd1080`;
+                previewEl.className = 'hover-video-preview loaded';
+                
+                mediaContainer.appendChild(previewEl);
+            }
+        }
+
+        // Preload visible cards immediately on initial call without waiting for scroll!
+        projectCards.forEach(card => loadCardPreview(card));
+
+        // Intersection Observer: Pre-load video previews generously before cards scroll into view
         if ('IntersectionObserver' in window) {
             const observerOptions = {
                 root: null,
-                rootMargin: '0px',
-                threshold: 0.35 // Trigger when card is at least 35% visible in the viewport
+                rootMargin: '800px 0px', // Preload cards 800px ahead!
+                threshold: 0.01
             };
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     const card = entry.target;
-                    const mediaContainer = card.querySelector('.project-media');
-                    if (!mediaContainer) return;
-
-                    const projectId = card.getAttribute('data-project-id');
-                    const proj = projects.find(p => p.id === projectId);
-                    if (!proj) return;
-
-                    // If it is static design category, ignore
-                    if (proj.mediaSource === 'upload') {
-                        const isVideo = (proj.category === 'long' || proj.category === 'shorts');
-                        if (!isVideo) return;
-                    }
-
                     if (entry.isIntersecting) {
-                        if (document.body.classList.contains('editor-active')) return;
-                        const isAnyPlaying = document.querySelector('.project-card.playing-inline') || 
-                                             document.getElementById('video-modal').classList.contains('active');
-                        if (isAnyPlaying) return;
-
-                        // Check if a preview is already playing inside this card
-                        if (mediaContainer.querySelector('.hover-video-preview')) return;
-
-                        let previewEl;
-                        if (proj.mediaSource === 'upload') {
-                            previewEl = document.createElement('video');
-                            previewEl.src = normalizeMediaPath(proj.mediaLink);
-                            previewEl.muted = true;
-                            previewEl.loop = true;
-                            previewEl.autoplay = true;
-                            previewEl.setAttribute('muted', '');
-                            previewEl.setAttribute('playsinline', '');
-                            previewEl.playsInline = true;
-                            previewEl.className = 'hover-video-preview';
-                            
-                            previewEl.onplaying = () => {
-                                previewEl.classList.add('loaded');
-                            };
-                            
-                            mediaContainer.appendChild(previewEl);
-                        } else {
-                            const cleanId = extractYouTubeId(proj.mediaLink);
-                            previewEl = document.createElement('iframe');
-                            previewEl.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&enablejsapi=1&vq=hd1080`;
-                            previewEl.className = 'hover-video-preview';
-                            
-                            previewEl.onload = () => {
-                                previewEl.classList.add('loaded');
-                            };
-                            
-                            mediaContainer.appendChild(previewEl);
-                        }
-                    } else {
-                        // User scrolled past the card: clean up resources immediately
-                        mediaContainer.querySelectorAll('.hover-video-preview').forEach(el => el.remove());
+                        loadCardPreview(card);
                     }
                 });
             }, observerOptions);

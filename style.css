@@ -6217,14 +6217,21 @@ body.light-mode .graphics-view-more-btn:hover {
    REMOVE PAUSE BUTTON IN PREVIEW & SHOWREEL FULL PLAYBACK STATE
    ========================================================================== */
 
-/* Completely hide pause button overlay when playing inline or during video preview */
+/* Completely hide pause button overlay at all times during loading, buffering, hovering, or playing */
+.video-custom-overlay,
+.video-overlay-btn,
 .video-custom-overlay.playing,
 .video-custom-overlay.playing .video-overlay-btn,
 .video-custom-overlay.playing:hover .video-overlay-btn,
+.project-card .video-overlay-btn,
+.project-card:hover .video-overlay-btn,
 .project-card.playing-inline .video-overlay-btn,
 .project-card.playing-inline:hover .video-overlay-btn,
+.project-media .project-view-badge,
+.project-card:hover .project-view-badge,
 .project-media:has(.hover-video-preview) .video-overlay-btn,
 .project-media:has(.hover-video-preview) .project-view-badge,
+.showreel-frame .video-overlay-btn,
 .showreel-frame.is-playing .video-overlay-btn {
     display: none !important;
     opacity: 0 !important;
