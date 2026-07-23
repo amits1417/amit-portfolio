@@ -3740,6 +3740,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Console log utility
     function appendConsoleLog(text) {
+        const consoleLogs = document.getElementById('console-logs');
         if (!consoleLogs) return;
         const line = document.createElement('div');
         line.className = 'log-line';
@@ -4164,7 +4165,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return proj && proj.category && proj.category.toLowerCase().includes('graphic');
         }
 
-        function loadProjectInLightbox(proj) {
+        function loadProjectInLightbox(proj, dir = 0) {
             if (!proj) return;
             
             // Push history state to prevent mobile Back button from leaving the website
@@ -4175,50 +4176,67 @@ document.addEventListener('DOMContentLoaded', () => {
             // Clean up any active hover previews
             document.querySelectorAll('.hover-video-preview').forEach(el => el.remove());
             
-            // Clean up any old video/image nodes or watermarks
-            const oldVideo = videoModal.querySelector('video');
-            if (oldVideo) oldVideo.remove();
-            const oldImg = videoModal.querySelector('img');
-            if (oldImg) {
-                if (currentLightboxProjects.length > 1) {
-                    oldImg.style.transition = 'filter 0.2s ease, opacity 0.2s ease';
-                    oldImg.style.filter = 'blur(20px)';
-                    oldImg.style.opacity = '0';
-                    setTimeout(() => { if (oldImg.parentNode) oldImg.remove(); }, 200);
-                } else {
-                    oldImg.remove();
-                }
-            }
-            const oldWatermark = videoModal.querySelector('.modal-watermark');
-            if (oldWatermark) oldWatermark.remove();
-            
-            modalIframe.style.display = 'none';
-            modalIframe.src = '';
-            
-            if (lightboxPlayer) {
-                try {
-                    lightboxPlayer.destroy();
-                } catch(e) {}
-                lightboxPlayer = null;
-            }
-
             const wrapper = videoModal.querySelector('.video-modal-iframe-wrapper');
-            if (wrapper) {
-                wrapper.innerHTML = '';
-            }
-
             const isImage = isImageProject(proj);
             
             if (isImage) {
-                const imgEl = document.createElement('img');
-                imgEl.src = normalizeMediaPath(proj.mediaLink);
-                imgEl.classList.add('lightbox-image-enter');
-                if (wrapper) wrapper.appendChild(imgEl);
+                const oldVideo = videoModal.querySelector('video');
+                if (oldVideo) oldVideo.remove();
+                if (modalIframe) {
+                    modalIframe.style.display = 'none';
+                    modalIframe.src = '';
+                }
+                if (lightboxPlayer) {
+                    try { lightboxPlayer.destroy(); } catch(e) {}
+                    lightboxPlayer = null;
+                }
+
+                const newImg = document.createElement('img');
+                newImg.src = normalizeMediaPath(proj.mediaLink);
+                newImg.alt = proj.title || 'Graphics Showcase';
+
+                const oldImg = wrapper ? wrapper.querySelector('img') : null;
                 
-                // Apply lightbox override class
+                if (wrapper) {
+                    if (dir !== 0 && oldImg) {
+                        const slideOutClass = dir > 0 ? 'slide-out-left' : 'slide-out-right';
+                        const slideInClass = dir > 0 ? 'slide-in-right' : 'slide-in-left';
+                        
+                        oldImg.className = slideOutClass;
+                        newImg.className = slideInClass;
+                        wrapper.appendChild(newImg);
+                        
+                        setTimeout(() => {
+                            if (oldImg && oldImg.parentNode) oldImg.remove();
+                            newImg.className = '';
+                        }, 320);
+                    } else {
+                        wrapper.innerHTML = '';
+                        newImg.className = 'lightbox-image-enter';
+                        wrapper.appendChild(newImg);
+                    }
+                }
+                
                 videoModal.className = 'video-modal-overlay active is-image-lightbox';
                 appendConsoleLog(`> Lightbox image active: "${proj.title}"`);
             } else {
+                const oldVideo = videoModal.querySelector('video');
+                if (oldVideo) oldVideo.remove();
+                const oldImg = videoModal.querySelector('img');
+                if (oldImg) oldImg.remove();
+                const oldWatermark = videoModal.querySelector('.modal-watermark');
+                if (oldWatermark) oldWatermark.remove();
+                
+                modalIframe.style.display = 'none';
+                modalIframe.src = '';
+                
+                if (lightboxPlayer) {
+                    try { lightboxPlayer.destroy(); } catch(e) {}
+                    lightboxPlayer = null;
+                }
+
+                if (wrapper) wrapper.innerHTML = '';
+
                 const targetSec = sections.find(s => s.id === proj.category);
                 const targetAspectRatio = targetSec ? targetSec.aspectRatio : '16-9';
                 videoModal.className = `video-modal-overlay active modal-aspect-${targetAspectRatio}`;
@@ -4301,12 +4319,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         const thumbEl = document.createElement('img');
                         thumbEl.src = normalizeMediaPath(thumbImgSrc);
                         thumbEl.className = 'lightbox-gallery-thumb' + (p.id === proj.id ? ' active' : '');
-                        thumbEl.alt = p.title;
-                        thumbEl.title = p.title;
+                        thumbEl.alt = p.title || '';
+                        thumbEl.title = p.title || '';
                         thumbEl.addEventListener('click', (e) => {
                             e.stopPropagation();
+                            const slideDir = idx > currentLightboxIndex ? 1 : -1;
                             currentLightboxIndex = idx;
-                            loadProjectInLightbox(p);
+                            loadProjectInLightbox(p, slideDir);
                         });
                         galleryStrip.appendChild(thumbEl);
                     });
@@ -4331,7 +4350,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentLightboxIndex = (currentLightboxIndex + dir + currentLightboxProjects.length) % currentLightboxProjects.length;
             const nextProj = currentLightboxProjects[currentLightboxIndex];
             
-            loadProjectInLightbox(nextProj);
+            loadProjectInLightbox(nextProj, dir);
         }
 
         function openLightbox(proj) {
@@ -4341,7 +4360,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Slide/swipe gallery view should ONLY work for 'shorts' and 'graphics'
                 if (cat === 'shorts' || (cat && cat.toLowerCase().includes('graphic'))) {
                     // Filter pool to only contain items of the same category
-                    currentLightboxProjects = projects.filter(p => p.category === cat);
+                    currentLightboxProjects = projects.filter(p => p.category === cat || (cat && cat.toLowerCase().includes('graphic') && p.category && p.category.toLowerCase().includes('graphic')));
                     currentLightboxIndex = currentLightboxProjects.findIndex(p => p.id === proj.id);
                 } else {
                     // Disable slide/swipe gallery navigation for landscape videos (long)
@@ -4349,9 +4368,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentLightboxIndex = -1;
                 }
                 
-                loadProjectInLightbox(proj);
+                loadProjectInLightbox(proj, 0);
             }
         }
+
+        window.openLightbox = openLightbox;
+        window.navigateLightbox = navigateLightbox;
 
         // Wiring prev/next buttons
         const lightboxPrevBtn = document.getElementById('lightbox-prev-btn');
