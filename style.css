@@ -1166,14 +1166,29 @@ body.hover-interactive .custom-cursor-glow {
     width: 100%;
     display: flex;
     overflow: hidden;
+    user-select: none;
 }
 
 .marquee-content {
     display: flex;
-    align-items: center;
     white-space: nowrap;
-    animation: marqueeScroll 25s linear infinite;
-    gap: 0;
+    width: max-content;
+    animation: marqueeScroll 35s linear infinite;
+}
+
+.marquee-track {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+@keyframes marqueeScroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
 }
 
 .marquee-item {
