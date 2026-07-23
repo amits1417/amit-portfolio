@@ -5405,6 +5405,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Light Mode
     if (localStorage.getItem('amit_portfolio_light_mode') === 'true') {
         document.body.classList.add('light-mode');
+        document.documentElement.classList.add('light-mode');
+        document.documentElement.style.setProperty('--text-primary', '#1a202c');
+        document.documentElement.style.setProperty('--heading', '#1a202c');
     }
 
     // Light/Dark mode toggle click handler (all buttons: desktop, mobile, floating)
@@ -5412,8 +5415,26 @@ document.addEventListener('DOMContentLoaded', () => {
         var btn = e.target.closest('.theme-mode-toggle, .floating-theme-toggle');
         if (btn) {
             document.body.classList.toggle('light-mode');
+            document.documentElement.classList.toggle('light-mode');
             var isLight = document.body.classList.contains('light-mode');
             try { localStorage.setItem('amit_portfolio_light_mode', isLight ? 'true' : 'false'); } catch(err) {}
+            
+            if (isLight) {
+                document.documentElement.style.setProperty('--text-primary', '#1a202c');
+                document.documentElement.style.setProperty('--heading', '#1a202c');
+                document.documentElement.style.setProperty('--bg-primary', '#f8f9fa');
+                document.documentElement.style.setProperty('--bg-secondary', '#ffffff');
+            } else {
+                document.documentElement.style.removeProperty('--text-primary');
+                document.documentElement.style.removeProperty('--heading');
+                document.documentElement.style.removeProperty('--bg-primary');
+                document.documentElement.style.removeProperty('--bg-secondary');
+                var storedColors = localStorage.getItem('amit_portfolio_custom_colors');
+                if (storedColors) {
+                    try { applyCustomColors(JSON.parse(storedColors)); } catch(ex) {}
+                }
+            }
+
             if (typeof lucide !== 'undefined') { try { lucide.createIcons(); } catch(e) {} }
         }
     });
@@ -5557,6 +5578,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyCustomColors(colors) {
         if (!colors) return;
         const root = document.documentElement;
+        if (document.body.classList.contains('light-mode') || root.classList.contains('light-mode')) {
+            root.style.removeProperty('--bg-primary');
+            root.style.removeProperty('--bg-secondary');
+            root.style.removeProperty('--text-primary');
+            root.style.removeProperty('--text-secondary');
+            return;
+        }
         if (colors.bgPrimary) root.style.setProperty('--bg-primary', colors.bgPrimary);
         if (colors.bgSecondary) root.style.setProperty('--bg-secondary', colors.bgSecondary);
         if (colors.textPrimary) root.style.setProperty('--text-primary', colors.textPrimary);

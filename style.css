@@ -1172,20 +1172,25 @@ body.hover-interactive .custom-cursor-glow {
     gap: 60px;
 }
 
+#skills-marquee-section .marquee-content span,
 .marquee-content span {
     font-family: var(--font-heading);
     font-size: 2.2rem;
     font-weight: 800;
     letter-spacing: -1px;
-    color: transparent;
-    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.15);
+    color: var(--marquee-text-color, #ffffff);
+    -webkit-text-fill-color: var(--marquee-text-color, #ffffff);
+    -webkit-text-stroke: 0px transparent;
     display: flex;
     align-items: center;
     gap: 60px;
     transition: var(--transition-fast);
 }
+#skills-marquee-section .marquee-content span:hover,
 .marquee-content span:hover {
-    -webkit-text-stroke-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+    -webkit-text-fill-color: var(--accent-cyan);
+    -webkit-text-stroke: 0px transparent;
 }
 
 .marquee-dot {
@@ -4990,12 +4995,12 @@ body.editor-active {
 /* --- PROFESSIONAL THEMES (forced to single Premium Dark Blue theme) --- */
 /* All theme classes (including the default neon-cyber) now use the new
    premium dark theme so the purple accent is fully removed. */
-body.theme-neon-cyber, body.theme-legacy-v100,
-body.theme-emerald-corp, body.theme-luxury-gold,
-body.theme-royal-purple, body.theme-electric-amber,
-body.theme-ocean-breeze, body.theme-sunset-bronze,
-body.theme-velvet-rose, body.theme-slate-prof,
-body.theme-carbon-tech, body.theme-elegant-divi {
+body.theme-neon-cyber:not(.light-mode), body.theme-legacy-v100:not(.light-mode),
+body.theme-emerald-corp:not(.light-mode), body.theme-luxury-gold:not(.light-mode),
+body.theme-royal-purple:not(.light-mode), body.theme-electric-amber:not(.light-mode),
+body.theme-ocean-breeze:not(.light-mode), body.theme-sunset-bronze:not(.light-mode),
+body.theme-velvet-rose:not(.light-mode), body.theme-slate-prof:not(.light-mode),
+body.theme-carbon-tech:not(.light-mode), body.theme-elegant-divi:not(.light-mode) {
     --bg-primary: var(--background);
     --bg-secondary: var(--surface);
     --bg-tertiary: var(--surface-light);
@@ -5019,16 +5024,21 @@ body.theme-carbon-tech, body.theme-elegant-divi {
 
 /* --- LIGHT & DARK MODE OVERRIDES --- */
 
-body.light-mode {
-    --bg-primary: #f8f9fa;
-    --bg-secondary: #ffffff;
-    --bg-tertiary: #edf2f7;
-    --text-primary: #1a202c;
-    --text-secondary: #4a5568;
-    --text-muted: #718096;
-    --glass-bg: rgba(255, 255, 255, 0.85);
-    --border-color: rgba(0, 0, 0, 0.08);
-    --border-glow: rgba(0, 0, 0, 0.12);
+body.light-mode,
+body.light-mode[class*="theme-"] {
+    --bg-primary: #f8f9fa !important;
+    --bg-secondary: #ffffff !important;
+    --bg-tertiary: #edf2f7 !important;
+    --text-primary: #1a202c !important;
+    --text-secondary: #4a5568 !important;
+    --text-muted: #718096 !important;
+    --heading: #1a202c !important;
+    --body-text: #4a5568 !important;
+    --surface: #ffffff !important;
+    --background: #f8f9fa !important;
+    --glass-bg: rgba(255, 255, 255, 0.85) !important;
+    --border-color: rgba(0, 0, 0, 0.08) !important;
+    --border-glow: rgba(0, 0, 0, 0.12) !important;
     --accent-glow-shadow: transparent !important;
     --accent-glow-hover-shadow: transparent !important;
     --accent-glow-card-shadow: transparent !important;
@@ -6319,5 +6329,40 @@ body.light-mode .graphics-view-more-btn:hover {
     display: none !important;
     opacity: 0 !important;
     visibility: hidden !important;
+}
+
+/* Light Mode Marquee Scrolling Text Contrast Fix */
+body.light-mode,
+html.light-mode {
+    --marquee-text-color: #1a202c !important;
+}
+
+body.light-mode #skills-marquee-section,
+html.light-mode #skills-marquee-section,
+.light-mode #skills-marquee-section {
+    background: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+body.light-mode #skills-marquee-section span,
+html.light-mode #skills-marquee-section span,
+.light-mode #skills-marquee-section span,
+body.light-mode .marquee-content span,
+html.light-mode .marquee-content span,
+.light-mode .marquee-content span {
+    color: #1a202c !important;
+    -webkit-text-fill-color: #1a202c !important;
+    -webkit-text-stroke: 0px transparent !important;
+}
+
+body.light-mode #skills-marquee-section span:hover,
+html.light-mode #skills-marquee-section span:hover,
+.light-mode #skills-marquee-section span:hover,
+body.light-mode .marquee-content span:hover,
+html.light-mode .marquee-content span:hover,
+.light-mode .marquee-content span:hover {
+    color: #168BFF !important;
+    -webkit-text-fill-color: #168BFF !important;
+    -webkit-text-stroke: 0px transparent !important;
 }
 
