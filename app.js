@@ -1284,9 +1284,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function getProjectTimestamp(p) {
+        if (!p) return 0;
+        if (p.createdAt) {
+            const t = typeof p.createdAt === 'number' ? p.createdAt : Date.parse(p.createdAt);
+            if (!isNaN(t) && t > 0) return t;
+        }
+        if (p.id) {
+            const matches = String(p.id).match(/\d{10,13}/);
+            if (matches && matches[0]) {
+                const num = parseInt(matches[0], 10);
+                if (!isNaN(num) && num > 1000000000) return num;
+            }
+        }
+        return 0;
+    }
+    window.getProjectTimestamp = getProjectTimestamp;
+
     function renderGridCategory(gridEl, category, isEditorActive, aspectRatio) {
         gridEl.innerHTML = '';
         const catProjects = projects.filter(p => p.category === category);
+        
+        // Sort videos date & time wise: latest / most recent uploads first at the top
+        catProjects.sort((a, b) => getProjectTimestamp(b) - getProjectTimestamp(a));
         
         catProjects.forEach((proj, idx) => {
             if (isEditorActive && copiedCard) {
