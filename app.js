@@ -3614,7 +3614,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cleanId = extractYouTubeId(proj.mediaLink);
                 if (!cleanId) return;
                 previewEl = document.createElement('iframe');
-                previewEl.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&enablejsapi=1&playsinline=1&vq=hd1080`;
+                previewEl.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&vq=hd1080`;
                 previewEl.className = 'hover-video-preview loaded';
                 
                 mediaContainer.appendChild(previewEl);
@@ -3782,7 +3782,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!cleanYtId) return;
 
                     // Muted preview with loop=1&playlist=cleanYtId so preview NEVER stops or freezes!
-                    videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${cleanYtId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanYtId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&enablejsapi=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+                    videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${cleanYtId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanYtId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
                     const waveformEl = document.getElementById('waveform-canvas');
                     if (waveformEl) waveformEl.style.display = 'none';
                     wavePlaying = true;
@@ -3796,7 +3796,20 @@ document.addEventListener('DOMContentLoaded', () => {
         viewport.addEventListener('click', (e) => {
             if (e.target.closest('#btn-edit-showreel') || e.target.closest('.showreel-edit-overlay')) return;
             if (document.body.classList.contains('editor-active')) return;
-            playFullShowreel();
+            if (isFullPlaying) {
+                // Toggle: stop playing and restore initial state
+                videoContainer.innerHTML = '';
+                frame.classList.remove('is-playing');
+                isFullPlaying = false;
+                autoPlayed = false;
+                autoObserver.observe(viewport);
+                const waveformEl = document.getElementById('waveform-canvas');
+                if (waveformEl) waveformEl.style.display = '';
+                const backdrop = viewport.querySelector('.showreel-glow-backdrop');
+                if (backdrop) backdrop.style.display = '';
+            } else {
+                playFullShowreel();
+            }
         });
 
         // Stop all video previews (used when entering CMS mode)
