@@ -592,7 +592,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const localTimestamp = parseInt(localStorage.getItem('amit_portfolio_last_updated') || '0');
             let cloudTimestamp = 0;
             try {
-                const tsRes = await fetch(`${url}/last_updated.json`);
+                const tsRes = await fetch(`${url}/last_updated.json?t=${Date.now()}`, { cache: 'no-store' });
                 if (tsRes.ok) {
                     const parsedTs = await tsRes.json();
                     cloudTimestamp = parsedTs ? parseInt(parsedTs) : 0;
@@ -617,15 +617,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 return null;
             }
 
-            const projRes = await fetch(`${url}/projects.json`);
+            const projRes = await fetch(`${url}/projects.json?t=${Date.now()}`, { cache: 'no-store' });
             if (!projRes.ok) return;
             const cloudProjects = firebaseToArray(await projRes.json());
             
-            const secRes = await fetch(`${url}/sections.json`);
+            const secRes = await fetch(`${url}/sections.json?t=${Date.now()}`, { cache: 'no-store' });
             if (!secRes.ok) return;
             const cloudSections = firebaseToArray(await secRes.json());
 
-            const layRes = await fetch(`${url}/layout_order.json`);
+            const layRes = await fetch(`${url}/layout_order.json?t=${Date.now()}`, { cache: 'no-store' });
             let cloudLayout = null;
             if (layRes.ok) {
                 cloudLayout = firebaseToArray(await layRes.json());
@@ -669,7 +669,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            const themeRes = await fetch(`${url}/theme.json`);
+            const themeRes = await fetch(`${url}/theme.json?t=${Date.now()}`, { cache: 'no-store' });
             if (themeRes.ok) {
                 const cloudTheme = await themeRes.json();
                 if (cloudTheme && typeof cloudTheme === 'string') {
@@ -682,7 +682,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            const softRes = await fetch(`${url}/software.json`);
+            const softRes = await fetch(`${url}/software.json?t=${Date.now()}`, { cache: 'no-store' });
             if (softRes.ok) {
                 const cloudSoftware = firebaseToArray(await softRes.json());
                 if (cloudSoftware && Array.isArray(cloudSoftware)) {
@@ -694,7 +694,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            const customColorsRes = await fetch(`${url}/custom_colors.json`);
+            const customColorsRes = await fetch(`${url}/custom_colors.json?t=${Date.now()}`, { cache: 'no-store' });
             if (customColorsRes.ok) {
                 const cloudColors = await customColorsRes.json();
                 const localColorsStr = localStorage.getItem('amit_portfolio_custom_colors');
@@ -711,7 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            const clientsRes = await fetch(`${url}/clients.json`);
+            const clientsRes = await fetch(`${url}/clients.json?t=${Date.now()}`, { cache: 'no-store' });
             if (clientsRes.ok) {
                 const cloudClients = await clientsRes.json();
                 if (cloudClients && Array.isArray(cloudClients)) {
@@ -726,7 +726,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Fetch education from Firebase (null-safe)
-            const eduRes = await fetch(`${url}/education.json`);
+            const eduRes = await fetch(`${url}/education.json?t=${Date.now()}`, { cache: 'no-store' });
             if (eduRes.ok) {
                 const rawEdu = await eduRes.json();
                 const cloudEdu = firebaseToArray(rawEdu);
@@ -740,7 +740,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Fetch timeline from Firebase (null-safe)
-            const timelineRes = await fetch(`${url}/timeline.json`);
+            const timelineRes = await fetch(`${url}/timeline.json?t=${Date.now()}`, { cache: 'no-store' });
             if (timelineRes.ok) {
                 const rawTimeline = await timelineRes.json();
                 const cloudTimeline = firebaseToArray(rawTimeline);
@@ -754,7 +754,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Fetch services from Firebase (null-safe)
-            const servicesRes = await fetch(`${url}/services.json`);
+            const servicesRes = await fetch(`${url}/services.json?t=${Date.now()}`, { cache: 'no-store' });
             if (servicesRes.ok) {
                 const rawServices = await servicesRes.json();
                 const cloudServices = firebaseToArray(rawServices);
@@ -768,7 +768,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Fetch cms_text from Firebase (null-safe)
-            const cmsTextRes = await fetch(`${url}/cms_text.json`);
+            const cmsTextRes = await fetch(`${url}/cms_text.json?t=${Date.now()}`, { cache: 'no-store' });
             if (cmsTextRes.ok) {
                 const cloudCmsText = await cmsTextRes.json();
                 if (cloudCmsText && typeof cloudCmsText === 'object' && cloudCmsText !== null && Object.keys(cloudCmsText).length > 0) {
