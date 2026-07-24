@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Automatic DB version upgrade migration (forces cache clear for new defaults)
         const DB_VERSION_KEY = 'amit_portfolio_db_version';
-        const CURRENT_DB_VERSION = '19';
+        const CURRENT_DB_VERSION = '20';
         const storedVersion = localStorage.getItem(DB_VERSION_KEY);
         if (storedVersion !== CURRENT_DB_VERSION) {
             localStorage.removeItem('amit_portfolio_projects');
@@ -420,11 +420,20 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('amit_portfolio_sections', JSON.stringify(sections));
         }
 
-        // Seed from baked data into localStorage (do NOT push to cloud on load;
-        // cloud pull below is the source of truth and edits push explicitly)
+        // Load projects from localStorage if available, otherwise fallback to baked data
+        const storedProjects = localStorage.getItem('amit_portfolio_projects');
         const bakedData = (typeof window.CLOUD_DEFAULT_PROJECTS !== 'undefined' && Array.isArray(window.CLOUD_DEFAULT_PROJECTS)) ? window.CLOUD_DEFAULT_PROJECTS : defaultProjects;
-        projects = JSON.parse(JSON.stringify(bakedData));
-        localStorage.setItem('amit_portfolio_projects', JSON.stringify(projects));
+        
+        if (storedProjects) {
+            try {
+                projects = JSON.parse(storedProjects);
+            } catch(e) {
+                projects = JSON.parse(JSON.stringify(bakedData));
+            }
+        } else {
+            projects = JSON.parse(JSON.stringify(bakedData));
+            localStorage.setItem('amit_portfolio_projects', JSON.stringify(projects));
+        }
 
         // Pull live cloud data so changes made in edit mode appear for all visitors
         if (firebaseDbUrl) {
