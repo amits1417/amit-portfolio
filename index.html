@@ -1445,7 +1445,7 @@
     <!-- Baked default portfolio data (cloud projects) -->
     <script src="data.js?v=1.0"></script>
     <!-- Custom Application Logic -->
-    <script src="app.js?v=11.7"></script>
+    <script src="app.js?v=11.8"></script>
 <script>
 // Batch YouTube Import - uses window.* exposed by app.js
 (function() {
@@ -1473,7 +1473,7 @@
                     var line = lines[i];
                     var ytId = window.extractYouTubeId(line);
                     if (!ytId) { failed++; continue; }
-                    window.projects.push({
+                    var newObj = {
                         id: 'proj_' + Date.now() + '_' + Math.floor(Math.random() * 100000),
                         title: '',
                         category: cat,
@@ -1482,7 +1482,13 @@
                         mediaLink: 'https://youtu.be/' + ytId,
                         thumbSource: 'auto',
                         thumbLink: 'https://img.youtube.com/vi/' + ytId + '/maxresdefault.jpg'
-                    });
+                    };
+                    var firstIdx = window.projects.findIndex(function(p){ return p.category === cat; });
+                    if (firstIdx !== -1) {
+                        window.projects.splice(firstIdx, 0, newObj);
+                    } else {
+                        window.projects.unshift(newObj);
+                    }
                     added++;
                     st.textContent = 'Importing... ' + added + ' done';
                 }

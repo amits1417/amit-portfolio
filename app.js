@@ -4963,8 +4963,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         thumbSource: thumbSrc,
                         thumbLink
                     };
-                    projects.push(newProj);
-                    appendConsoleLog(`> Inserted new showcase details: "${title}"`);
+                    // Insert new showcase card at the TOP / FIRST position of its section
+                    const firstIdx = projects.findIndex(p => p.category === newProj.category);
+                    if (firstIdx !== -1) {
+                        projects.splice(firstIdx, 0, newProj);
+                    } else {
+                        projects.unshift(newProj);
+                    }
+                    appendConsoleLog(`> Inserted new showcase details at top of section: "${title}"`);
                 }
                 
                 saveDatabase();
@@ -5251,7 +5257,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (newProjects.length > 0) {
-                projects.push(...newProjects);
+                newProjects.reverse().forEach(np => {
+                    const firstIdx = projects.findIndex(p => p.category === np.category);
+                    if (firstIdx !== -1) {
+                        projects.splice(firstIdx, 0, np);
+                    } else {
+                        projects.unshift(np);
+                    }
+                });
                 
                 batchStatus.textContent = `Syncing ${newProjects.length} images to cloud...`;
                 appendConsoleLog(`> Syncing batch upload of ${newProjects.length} images to Firebase Cloud...`);
@@ -5849,7 +5862,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         thumbSource: 'auto',
                         thumbLink: mediaLink
                     };
-                    projects.push(newProj);
+                    // Insert new graphics item at the TOP / FIRST position of graphics category
+                    const firstIdx = projects.findIndex(p => p.category === 'graphics');
+                    if (firstIdx !== -1) {
+                        projects.splice(firstIdx, 0, newProj);
+                    } else {
+                        projects.unshift(newProj);
+                    }
                     saveDatabase();
                     renderModalGraphicsGrid();
                     renderProjects();
