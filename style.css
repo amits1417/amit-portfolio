@@ -6371,3 +6371,26 @@ body.light-mode .graphics-view-more-btn:hover {
     visibility: hidden !important;
 }
 
+/* Password Lock Modal & CMS HUD display overrides for ?edit mode */
+#password-lock-modal.active {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+    display: flex !important;
+    z-index: 100000 !important;
+}
+
+#password-lock-modal.active .project-modal-container {
+    transform: scale(1) !important;
+    opacity: 1 !important;
+}
+
+body.editor-active #studio-console-drawer {
+    transform: translateX(0) !important;
+}
+
+body.editor-active .card-edit-overlay {
+    display: flex !important;
+    opacity: 1 !important;
+}
+

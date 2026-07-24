@@ -5,23 +5,8 @@
 const CMS_PASSWORD = "DellN5010";
 
 document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const hudToggle = document.getElementById('studio-hud-toggle');
-    const lockModal = document.getElementById('password-lock-modal');
-    
-    const isEditURL = urlParams.has('edit');
-    let isAuth = localStorage.getItem('cms_authenticated') === 'true';
-
-    if (isEditURL) {
-        if (isAuth) {
-            activateStudioMode();
-        } else if (lockModal) {
-            lockModal.classList.add('active');
-        }
-    }
-
-    if (hudToggle) {
-        hudToggle.style.setProperty('display', isEditURL ? 'flex' : 'none', 'important');
+    if (typeof checkEditURL === 'function') {
+        checkEditURL();
     }
 
     // Helper to extract YouTube video ID from any link style (including Shorts)
@@ -447,6 +432,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Projects loaded. Ready.
+        if (typeof checkEditURL === 'function') {
+            checkEditURL();
+        }
 
         // Auto-migrate showreel default thumbnail to new compelling cover image
         const storedShowreel = localStorage.getItem('amit_portfolio_showreel');
@@ -4514,8 +4502,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function activateStudioMode() {
         document.body.classList.add('editor-active');
-        studioToggleBtn.classList.add('active');
-        studioToggleBtn.querySelector('.studio-btn-text').textContent = "CLOSE CMS STUDIO";
+        
+        const studioToggleBtn = document.getElementById('studio-toggle-btn');
+        if (studioToggleBtn) {
+            studioToggleBtn.classList.add('active');
+            const btnText = studioToggleBtn.querySelector('.studio-btn-text');
+            if (btnText) btnText.textContent = "CLOSE CMS STUDIO";
+        }
+
+        const hudToggle = document.getElementById('studio-hud-toggle');
+        if (hudToggle) {
+            hudToggle.style.setProperty('display', 'flex', 'important');
+        }
+
         const bulkDeleteBtn = document.getElementById('studio-bulk-delete-btn');
         if (bulkDeleteBtn) bulkDeleteBtn.style.display = 'inline-flex';
         
@@ -4524,13 +4523,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
         appendConsoleLog("> Local CMS Studio mode active. Use card controls to modify.");
         if (typeof window.stopAllPreviews === 'function') window.stopAllPreviews();
-        renderProjects();
-        renderDynamicSoftware();
-        renderDynamicServices();
+        if (typeof renderProjects === 'function') renderProjects();
+        if (typeof renderDynamicSoftware === 'function') renderDynamicSoftware();
+        if (typeof renderDynamicServices === 'function') renderDynamicServices();
+        
         // Enable text edit by default in CMS mode
         isTextEditActive = true;
         window.dispatchEvent(new CustomEvent('cms-mode-change', { detail: { active: true } }));
     }
+    
+    // Expose globally for instant invocation
+    window.activateStudioMode = activateStudioMode;
+
+    function checkEditURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchStr = window.location.search.toLowerCase();
+        const hashStr = window.location.hash.toLowerCase();
+        const isEditURL = urlParams.has('edit') || searchStr.includes('edit') || hashStr.includes('edit');
+        
+        const hudToggle = document.getElementById('studio-hud-toggle');
+        if (hudToggle) {
+            hudToggle.style.setProperty('display', isEditURL ? 'flex' : 'none', 'important');
+        }
+
+        if (!isEditURL) return;
+
+        const editParamVal = urlParams.get('edit');
+        const correctPass = localStorage.getItem('amit_portfolio_password') || 'DellN5010';
+        
+        // Support direct password in query string: ?edit=DellN5010 or ?edit=true
+        if (editParamVal && (editParamVal.toLowerCase() === 'delln5010' || editParamVal === correctPass || editParamVal.toLowerCase() === 'true')) {
+            localStorage.setItem('cms_authenticated', 'true');
+        }
+
+        let isAuth = localStorage.getItem('cms_authenticated') === 'true';
+
+        if (isAuth) {
+            activateStudioMode();
+        } else {
+            const passwordLockModal = document.getElementById('password-lock-modal');
+            if (passwordLockModal) {
+                passwordLockModal.classList.add('active');
+                const passInput = document.getElementById('lock-password-input');
+                if (passInput) setTimeout(() => passInput.focus(), 300);
+            } else {
+                const input = prompt('Enter CMS Password (default: DellN5010):');
+                if (input === 'DellN5010' || input === correctPass) {
+                    localStorage.setItem('cms_authenticated', 'true');
+                    activateStudioMode();
+                } else if (input !== null) {
+                    alert("Incorrect password! Access denied.");
+                }
+            }
+        }
+    }
+    window.checkEditURL = checkEditURL;
 
     const showreelEditOverlay = document.querySelector('.showreel-edit-overlay');
     if (showreelEditOverlay) {
