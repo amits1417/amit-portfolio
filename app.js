@@ -4587,11 +4587,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function checkEditURL() {
         const fullHref = window.location.href.toLowerCase();
-        const urlParams = new URLSearchParams(window.location.search);
         const searchStr = window.location.search.toLowerCase();
         const hashStr = window.location.hash.toLowerCase();
         
-        const isEditURL = urlParams.has('edit') || searchStr.includes('edit') || hashStr.includes('edit') || searchStr.includes('admin') || hashStr.includes('admin') || searchStr.includes('cms') || hashStr.includes('cms');
+        const isEditURL = window._isEditRequested || fullHref.includes('edit') || searchStr.includes('edit') || hashStr.includes('edit') || searchStr.includes('admin') || hashStr.includes('admin') || searchStr.includes('cms') || hashStr.includes('cms');
         
         if (!isEditURL) return;
 
@@ -4605,6 +4604,7 @@ document.addEventListener('DOMContentLoaded', () => {
         triggerCMSUnlock();
     }
     window.checkEditURL = checkEditURL;
+    try { checkEditURL(); } catch(e) {}
 
     // Secret Keyboard Shortcut: Ctrl + Shift + E or Alt + E to trigger CMS Unlock
     document.addEventListener('keydown', (e) => {
