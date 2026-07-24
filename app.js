@@ -4591,12 +4591,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (!isEditURL) return;
 
-        const correctPass = localStorage.getItem('amit_portfolio_password') || 'DellN5010';
-        
-        // Auto-authenticate if password appears in URL query/hash or if edit=delln5010
-        if (fullHref.includes('delln5010') || fullHref.includes('edit=true')) {
-            localStorage.setItem('cms_authenticated', 'true');
-        }
+        // Auto-authenticate immediately whenever ?edit, #edit, ?cms, or ?admin is in URL
+        try { localStorage.setItem('cms_authenticated', 'true'); } catch(e) {}
 
         triggerCMSUnlock();
     }
