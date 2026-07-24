@@ -4535,27 +4535,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Expose globally for instant invocation
     window.activateStudioMode = activateStudioMode;
 
-    function checkEditURL() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const searchStr = window.location.search.toLowerCase();
-        const hashStr = window.location.hash.toLowerCase();
-        const isEditURL = urlParams.has('edit') || searchStr.includes('edit') || hashStr.includes('edit');
-        
+    function triggerCMSUnlock() {
         const hudToggle = document.getElementById('studio-hud-toggle');
         if (hudToggle) {
-            hudToggle.style.setProperty('display', isEditURL ? 'flex' : 'none', 'important');
+            hudToggle.style.setProperty('display', 'flex', 'important');
         }
 
-        if (!isEditURL) return;
-
-        const editParamVal = urlParams.get('edit');
         const correctPass = localStorage.getItem('amit_portfolio_password') || 'DellN5010';
-        
-        // Support direct password in query string: ?edit=DellN5010 or ?edit=true
-        if (editParamVal && (editParamVal.toLowerCase() === 'delln5010' || editParamVal === correctPass || editParamVal.toLowerCase() === 'true')) {
-            localStorage.setItem('cms_authenticated', 'true');
-        }
-
         let isAuth = localStorage.getItem('cms_authenticated') === 'true';
 
         if (isAuth) {
@@ -4577,7 +4563,53 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
+    window.triggerCMSUnlock = triggerCMSUnlock;
+
+    function checkEditURL() {
+        const fullHref = window.location.href.toLowerCase();
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchStr = window.location.search.toLowerCase();
+        const hashStr = window.location.hash.toLowerCase();
+        
+        const isEditURL = urlParams.has('edit') || searchStr.includes('edit') || hashStr.includes('edit') || searchStr.includes('admin') || hashStr.includes('admin') || searchStr.includes('cms') || hashStr.includes('cms');
+        
+        if (!isEditURL) return;
+
+        const correctPass = localStorage.getItem('amit_portfolio_password') || 'DellN5010';
+        
+        // Auto-authenticate if password appears in URL query/hash or if edit=delln5010
+        if (fullHref.includes('delln5010') || fullHref.includes('edit=true')) {
+            localStorage.setItem('cms_authenticated', 'true');
+        }
+
+        triggerCMSUnlock();
+    }
     window.checkEditURL = checkEditURL;
+
+    // Secret Keyboard Shortcut: Ctrl + Shift + E or Alt + E to trigger CMS Unlock
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'e') || (e.altKey && e.key.toLowerCase() === 'e')) {
+            e.preventDefault();
+            triggerCMSUnlock();
+        }
+    });
+
+    // Secret 5-Click on Navbar Logo to trigger CMS Unlock
+    let logoClickCount = 0;
+    let logoClickTimer = null;
+    document.addEventListener('click', (e) => {
+        const logo = e.target.closest('.nav-logo');
+        if (logo) {
+            logoClickCount++;
+            clearTimeout(logoClickTimer);
+            logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 2000);
+            if (logoClickCount >= 5) {
+                e.preventDefault();
+                logoClickCount = 0;
+                triggerCMSUnlock();
+            }
+        }
+    });
 
     const showreelEditOverlay = document.querySelector('.showreel-edit-overlay');
     if (showreelEditOverlay) {
