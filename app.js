@@ -22,6 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Auto-enable Studio (edit) mode when authorized via ?edit so edits save reliably
     if (authorized) {
         document.body.classList.add('editor-active');
+        isTextEditActive = true;
+        window.dispatchEvent(new CustomEvent('cms-mode-change', { detail: { active: true } }));
     }
     
     if (hudToggle) {
@@ -740,6 +742,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             }
+            const cmsTextRes = await fetch(`${url}/cms_text.json`);
+            if (cmsTextRes.ok) {
+                const cloudCmsText = await cmsTextRes.json();
+                if (cloudCmsText && typeof cloudCmsText === 'object') {
+                    const localCmsText = localStorage.getItem('amit_portfolio_cms_text');
+                    if (!localCmsText || JSON.stringify(cloudCmsText) !== localCmsText) {
+                        localStorage.setItem('amit_portfolio_cms_text', JSON.stringify(cloudCmsText));
+                        if (typeof initInlineTextCMS === 'function') {
+                            initInlineTextCMS();
+                        }
+                        appendConsoleLog("> Inline text edits synced from cloud.");
+                    }
+                }
+            } else if (localStorage.getItem('amit_portfolio_cms_text')) {
+                // Cloud has no cms_text but local does — push it up
+                try {
+                    const localCmsText = JSON.parse(localStorage.getItem('amit_portfolio_cms_text'));
+                    pushToCloud('cms_text', localCmsText, true);
+                } catch(e) {}
+            }
+
              if (hasChanges) {
                 renderProjects();
                 reorderDOMSections();
@@ -871,7 +894,8 @@ document.addEventListener('DOMContentLoaded', () => {
             pushToCloudPromise('sections', sections),
             pushToCloudPromise('layout_order', layoutOrder),
             pushToCloudPromise('software', software),
-            pushToCloudPromise('last_updated', parseInt(localStorage.getItem('amit_portfolio_last_updated') || '0'))
+            pushToCloudPromise('last_updated', parseInt(localStorage.getItem('amit_portfolio_last_updated') || '0')),
+            pushToCloudPromise('cms_text', (() => { try { return JSON.parse(localStorage.getItem('amit_portfolio_cms_text') || '{}'); } catch(e) { return {}; } })())
         ]).then(() => {
             syncErrorOccurred = false;
             setCmsSyncStatus('synced');
@@ -5124,6 +5148,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             try {
                                 textDb[key] = el.innerHTML;
                                 localStorage.setItem('amit_portfolio_cms_text', JSON.stringify(textDb));
+                                pushToCloud('cms_text', textDb);
                                 appendConsoleLog('> Saved: [' + key + ']');
                             } catch(e) { console.error('save error:', e); }
                         }
