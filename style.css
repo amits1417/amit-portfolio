@@ -869,7 +869,7 @@ body.hover-interactive .custom-cursor-glow {
 .category-header-title svg {
     width: 24px;
     height: 24px;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    filter: none !important;
 }
 
 /* Vertical Tools List container */
@@ -920,14 +920,16 @@ body.hover-interactive .custom-cursor-glow {
     width: 22px;
     height: 22px;
     object-fit: contain;
-    filter: drop-shadow(0 0 4px var(--brand-color));
+    filter: none !important;
+    box-shadow: none !important;
     transition: transform 0.3s ease, opacity 0.3s ease;
     color: var(--brand-color);
 }
 
 .vertical-tool-row:hover .vertical-tool-logo {
     transform: scale(1.1) rotate(5deg);
-    filter: drop-shadow(0 0 8px var(--brand-color));
+    filter: none !important;
+    box-shadow: none !important;
 }
 
 .cms-logo-upload-trigger {
@@ -1147,51 +1149,96 @@ body.hover-interactive .custom-cursor-glow {
 }
 
 /* ==========================================================================
-   INFINITE MARQUEE
+   INFINITE MARQUEE STRIP (BLUE IN DARK MODE, DARK GRAY IN LIGHT MODE)
    ========================================================================== */
 #skills-marquee-section {
-    background: var(--bg-secondary);
-    border-top: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
-    padding: 30px 0;
+    background: #1665ff !important; /* Electric Blue Strip in Dark Mode */
+    padding: 15px 0 !important;
     overflow: hidden;
+    position: relative;
+    z-index: 10;
+    border-top: none !important;
+    border-bottom: none !important;
+    transition: background 0.3s ease;
 }
 
 .marquee-container {
     width: 100%;
     display: flex;
     overflow: hidden;
+    user-select: none;
 }
 
 .marquee-content {
     display: flex;
     white-space: nowrap;
-    animation: marqueeScroll 25s linear infinite;
-    gap: 60px;
+    width: max-content;
+    animation: marqueeScroll 35s linear infinite;
 }
 
-.marquee-content span {
-    font-family: var(--font-heading);
-    font-size: 2.2rem;
-    font-weight: 800;
-    letter-spacing: -1px;
-    color: transparent;
-    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.15);
+.marquee-track {
     display: flex;
     align-items: center;
-    gap: 60px;
-    transition: var(--transition-fast);
+    flex-shrink: 0;
 }
-.marquee-content span:hover {
-    -webkit-text-stroke-color: var(--accent-cyan);
+
+@keyframes marqueeScroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.marquee-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 28px;
+    padding-right: 28px;
+}
+
+.marquee-item span:first-child {
+    font-family: var(--font-heading), 'Montserrat', sans-serif;
+    font-size: 1.12rem;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    -webkit-text-stroke: 0px transparent !important;
+    line-height: 1;
 }
 
 .marquee-dot {
-    width: 12px;
-    height: 12px;
-    background-color: var(--accent-cyan);
+    width: 6px;
+    height: 6px;
+    background-color: #ffffff !important;
     border-radius: 50%;
-    box-shadow: var(--neon-shadow);
+    display: inline-block;
+    flex-shrink: 0;
+    opacity: 0.9;
+    box-shadow: none !important;
+}
+
+/* Light Mode Override (Dark Charcoal / Gray Strip as in reference) */
+body.light-mode #skills-marquee-section,
+html.light-mode #skills-marquee-section,
+.light-mode #skills-marquee-section {
+    background: #23242a !important; /* Dark Gray Strip in Light Mode */
+}
+
+body.light-mode .marquee-item span:first-child,
+html.light-mode .marquee-item span:first-child,
+.light-mode .marquee-item span:first-child {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+body.light-mode .marquee-dot,
+html.light-mode .marquee-dot,
+.light-mode .marquee-dot {
+    background-color: #ffffff !important;
 }
 
 /* ==========================================================================
@@ -1435,11 +1482,31 @@ body.hover-interactive .custom-cursor-glow {
     transition: var(--transition-smooth);
 }
 
-/* Graphics category thumbnail image containment override */
-.portfolio-item[data-category="graphics"] .project-media img {
-    object-fit: contain;
-    background-color: #0c0b10;
-    image-rendering: auto;
+/* Graphics category thumbnail image containment & 3D coin flip styling */
+.grid-graphics .project-media {
+    perspective: 800px !important;
+    overflow: hidden;
+}
+
+.portfolio-item[data-category="graphics"] .project-media img,
+.grid-graphics .project-media img {
+    object-fit: contain !important;
+    background-color: rgba(10, 11, 15, 0.95) !important;
+    padding: 6px !important;
+    border-radius: 8px !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease !important;
+    backface-visibility: hidden !important;
+}
+
+body.light-mode .portfolio-item[data-category="graphics"] .project-media img,
+body.light-mode .grid-graphics .project-media img {
+    background-color: #f0f2f5 !important;
+}
+
+body.light-mode .portfolio-item[data-category="graphics"] .project-media,
+body.light-mode .grid-graphics .project-media {
+    background-color: #f0f2f5 !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
 }
 .portfolio-item[data-category="graphics"] .project-card:hover .project-media img {
     transform: none !important;
@@ -4968,12 +5035,12 @@ body.editor-active {
 /* --- PROFESSIONAL THEMES (forced to single Premium Dark Blue theme) --- */
 /* All theme classes (including the default neon-cyber) now use the new
    premium dark theme so the purple accent is fully removed. */
-body.theme-neon-cyber, body.theme-legacy-v100,
-body.theme-emerald-corp, body.theme-luxury-gold,
-body.theme-royal-purple, body.theme-electric-amber,
-body.theme-ocean-breeze, body.theme-sunset-bronze,
-body.theme-velvet-rose, body.theme-slate-prof,
-body.theme-carbon-tech, body.theme-elegant-divi {
+body.theme-neon-cyber:not(.light-mode), body.theme-legacy-v100:not(.light-mode),
+body.theme-emerald-corp:not(.light-mode), body.theme-luxury-gold:not(.light-mode),
+body.theme-royal-purple:not(.light-mode), body.theme-electric-amber:not(.light-mode),
+body.theme-ocean-breeze:not(.light-mode), body.theme-sunset-bronze:not(.light-mode),
+body.theme-velvet-rose:not(.light-mode), body.theme-slate-prof:not(.light-mode),
+body.theme-carbon-tech:not(.light-mode), body.theme-elegant-divi:not(.light-mode) {
     --bg-primary: var(--background);
     --bg-secondary: var(--surface);
     --bg-tertiary: var(--surface-light);
@@ -4997,16 +5064,21 @@ body.theme-carbon-tech, body.theme-elegant-divi {
 
 /* --- LIGHT & DARK MODE OVERRIDES --- */
 
-body.light-mode {
-    --bg-primary: #f8f9fa;
-    --bg-secondary: #ffffff;
-    --bg-tertiary: #edf2f7;
-    --text-primary: #1a202c;
-    --text-secondary: #4a5568;
-    --text-muted: #718096;
-    --glass-bg: rgba(255, 255, 255, 0.85);
-    --border-color: rgba(0, 0, 0, 0.08);
-    --border-glow: rgba(0, 0, 0, 0.12);
+body.light-mode,
+body.light-mode[class*="theme-"] {
+    --bg-primary: #f8f9fa !important;
+    --bg-secondary: #ffffff !important;
+    --bg-tertiary: #edf2f7 !important;
+    --text-primary: #1a202c !important;
+    --text-secondary: #4a5568 !important;
+    --text-muted: #718096 !important;
+    --heading: #1a202c !important;
+    --body-text: #4a5568 !important;
+    --surface: #ffffff !important;
+    --background: #f8f9fa !important;
+    --glass-bg: rgba(255, 255, 255, 0.85) !important;
+    --border-color: rgba(0, 0, 0, 0.08) !important;
+    --border-glow: rgba(0, 0, 0, 0.12) !important;
     --accent-glow-shadow: transparent !important;
     --accent-glow-hover-shadow: transparent !important;
     --accent-glow-card-shadow: transparent !important;
@@ -5975,5 +6047,350 @@ body.show-all-graphics .portfolio-item.graphics-extra { display: block !importan
 }
 .studio-console-drawer::-webkit-scrollbar-thumb:hover {
     background: var(--accent-purple) !important;
+}
+
+/* ==========================================================================
+   LIGHT MODE CONTRAST OVERRIDES FOR DARK SECTIONS (#services, #contact, footer)
+   ========================================================================== */
+body.light-mode #services .section-title,
+body.light-mode #contact .section-title,
+body.light-mode .section-dark-bg .section-title,
+body.light-mode #services h2,
+body.light-mode #contact h2,
+body.light-mode .section-dark-bg h2,
+body.light-mode #contact .info-value,
+body.light-mode footer .footer-logo,
+body.light-mode footer h3,
+body.light-mode footer h4 {
+    color: #ffffff !important;
+}
+
+body.light-mode #services .section-desc,
+body.light-mode #contact .section-desc,
+body.light-mode .section-dark-bg .section-desc,
+body.light-mode #contact .info-label,
+body.light-mode #contact .contact-details-box p,
+body.light-mode #contact .contact-details-box span,
+body.light-mode footer p,
+body.light-mode footer span,
+body.light-mode footer .footer-tagline,
+body.light-mode footer .footer-copyright,
+body.light-mode footer a.footer-link,
+body.light-mode footer .footer-links a {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+body.light-mode #services .section-badge,
+body.light-mode #contact .section-badge,
+body.light-mode .section-dark-bg .section-badge {
+    color: #00d2ff !important;
+    background: rgba(0, 210, 255, 0.15) !important;
+    border-color: rgba(0, 210, 255, 0.3) !important;
+}
+
+/* Ensure text inside white cards inside dark sections stays dark & crisp */
+body.light-mode .service-card .service-title,
+body.light-mode .contact-form-box .form-title {
+    color: #1a202c !important;
+}
+
+body.light-mode .service-card .service-text,
+body.light-mode .service-card .service-bullets li,
+body.light-mode .contact-form-box .form-label,
+body.light-mode .contact-form-box p {
+    color: #4a5568 !important;
+}
+
+/* Ensure primary action buttons (.btn-primary) have solid blue background and crisp white text in Light Mode */
+body.light-mode .btn-primary,
+body.light-mode a.btn-primary,
+body.light-mode button.btn-primary,
+body.light-mode #hero-btn-portfolio {
+    background: #168BFF !important;
+    background: linear-gradient(135deg, #168BFF 0%, #0878E8 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(22, 139, 255, 0.3) !important;
+}
+
+body.light-mode .btn-primary:hover,
+body.light-mode a.btn-primary:hover,
+body.light-mode button.btn-primary:hover,
+body.light-mode #hero-btn-portfolio:hover {
+    background: #0878E8 !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 20px rgba(22, 139, 255, 0.4) !important;
+    transform: translateY(-2px);
+}
+
+body.light-mode .btn-primary *,
+body.light-mode a.btn-primary *,
+body.light-mode button.btn-primary *,
+body.light-mode #hero-btn-portfolio * {
+    color: #ffffff !important;
+}
+
+/* Ensure both About Me paragraphs use var(--text-primary) in both light and dark modes */
+.bio-text-redesign p,
+body.light-mode .bio-text-redesign p {
+    color: var(--text-primary) !important;
+}
+
+/* ==========================================================================
+   GRAPHICS SECTION 12-ITEM LIMIT, VIEW MORE BUTTON & PREVIEW MODAL FIXES
+   ========================================================================== */
+.portfolio-item.graphics-extra {
+    display: none !important;
+}
+
+body.show-all-graphics .portfolio-item.graphics-extra {
+    display: block !important;
+}
+
+.graphics-view-more-wrapper {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    margin-top: 30px !important;
+    margin-bottom: 10px !important;
+    clear: both !important;
+}
+
+.graphics-view-more-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 14px 36px !important;
+    background: linear-gradient(135deg, rgba(0, 210, 255, 0.12), rgba(168, 85, 247, 0.12)) !important;
+    border: 1.5px solid var(--accent-cyan) !important;
+    border-radius: 50px !important;
+    color: var(--accent-cyan) !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    letter-spacing: 0.03em !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 0 6px 25px rgba(0, 210, 255, 0.15) !important;
+}
+
+.graphics-view-more-btn:hover {
+    background: var(--accent-cyan) !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 30px rgba(0, 210, 255, 0.35) !important;
+    transform: translateY(-2px) !important;
+}
+
+.graphics-view-more-btn * {
+    transition: transform 0.3s ease !important;
+}
+
+body.light-mode .graphics-view-more-btn {
+    background: #ffffff !important;
+    border-color: #168BFF !important;
+    color: #168BFF !important;
+    box-shadow: 0 4px 15px rgba(22, 139, 255, 0.15) !important;
+}
+
+body.light-mode .graphics-view-more-btn:hover {
+    background: #168BFF !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 25px rgba(22, 139, 255, 0.35) !important;
+}
+
+/* Lightbox Modal Graphics Image Preview Fix */
+.video-modal-overlay.is-image-lightbox {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(0, 0, 0, 0.92) !important;
+    backdrop-filter: blur(15px) !important;
+}
+
+.video-modal-overlay.is-image-lightbox .video-modal-container {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    max-width: 95vw !important;
+    max-height: 90vh !important;
+    height: auto !important;
+    width: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    overflow: visible !important;
+}
+
+.video-modal-overlay.is-image-lightbox .video-modal-iframe-wrapper {
+    padding-top: 0 !important;
+    height: auto !important;
+    width: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    max-width: 95vw !important;
+    max-height: 85vh !important;
+}
+
+.video-modal-overlay.is-image-lightbox .video-modal-iframe-wrapper img {
+    max-width: 92vw !important;
+    max-height: 82vh !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    border-radius: 12px !important;
+    box-shadow: 0 25px 65px rgba(0, 0, 0, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Technical Proficiency - Remove all shadows & glows behind icons */
+#expertise .vertical-tool-logo,
+#expertise .category-header-title svg,
+#expertise .software-icon,
+#expertise .vertical-tool-logo-wrapper,
+#expertise .vertical-tool-logo-wrapper img,
+#expertise .vertical-tool-logo-wrapper svg,
+#expertise i,
+#expertise svg,
+#expertise img {
+    filter: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+#expertise .vertical-tool-row:hover .vertical-tool-logo {
+    filter: none !important;
+    box-shadow: none !important;
+}
+
+/* ==========================================================================
+   REMOVE PAUSE BUTTON IN PREVIEW & SHOWREEL FULL PLAYBACK STATE
+   ========================================================================== */
+
+/* Completely hide pause button overlay at all times during loading, buffering, hovering, or playing */
+.video-custom-overlay,
+.video-overlay-btn,
+.video-custom-overlay.playing,
+.video-custom-overlay.playing .video-overlay-btn,
+.video-custom-overlay.playing:hover .video-overlay-btn,
+.project-card .video-overlay-btn,
+.project-card:hover .video-overlay-btn,
+.project-card.playing-inline .video-overlay-btn,
+.project-card.playing-inline:hover .video-overlay-btn,
+.project-media .project-view-badge,
+.project-card:hover .project-view-badge,
+.project-media:has(.hover-video-preview) .video-overlay-btn,
+.project-media:has(.hover-video-preview) .project-view-badge,
+.showreel-frame .video-overlay-btn,
+.showreel-frame.is-playing .video-overlay-btn {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Full playing state for Showreel frame */
+.showreel-frame.is-playing .showreel-overlay,
+.showreel-frame.is-playing .showreel-img,
+.showreel-frame.is-playing .waveform-canvas {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    display: none !important;
+}
+
+.showreel-frame.is-playing .showreel-video-container {
+    z-index: 10 !important;
+    pointer-events: auto !important;
+}
+
+.showreel-frame.is-playing .showreel-video-container iframe,
+.showreel-frame.is-playing .showreel-video-container video {
+    pointer-events: auto !important;
+}
+
+/* ==========================================================================
+   SMOOTH SLIDE TRANSITIONS FOR GRAPHICS LIGHTBOX GALLERY SLIDESHOW
+   ========================================================================== */
+.video-modal-overlay.is-image-lightbox .video-modal-iframe-wrapper {
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.video-modal-overlay.is-image-lightbox .video-modal-iframe-wrapper img {
+    transition: transform 0.32s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.32s ease !important;
+}
+
+.video-modal-overlay.is-image-lightbox .video-modal-iframe-wrapper img.slide-out-left {
+    position: absolute !important;
+    transform: translateX(-100%) scale(0.92) !important;
+    opacity: 0 !important;
+}
+
+.video-modal-overlay.is-image-lightbox .video-modal-iframe-wrapper img.slide-out-right {
+    position: absolute !important;
+    transform: translateX(100%) scale(0.92) !important;
+    opacity: 0 !important;
+}
+
+.video-modal-overlay.is-image-lightbox .video-modal-iframe-wrapper img.slide-in-right {
+    animation: slideInRight 0.32s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
+.video-modal-overlay.is-image-lightbox .video-modal-iframe-wrapper img.slide-in-left {
+    animation: slideInLeft 0.32s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
+@keyframes slideInRight {
+    0% {
+        transform: translateX(100%) scale(0.92);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInLeft {
+    0% {
+        transform: translateX(-100%) scale(0.92);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Ensure no play/pause or badge elements block previews */
+.hover-video-preview ~ .project-view-badge,
+.hover-video-preview ~ .video-overlay-btn,
+.hover-video-preview ~ .play-btn-circle {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+/* Password Lock Modal & CMS HUD display overrides for ?edit mode */
+#password-lock-modal.active {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+    display: flex !important;
+    z-index: 100000 !important;
+}
+
+#password-lock-modal.active .project-modal-container {
+    transform: scale(1) !important;
+    opacity: 1 !important;
+}
+
+body.editor-active #studio-console-drawer {
+    transform: translateX(0) !important;
+}
+
+body.editor-active .card-edit-overlay {
+    display: flex !important;
+    opacity: 1 !important;
 }
 

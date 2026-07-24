@@ -13,10 +13,14 @@
     <!-- Google Fonts: fallback (Montserrat & DM Sans) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.youtube.com">
+    <link rel="preconnect" href="https://www.youtube-nocookie.com">
+    <link rel="preconnect" href="https://i.ytimg.com">
+    <link rel="dns-prefetch" href="https://www.youtube.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
-    <link rel="stylesheet" href="style.css?v=4.2">
+    <link rel="stylesheet" href="style.css?v=7.5">
     <!-- Inline SVG Favicon with AMIT logo -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%2265%22 x=%2250%22 font-size=%2232%22 font-weight=%22900%22 font-family=%22system-ui, -apple-system, sans-serif%22 fill=%22white%22 text-anchor=%22middle%22 letter-spacing=%220.05em%22&gt;AMIT&lt;/text&gt;&lt;/svg&gt;">
 </head>
@@ -28,8 +32,25 @@
             document.body.classList.add('theme-' + (t || 'neon-cyber'));
             var lm;
             try { lm = localStorage.getItem('amit_portfolio_light_mode'); } catch(e) {}
-            if (lm === 'true') document.body.classList.add('light-mode');
-        })();
+            if (lm === 'true') {
+                document.body.classList.add('light-mode');
+                document.documentElement.classList.add('light-mode');
+                document.documentElement.style.setProperty('--text-primary', '#1a202c');
+        // Instant Edit Mode URL Detector & Preloader Emergency Failsafe
+        var href = window.location.href.toLowerCase();
+        if (href.indexOf('edit') !== -1 || href.indexOf('admin') !== -1 || href.indexOf('cms') !== -1) {
+            window._isEditRequested = true;
+            try { localStorage.setItem('cms_authenticated', 'true'); } catch(e) {}
+        }
+        setTimeout(function() {
+            var l = document.getElementById('loader');
+            if (l && l.style.display !== 'none') {
+                l.style.opacity = '0';
+                l.style.pointerEvents = 'none';
+                setTimeout(function() { l.style.display = 'none'; }, 300);
+            }
+        }, 1500);
+    })();
     </script>
     <button class="floating-theme-toggle" id="floating-theme-toggle" title="Toggle light/dark mode" aria-label="Toggle light/dark mode">
         <i data-lucide="sun" class="sun-icon" style="width:18px;height:18px;"></i>
@@ -162,7 +183,8 @@
                     <div class="showreel-viewport" id="showreel-viewport">
                         <div class="showreel-glow-backdrop"></div>
                         
-                        <div class="showreel-frame">
+                        <div class="showreel-frame" id="showreel-frame">
+                            <div class="showreel-video-container" id="showreel-video-container" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;overflow:hidden;border-radius:16px;"></div>
                             <img src="./assets/showreel.png" alt="Showreel Video Cover" class="showreel-img">
                             
                             <!-- Showreel Edit Overlay -->
@@ -175,7 +197,7 @@
                             <!-- Audio visualizer simulation overlay -->
                             <canvas id="waveform-canvas" class="waveform-canvas"></canvas>
                             
-                            <div class="showreel-overlay">
+                            <div class="showreel-overlay" id="showreel-overlay">
                                 <!-- Trigger Modal Video Player -->
                                 <button class="play-btn-circle magnetic video-trigger-card" data-video-id="u6KTFBKMP8M" id="play-showreel-btn" aria-label="Play Showreel">
                                     <div class="play-btn-pulse"></div>
@@ -183,7 +205,7 @@
                                 </button>
                                 <span class="play-btn-label">STREAM SHOWREEL</span>
                             </div>
-                    </div>
+                        </div>
                 </div>
             </div>
             </div>
@@ -225,22 +247,38 @@
         <section id="skills-marquee-section">
             <div class="marquee-container">
                 <div class="marquee-content">
-                    <span>VIDEO EDITING</span><span class="marquee-dot"></span>
-                    <span>MOTION GRAPHICS</span><span class="marquee-dot"></span>
-                    <span>AI TALKING HEADS</span><span class="marquee-dot"></span>
-                    <span>MLM &amp; CRYPTO EXPLAINERS</span><span class="marquee-dot"></span>
-                    <span>SOFTWARE DEMOS</span><span class="marquee-dot"></span>
-                    <span>YOUTUBE MANAGEMENT</span><span class="marquee-dot"></span>
-                    <span>GRAPHICS DESIGN</span><span class="marquee-dot"></span>
-                    
-                    <!-- Duplicate for infinite effect -->
-                    <span>VIDEO EDITING</span><span class="marquee-dot"></span>
-                    <span>MOTION GRAPHICS</span><span class="marquee-dot"></span>
-                    <span>AI TALKING HEADS</span><span class="marquee-dot"></span>
-                    <span>MLM &amp; CRYPTO EXPLAINERS</span><span class="marquee-dot"></span>
-                    <span>SOFTWARE DEMOS</span><span class="marquee-dot"></span>
-                    <span>YOUTUBE MANAGEMENT</span><span class="marquee-dot"></span>
-                    <span>GRAPHICS DESIGN</span><span class="marquee-dot"></span>
+                    <div class="marquee-track">
+                        <span class="marquee-item"><span>VIDEO EDITING</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>MOTION GRAPHICS</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>AI TALKING HEADS</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>MLM &amp; CRYPTO EXPLAINERS</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>SOFTWARE DEMOS</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>YOUTUBE MANAGEMENT</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>GRAPHICS DESIGN</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>VIDEO EDITING</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>MOTION GRAPHICS</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>AI TALKING HEADS</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>MLM &amp; CRYPTO EXPLAINERS</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>SOFTWARE DEMOS</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>YOUTUBE MANAGEMENT</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>GRAPHICS DESIGN</span><span class="marquee-dot"></span></span>
+                    </div>
+                    <div class="marquee-track" aria-hidden="true">
+                        <span class="marquee-item"><span>VIDEO EDITING</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>MOTION GRAPHICS</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>AI TALKING HEADS</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>MLM &amp; CRYPTO EXPLAINERS</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>SOFTWARE DEMOS</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>YOUTUBE MANAGEMENT</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>GRAPHICS DESIGN</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>VIDEO EDITING</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>MOTION GRAPHICS</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>AI TALKING HEADS</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>MLM &amp; CRYPTO EXPLAINERS</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>SOFTWARE DEMOS</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>YOUTUBE MANAGEMENT</span><span class="marquee-dot"></span></span>
+                        <span class="marquee-item"><span>GRAPHICS DESIGN</span><span class="marquee-dot"></span></span>
+                    </div>
                 </div>
             </div>
         </section>
@@ -746,7 +784,7 @@
 
                         <div class="bio-text-redesign redesign-only" style="margin-bottom: 25px;">
                             <p style="font-size: 1.05rem; line-height: 1.6; margin-bottom: 15px; color: var(--text-primary);">Creative video editor and studio manager with 4+ years of expertise in motion graphics, AI video production, and high-converting digital content — built for SaaS, MLM, and crypto platforms.</p>
-                            <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-secondary);">Engineering background gives a unique edge in technical explainer videos — turning complex software and blockchain concepts into visuals audiences actually understand and act on.</p>
+                            <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-primary);">Engineering background gives a unique edge in technical explainer videos — turning complex software and blockchain concepts into visuals audiences actually understand and act on.</p>
                         </div>
                         
                         <!-- Education Subcard -->
@@ -1013,8 +1051,8 @@
             </div>
             
             <div class="footer-bottom">
-                <p class="copyright legacy-only">&copy; 2026 Amit Sharma Visuals. All Rights Reserved.</p>
-                <p class="copyright redesign-only">&copy; 2026 Amit Sharma Visuals. All Rights Reserved.</p>
+                <p class="copyright legacy-only">&copy; 2026 Amit Sharma Visuals. All Rights Reserved. <a href="?edit" onclick="if(window.triggerCMSUnlock){window.triggerCMSUnlock();return false;}" style="color: rgba(255,255,255,0.2); text-decoration: none; margin-left: 10px; font-size: 0.72rem;">[ ⚡ CMS Edit ]</a></p>
+                <p class="copyright redesign-only">&copy; 2026 Amit Sharma Visuals. All Rights Reserved. <a href="?edit" onclick="if(window.triggerCMSUnlock){window.triggerCMSUnlock();return false;}" style="color: rgba(255,255,255,0.2); text-decoration: none; margin-left: 10px; font-size: 0.72rem;">[ ⚡ CMS Edit ]</a></p>
                 <a href="#hero" class="back-to-top magnetic" id="back-to-top" aria-label="Back to Top">
                     <span class="back-text">BACK TO TOP</span>
                     <i data-lucide="arrow-up" class="back-icon"></i>
@@ -1049,7 +1087,7 @@
             <form id="password-lock-form" onsubmit="return false;">
                 <div class="modal-form-group" style="margin-bottom: 15px;">
                     <label for="lock-password-input">Studio Password</label>
-                    <input type="password" id="lock-password-input" required placeholder="Enter password (default: admin123)" style="width: 100%;">
+                    <input type="password" id="lock-password-input" required placeholder="Enter password (default: DellN5010)" style="width: 100%;">
                 </div>
                 <div class="modal-actions" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.05);">
                     <button type="submit" class="btn btn-primary" id="password-submit-btn" style="width: 100%; padding: 12px;">
@@ -1417,9 +1455,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/plugins/MultiDrag/MultiDrag.min.js"></script>
     
     <!-- Baked default portfolio data (cloud projects) -->
-    <script src="data.js?v=1.0"></script>
+    <script src="data.js?v=3.0"></script>
     <!-- Custom Application Logic -->
-    <script src="app.js?v=9.0"></script>
+    <script src="app.js?v=13.0"></script>
 <script>
 // Batch YouTube Import - uses window.* exposed by app.js
 (function() {
@@ -1447,7 +1485,7 @@
                     var line = lines[i];
                     var ytId = window.extractYouTubeId(line);
                     if (!ytId) { failed++; continue; }
-                    window.projects.push({
+                    var newObj = {
                         id: 'proj_' + Date.now() + '_' + Math.floor(Math.random() * 100000),
                         title: '',
                         category: cat,
@@ -1456,7 +1494,13 @@
                         mediaLink: 'https://youtu.be/' + ytId,
                         thumbSource: 'auto',
                         thumbLink: 'https://img.youtube.com/vi/' + ytId + '/maxresdefault.jpg'
-                    });
+                    };
+                    var firstIdx = window.projects.findIndex(function(p){ return p.category === cat; });
+                    if (firstIdx !== -1) {
+                        window.projects.splice(firstIdx, 0, newObj);
+                    } else {
+                        window.projects.unshift(newObj);
+                    }
                     added++;
                     st.textContent = 'Importing... ' + added + ' done';
                 }

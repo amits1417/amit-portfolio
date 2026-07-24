@@ -1,3 +1,19 @@
 {
-  "framework": null
+  "cleanUrls": false,
+  "rewrites": [
+    { "source": "/edit", "destination": "/index.html?edit" },
+    { "source": "/admin", "destination": "/index.html?edit" },
+    { "source": "/cms", "destination": "/index.html?edit" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
+  ]
 }

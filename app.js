@@ -5,29 +5,8 @@
 const CMS_PASSWORD = "DellN5010";
 
 document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const hudToggle = document.getElementById('studio-hud-toggle');
-    
-    let authorized = false;
-    if (sessionStorage.getItem('cms_authenticated') === 'true') {
-        authorized = true;
-    } else if (urlParams.has('edit')) {
-        const input = prompt('Enter CMS password:');
-        if (input === CMS_PASSWORD) {
-            sessionStorage.setItem('cms_authenticated', 'true');
-            authorized = true;
-        }
-    }
-
-    // Auto-enable Studio (edit) mode when authorized via ?edit so edits save reliably
-    if (authorized) {
-        document.body.classList.add('editor-active');
-        isTextEditActive = true;
-        window.dispatchEvent(new CustomEvent('cms-mode-change', { detail: { active: true } }));
-    }
-    
-    if (hudToggle) {
-        hudToggle.style.setProperty('display', authorized ? 'flex' : 'none', 'important');
+    if (typeof checkEditURL === 'function') {
+        checkEditURL();
     }
 
     // Helper to extract YouTube video ID from any link style (including Shorts)
@@ -395,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Automatic DB version upgrade migration (forces cache clear for new defaults)
         const DB_VERSION_KEY = 'amit_portfolio_db_version';
-        const CURRENT_DB_VERSION = '19';
+        const CURRENT_DB_VERSION = '20';
         const storedVersion = localStorage.getItem(DB_VERSION_KEY);
         if (storedVersion !== CURRENT_DB_VERSION) {
             localStorage.removeItem('amit_portfolio_projects');
@@ -441,11 +420,20 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('amit_portfolio_sections', JSON.stringify(sections));
         }
 
-        // Seed from baked data into localStorage (do NOT push to cloud on load;
-        // cloud pull below is the source of truth and edits push explicitly)
+        // Load projects from localStorage if available, otherwise fallback to baked data
+        const storedProjects = localStorage.getItem('amit_portfolio_projects');
         const bakedData = (typeof window.CLOUD_DEFAULT_PROJECTS !== 'undefined' && Array.isArray(window.CLOUD_DEFAULT_PROJECTS)) ? window.CLOUD_DEFAULT_PROJECTS : defaultProjects;
-        projects = JSON.parse(JSON.stringify(bakedData));
-        localStorage.setItem('amit_portfolio_projects', JSON.stringify(projects));
+        
+        if (storedProjects) {
+            try {
+                projects = JSON.parse(storedProjects);
+            } catch(e) {
+                projects = JSON.parse(JSON.stringify(bakedData));
+            }
+        } else {
+            projects = JSON.parse(JSON.stringify(bakedData));
+            localStorage.setItem('amit_portfolio_projects', JSON.stringify(projects));
+        }
 
         // Pull live cloud data so changes made in edit mode appear for all visitors
         if (firebaseDbUrl) {
@@ -453,6 +441,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Projects loaded. Ready.
+        if (typeof checkEditURL === 'function') {
+            checkEditURL();
+        }
 
         // Auto-migrate showreel default thumbnail to new compelling cover image
         const storedShowreel = localStorage.getItem('amit_portfolio_showreel');
@@ -588,9 +579,9 @@ document.addEventListener('DOMContentLoaded', () => {
         renderDynamicServices();
         renderClientsStrip();
 
-        // Set default password if not exists
-        if (!localStorage.getItem('amit_portfolio_password')) {
-            localStorage.setItem('amit_portfolio_password', 'admin123');
+        // Set default password if not exists or if reset
+        if (!localStorage.getItem('amit_portfolio_password') || localStorage.getItem('amit_portfolio_password') === 'admin123') {
+            localStorage.setItem('amit_portfolio_password', 'DellN5010');
         }
 
         // Initialize Firebase Cloud sync configurations
@@ -610,7 +601,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const localTimestamp = parseInt(localStorage.getItem('amit_portfolio_last_updated') || '0');
             let cloudTimestamp = 0;
             try {
-                const tsRes = await fetch(`${url}/last_updated.json`);
+                const tsRes = await fetch(`${url}/last_updated.json?t=${Date.now()}`, { cache: 'no-store' });
                 if (tsRes.ok) {
                     const parsedTs = await tsRes.json();
                     cloudTimestamp = parsedTs ? parseInt(parsedTs) : 0;
@@ -635,15 +626,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 return null;
             }
 
-            const projRes = await fetch(`${url}/projects.json`);
+            const projRes = await fetch(`${url}/projects.json?t=${Date.now()}`, { cache: 'no-store' });
             if (!projRes.ok) return;
             const cloudProjects = firebaseToArray(await projRes.json());
             
-            const secRes = await fetch(`${url}/sections.json`);
+            const secRes = await fetch(`${url}/sections.json?t=${Date.now()}`, { cache: 'no-store' });
             if (!secRes.ok) return;
             const cloudSections = firebaseToArray(await secRes.json());
 
-            const layRes = await fetch(`${url}/layout_order.json`);
+            const layRes = await fetch(`${url}/layout_order.json?t=${Date.now()}`, { cache: 'no-store' });
             let cloudLayout = null;
             if (layRes.ok) {
                 cloudLayout = firebaseToArray(await layRes.json());
@@ -687,7 +678,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            const themeRes = await fetch(`${url}/theme.json`);
+            const themeRes = await fetch(`${url}/theme.json?t=${Date.now()}`, { cache: 'no-store' });
             if (themeRes.ok) {
                 const cloudTheme = await themeRes.json();
                 if (cloudTheme && typeof cloudTheme === 'string') {
@@ -700,7 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            const softRes = await fetch(`${url}/software.json`);
+            const softRes = await fetch(`${url}/software.json?t=${Date.now()}`, { cache: 'no-store' });
             if (softRes.ok) {
                 const cloudSoftware = firebaseToArray(await softRes.json());
                 if (cloudSoftware && Array.isArray(cloudSoftware)) {
@@ -712,7 +703,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            const customColorsRes = await fetch(`${url}/custom_colors.json`);
+            const customColorsRes = await fetch(`${url}/custom_colors.json?t=${Date.now()}`, { cache: 'no-store' });
             if (customColorsRes.ok) {
                 const cloudColors = await customColorsRes.json();
                 const localColorsStr = localStorage.getItem('amit_portfolio_custom_colors');
@@ -729,7 +720,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            const clientsRes = await fetch(`${url}/clients.json`);
+            const clientsRes = await fetch(`${url}/clients.json?t=${Date.now()}`, { cache: 'no-store' });
             if (clientsRes.ok) {
                 const cloudClients = await clientsRes.json();
                 if (cloudClients && Array.isArray(cloudClients)) {
@@ -742,12 +733,56 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             }
-            const cmsTextRes = await fetch(`${url}/cms_text.json`);
+
+            // Fetch education from Firebase (null-safe)
+            const eduRes = await fetch(`${url}/education.json?t=${Date.now()}`, { cache: 'no-store' });
+            if (eduRes.ok) {
+                const rawEdu = await eduRes.json();
+                const cloudEdu = firebaseToArray(rawEdu);
+                if (cloudEdu && Array.isArray(cloudEdu) && cloudEdu.length > 0) {
+                    if (JSON.stringify(education) !== JSON.stringify(cloudEdu)) {
+                        education = cloudEdu;
+                        localStorage.setItem('amit_portfolio_education', JSON.stringify(education));
+                        hasChanges = true;
+                    }
+                }
+            }
+
+            // Fetch timeline from Firebase (null-safe)
+            const timelineRes = await fetch(`${url}/timeline.json?t=${Date.now()}`, { cache: 'no-store' });
+            if (timelineRes.ok) {
+                const rawTimeline = await timelineRes.json();
+                const cloudTimeline = firebaseToArray(rawTimeline);
+                if (cloudTimeline && Array.isArray(cloudTimeline) && cloudTimeline.length > 0) {
+                    if (JSON.stringify(timeline) !== JSON.stringify(cloudTimeline)) {
+                        timeline = cloudTimeline;
+                        localStorage.setItem('amit_portfolio_timeline', JSON.stringify(timeline));
+                        hasChanges = true;
+                    }
+                }
+            }
+
+            // Fetch services from Firebase (null-safe)
+            const servicesRes = await fetch(`${url}/services.json?t=${Date.now()}`, { cache: 'no-store' });
+            if (servicesRes.ok) {
+                const rawServices = await servicesRes.json();
+                const cloudServices = firebaseToArray(rawServices);
+                if (cloudServices && Array.isArray(cloudServices) && cloudServices.length > 0) {
+                    if (JSON.stringify(services) !== JSON.stringify(cloudServices)) {
+                        services = cloudServices;
+                        localStorage.setItem('amit_portfolio_services', JSON.stringify(services));
+                        hasChanges = true;
+                    }
+                }
+            }
+
+            // Fetch cms_text from Firebase (null-safe)
+            const cmsTextRes = await fetch(`${url}/cms_text.json?t=${Date.now()}`, { cache: 'no-store' });
             if (cmsTextRes.ok) {
                 const cloudCmsText = await cmsTextRes.json();
-                if (cloudCmsText && typeof cloudCmsText === 'object') {
-                    const localCmsText = localStorage.getItem('amit_portfolio_cms_text');
-                    if (!localCmsText || JSON.stringify(cloudCmsText) !== localCmsText) {
+                if (cloudCmsText && typeof cloudCmsText === 'object' && cloudCmsText !== null && Object.keys(cloudCmsText).length > 0) {
+                    const localCmsTextStr = localStorage.getItem('amit_portfolio_cms_text');
+                    if (localCmsTextStr !== JSON.stringify(cloudCmsText)) {
                         localStorage.setItem('amit_portfolio_cms_text', JSON.stringify(cloudCmsText));
                         if (typeof initInlineTextCMS === 'function') {
                             initInlineTextCMS();
@@ -768,6 +803,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 reorderDOMSections();
                 if (typeof renderDynamicSoftware === 'function') {
                     renderDynamicSoftware();
+                }
+                if (typeof renderDynamicEducation === 'function') {
+                    renderDynamicEducation();
+                }
+                if (typeof renderDynamicTimeline === 'function') {
+                    renderDynamicTimeline();
+                }
+                if (typeof renderDynamicServices === 'function') {
+                    renderDynamicServices();
+                }
+                if (typeof initInlineTextCMS === 'function') {
+                    initInlineTextCMS();
                 }
                 appendConsoleLog("> Showcase database synchronized with cloud updates.");
             } else {
@@ -1254,6 +1301,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function getProjectTimestamp(p) {
+        if (!p) return 0;
+        if (p.createdAt) {
+            const t = typeof p.createdAt === 'number' ? p.createdAt : Date.parse(p.createdAt);
+            if (!isNaN(t) && t > 0) return t;
+        }
+        if (p.id) {
+            const matches = String(p.id).match(/\d{10,13}/);
+            if (matches && matches[0]) {
+                const num = parseInt(matches[0], 10);
+                if (!isNaN(num) && num > 1000000000) return num;
+            }
+        }
+        return 0;
+    }
+    window.getProjectTimestamp = getProjectTimestamp;
+
     function renderGridCategory(gridEl, category, isEditorActive, aspectRatio) {
         gridEl.innerHTML = '';
         const catProjects = projects.filter(p => p.category === category);
@@ -1307,11 +1371,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             }
 
+            const isGraphicsCat = (category && category.toLowerCase().includes('graphic')) || (proj.category && proj.category.toLowerCase().includes('graphic'));
             const fallbackThumb = './assets/showreel_cover_compelling.png';
-            let thumbImgSrc = proj.category === 'graphics' ? proj.mediaLink : proj.thumbLink;
+            let thumbImgSrc = isGraphicsCat ? proj.mediaLink : proj.thumbLink;
             if (!thumbImgSrc || thumbImgSrc.trim() === '') {
                 thumbImgSrc = fallbackThumb;
             }
+            const hasDetailsText = (proj.title && proj.title.trim() !== '') || (proj.client && proj.client.trim() !== '') || (proj.role && proj.role.trim() !== '') || (proj.tools && proj.tools.trim() !== '') || (proj.desc && proj.desc.trim() !== '');
+            const hideDetails = !hasDetailsText || category === 'shorts' || isGraphicsCat;
             itemEl.innerHTML = `
                 <div class="project-card video-trigger-card" data-project-id="${proj.id}">
                     <!-- Multi-select delete checkbox overlay (direct child of card, high z-index) -->
@@ -1328,7 +1395,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span>${viewLabel}</span>
                         </div>
                     </div>
-                    <div class="project-details" ${category === 'shorts' || category === 'graphics' ? 'style="display: none !important;"' : ''}>
+                    <div class="project-details" ${hideDetails ? 'style="display: none !important;"' : ''}>
                         <h3 class="project-title">${proj.title}</h3>
                         ${proj.client || proj.role || proj.tools || proj.desc ? `
                             <div class="project-meta-info">
@@ -1392,23 +1459,116 @@ document.addEventListener('DOMContentLoaded', () => {
             gridEl.appendChild(addCard);
         }
 
-        // Graphics: show only 12 items + "View More" button (only on live, not in editor)
-        if (category === 'graphics' && !isEditorActive && catProjects.length > 12) {
-            const items = gridEl.querySelectorAll('.portfolio-item');
-            items.forEach((item, i) => {
-                if (i >= 12) item.classList.add('graphics-extra');
-            });
-            const viewMoreBtn = document.createElement('button');
-            viewMoreBtn.className = 'graphics-view-more-btn';
-            viewMoreBtn.textContent = `View All (${catProjects.length} designs)`;
-            viewMoreBtn.addEventListener('click', () => {
-                document.body.classList.toggle('show-all-graphics');
+        // Graphics: show only 12 items + "View More" button outside grid container
+        if (category && category.toLowerCase().includes('graphic')) {
+            const existingWrapper = gridEl.parentNode ? gridEl.parentNode.querySelector('.graphics-view-more-wrapper') : null;
+            if (existingWrapper) existingWrapper.remove();
+
+            if (!isEditorActive && catProjects.length > 12) {
+                const items = gridEl.querySelectorAll('.portfolio-item');
+                items.forEach((item, i) => {
+                    if (i >= 12) item.classList.add('graphics-extra');
+                });
+                
+                const viewMoreWrapper = document.createElement('div');
+                viewMoreWrapper.className = 'graphics-view-more-wrapper';
                 const isOpen = document.body.classList.contains('show-all-graphics');
-                viewMoreBtn.textContent = isOpen ? 'Show Less' : `View All (${catProjects.length} designs)`;
-                viewMoreBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            });
-            gridEl.appendChild(viewMoreBtn);
+                
+                viewMoreWrapper.innerHTML = `
+                    <button type="button" class="graphics-view-more-btn">
+                        <span>${isOpen ? 'Show Less' : `View All (${catProjects.length} Designs)`}</span>
+                        <i data-lucide="${isOpen ? 'chevron-up' : 'chevron-down'}"></i>
+                    </button>
+                `;
+                
+                const btn = viewMoreWrapper.querySelector('.graphics-view-more-btn');
+                btn.addEventListener('click', () => {
+                    document.body.classList.toggle('show-all-graphics');
+                    const nowOpen = document.body.classList.contains('show-all-graphics');
+                    const btnSpan = btn.querySelector('span');
+                    const btnIcon = btn.querySelector('i');
+                    if (btnSpan) btnSpan.textContent = nowOpen ? 'Show Less' : `View All (${catProjects.length} Designs)`;
+                    if (btnIcon) btnIcon.setAttribute('data-lucide', nowOpen ? 'chevron-up' : 'chevron-down');
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                    
+                    if (!nowOpen) {
+                        gridEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+
+                if (gridEl.parentNode) {
+                    gridEl.parentNode.appendChild(viewMoreWrapper);
+                }
+            }
         }
+        initGraphicsRandomSlideshow();
+    }
+
+    window.graphicsSlideshowTimers = window.graphicsSlideshowTimers || [];
+
+    function initGraphicsRandomSlideshow() {
+        if (window.graphicsSlideshowTimers) {
+            window.graphicsSlideshowTimers.forEach(t => clearTimeout(t));
+            window.graphicsSlideshowTimers = [];
+        }
+
+        if (document.body.classList.contains('editor-active')) return;
+
+        const allGraphics = projects.filter(p => p && p.category && p.category.toLowerCase().includes('graphic') && p.mediaLink && p.mediaLink.trim() !== '');
+        if (allGraphics.length <= 12) return;
+
+        const cardItems = document.querySelectorAll('.grid-graphics .portfolio-item');
+        if (!cardItems || cardItems.length === 0) return;
+
+        cardItems.forEach((itemEl, slotIndex) => {
+            let currentIndex = slotIndex;
+
+            function scheduleNextChange() {
+                const randomDelay = 3500 + Math.floor(Math.random() * 4000);
+                const timer = setTimeout(() => {
+                    if (document.body.classList.contains('editor-active')) return;
+
+                    currentIndex = (currentIndex + 12) % allGraphics.length;
+                    const nextProj = allGraphics[currentIndex];
+                    if (!nextProj) return;
+
+                    const img = itemEl.querySelector('.project-media img');
+                    const videoCard = itemEl.querySelector('.video-trigger-card');
+
+                    if (img) {
+                        img.style.transition = 'transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s ease';
+                        img.style.transform = 'perspective(600px) rotateY(90deg)';
+                        img.style.opacity = '0.3';
+                        
+                        setTimeout(() => {
+                            img.src = normalizeMediaPath(nextProj.mediaLink);
+                            if (videoCard) {
+                                videoCard.setAttribute('data-project-id', nextProj.id);
+                            }
+                            
+                            img.style.transition = 'none';
+                            img.style.transform = 'perspective(600px) rotateY(-90deg)';
+                            
+                            requestAnimationFrame(() => {
+                                requestAnimationFrame(() => {
+                                    img.style.transition = 'transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s ease';
+                                    img.style.transform = 'perspective(600px) rotateY(0deg)';
+                                    img.style.opacity = '1';
+                                });
+                            });
+                        }, 280);
+                    }
+
+                    scheduleNextChange();
+                }, randomDelay);
+
+                window.graphicsSlideshowTimers.push(timer);
+            }
+
+            const initialStartDelay = 500 + Math.floor(Math.random() * 3000);
+            const initTimer = setTimeout(scheduleNextChange, initialStartDelay);
+            window.graphicsSlideshowTimers.push(initTimer);
+        });
     }
 
     function renderConsoleSectionsList() {
@@ -2687,6 +2847,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedClass: 'sortable-selected', // Class for selected items
                 ghostClass: 'sortable-ghost',
                 dragClass: 'sortable-drag',
+                scroll: true, // Enable automatic page scrolling while dragging
+                scrollSensitivity: 150, // px distance to edge to trigger scrolling
+                scrollSpeed: 30, // scroll speed
+                bubbleScroll: true, // scroll window / parent containers
                 // Filter out non-draggable items like Add Card, Paste placeholders, or View More triggers
                 filter: '.paste-placeholder-card, .graphics-gallery-trigger-card, .portfolio-item:has(.btn-add-hud)',
                 onSelect: function (evt) {
@@ -2756,6 +2920,43 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Global Window & Modal Auto-Scroll during Drag Operations (Mouse & Touch)
+    function handleDragAutoScroll(e) {
+        if (!document.body.classList.contains('editor-active')) return;
+        const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : null);
+        if (clientY === null) return;
+        
+        // Only trigger scroll if actively dragging a sortable item
+        if (!document.querySelector('.sortable-drag, .sortable-ghost, .sortable-selected')) return;
+        
+        const viewportHeight = window.innerHeight;
+        const threshold = 150;
+        
+        if (clientY < threshold) {
+            // Near top edge of screen -> scroll UP
+            const speed = Math.max(12, Math.floor((threshold - clientY) * 0.6));
+            window.scrollBy(0, -speed);
+            const graphicsModal = document.getElementById('graphics-gallery-modal');
+            if (graphicsModal && graphicsModal.classList.contains('active')) {
+                graphicsModal.scrollTop -= speed;
+            }
+        } else if (clientY > viewportHeight - threshold) {
+            // Near bottom edge of screen -> scroll DOWN
+            const speed = Math.max(12, Math.floor((clientY - (viewportHeight - threshold)) * 0.6));
+            window.scrollBy(0, speed);
+            const graphicsModal = document.getElementById('graphics-gallery-modal');
+            if (graphicsModal && graphicsModal.classList.contains('active')) {
+                graphicsModal.scrollTop += speed;
+            }
+        }
+    }
+    
+    document.addEventListener('dragover', handleDragAutoScroll);
+    document.addEventListener('mousemove', (e) => {
+        if (e.buttons === 1) handleDragAutoScroll(e);
+    });
+    document.addEventListener('touchmove', handleDragAutoScroll, { passive: true });
+
     initDatabase();
     renderProjects();
 
@@ -2766,39 +2967,54 @@ document.addEventListener('DOMContentLoaded', () => {
     const loaderPercentage = document.getElementById('loader-percentage');
     const loaderProgressBar = document.getElementById('loader-progress-bar');
     
+    function hidePreloader() {
+        if (!loader || loader._hidden) return;
+        loader._hidden = true;
+        if (typeof gsap !== 'undefined' && loader) {
+            gsap.to(loader, {
+                yPercent: -100,
+                duration: 0.5,
+                ease: "power4.inOut",
+                onComplete: () => {
+                    if (loader) loader.style.display = 'none';
+                    if (typeof initHeroAnimations === 'function') {
+                        try { initHeroAnimations(); } catch(e) {}
+                    }
+                }
+            });
+        } else if (loader) {
+            loader.style.transition = 'transform 0.5s ease-in-out';
+            loader.style.transform = 'translateY(-100%)';
+            setTimeout(() => {
+                if (loader) loader.style.display = 'none';
+                if (typeof initHeroAnimations === 'function') {
+                    try { initHeroAnimations(); } catch(e) {}
+                }
+            }, 500);
+        }
+    }
+    window.hidePreloader = hidePreloader;
+
+    // Emergency Failsafe: Hide preloader max 1.2s after script load
+    setTimeout(hidePreloader, 1200);
+
+    // Instant hide if edit mode is active or requested
+    if (window._isEditRequested || window.location.href.toLowerCase().includes('edit')) {
+        if (loader) loader.style.display = 'none';
+    }
+
     let count = 0;
     const counterInterval = setInterval(() => {
-        count += Math.floor(Math.random() * 8) + 2; // Random increments
+        count += Math.floor(Math.random() * 12) + 8;
         if (count >= 100) {
             count = 100;
             clearInterval(counterInterval);
-            
-            // Hide Loader with GSAP
-            if (typeof gsap !== 'undefined') {
-                gsap.to(loader, {
-                    yPercent: -100,
-                    duration: 0.8,
-                    ease: "power4.inOut",
-                    onComplete: () => {
-                        loader.style.display = 'none';
-                        // Start Hero Animations
-                        initHeroAnimations();
-                    }
-                });
-            } else {
-                loader.style.transition = 'transform 0.8s ease-in-out';
-                loader.style.transform = 'translateY(-100%)';
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                    initHeroAnimations();
-                }, 800);
-            }
+            hidePreloader();
         }
         
-        // Update labels
-        loaderPercentage.textContent = count < 10 ? '0' + count : count;
-        loaderProgressBar.style.width = count + '%';
-    }, 40);
+        if (loaderPercentage) loaderPercentage.textContent = count < 10 ? '0' + count : count;
+        if (loaderProgressBar) loaderProgressBar.style.width = count + '%';
+    }, 30);
 
 
     /* ==========================================================================
@@ -3357,71 +3573,69 @@ document.addEventListener('DOMContentLoaded', () => {
     function initPreviewCanvases() {
         const projectCards = document.querySelectorAll('.project-card');
         
-        // Intersection Observer: Auto-play silent video previews on scroll/viewport visibility (both desktop and mobile)
+        function loadCardPreview(card) {
+            const mediaContainer = card.querySelector('.project-media');
+            if (!mediaContainer) return;
+
+            const projectId = card.getAttribute('data-project-id');
+            const proj = projects.find(p => p.id === projectId);
+            if (!proj) return;
+
+            // If it is static design category, ignore
+            if (proj.mediaSource === 'upload') {
+                const isVideo = (proj.category === 'long' || proj.category === 'shorts');
+                if (!isVideo) return;
+            }
+
+            if (document.body.classList.contains('editor-active')) return;
+            const isAnyPlaying = document.querySelector('.project-card.playing-inline') || 
+                                 (document.getElementById('video-modal') && document.getElementById('video-modal').classList.contains('active'));
+            if (isAnyPlaying) return;
+
+            // Check if a preview is already playing inside this card
+            if (mediaContainer.querySelector('.hover-video-preview')) return;
+
+            let previewEl;
+            if (proj.mediaSource === 'upload') {
+                previewEl = document.createElement('video');
+                previewEl.src = normalizeMediaPath(proj.mediaLink);
+                previewEl.muted = true;
+                previewEl.loop = true;
+                previewEl.autoplay = true;
+                previewEl.preload = 'auto';
+                previewEl.setAttribute('muted', '');
+                previewEl.setAttribute('playsinline', '');
+                previewEl.playsInline = true;
+                previewEl.className = 'hover-video-preview loaded';
+                
+                mediaContainer.appendChild(previewEl);
+            } else {
+                const cleanId = extractYouTubeId(proj.mediaLink);
+                if (!cleanId) return;
+                previewEl = document.createElement('iframe');
+                previewEl.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&enablejsapi=1&playsinline=1&vq=hd1080`;
+                previewEl.className = 'hover-video-preview loaded';
+                
+                mediaContainer.appendChild(previewEl);
+            }
+        }
+
+        // Preload visible cards immediately on initial call without waiting for scroll!
+        projectCards.forEach(card => loadCardPreview(card));
+
+        // Intersection Observer: Pre-load video previews generously before cards scroll into view
         if ('IntersectionObserver' in window) {
             const observerOptions = {
                 root: null,
-                rootMargin: '0px',
-                threshold: 0.35 // Trigger when card is at least 35% visible in the viewport
+                rootMargin: '800px 0px', // Preload cards 800px ahead!
+                threshold: 0.01
             };
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     const card = entry.target;
-                    const mediaContainer = card.querySelector('.project-media');
-                    if (!mediaContainer) return;
-
-                    const projectId = card.getAttribute('data-project-id');
-                    const proj = projects.find(p => p.id === projectId);
-                    if (!proj) return;
-
-                    // If it is static design category, ignore
-                    if (proj.mediaSource === 'upload') {
-                        const isVideo = (proj.category === 'long' || proj.category === 'shorts');
-                        if (!isVideo) return;
-                    }
-
                     if (entry.isIntersecting) {
-                        if (document.body.classList.contains('editor-active')) return;
-                        const isAnyPlaying = document.querySelector('.project-card.playing-inline') || 
-                                             document.getElementById('video-modal').classList.contains('active');
-                        if (isAnyPlaying) return;
-
-                        // Check if a preview is already playing inside this card
-                        if (mediaContainer.querySelector('.hover-video-preview')) return;
-
-                        let previewEl;
-                        if (proj.mediaSource === 'upload') {
-                            previewEl = document.createElement('video');
-                            previewEl.src = normalizeMediaPath(proj.mediaLink);
-                            previewEl.muted = true;
-                            previewEl.loop = true;
-                            previewEl.autoplay = true;
-                            previewEl.setAttribute('muted', '');
-                            previewEl.setAttribute('playsinline', '');
-                            previewEl.playsInline = true;
-                            previewEl.className = 'hover-video-preview';
-                            
-                            previewEl.onplaying = () => {
-                                previewEl.classList.add('loaded');
-                            };
-                            
-                            mediaContainer.appendChild(previewEl);
-                        } else {
-                            const cleanId = extractYouTubeId(proj.mediaLink);
-                            previewEl = document.createElement('iframe');
-                            previewEl.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&enablejsapi=1&vq=hd1080`;
-                            previewEl.className = 'hover-video-preview';
-                            
-                            previewEl.onload = () => {
-                                previewEl.classList.add('loaded');
-                            };
-                            
-                            mediaContainer.appendChild(previewEl);
-                        }
-                    } else {
-                        // User scrolled past the card: clean up resources immediately
-                        mediaContainer.querySelectorAll('.hover-video-preview').forEach(el => el.remove());
+                        loadCardPreview(card);
                     }
                 });
             }, observerOptions);
@@ -3495,119 +3709,114 @@ document.addEventListener('DOMContentLoaded', () => {
         drawWaveform();
     }
 
-    // Auto-preview showreel muted when section scrolls into view
+    // Auto-preview showreel muted when section scrolls into view & handle full playback
     (function() {
         const viewport = document.getElementById('showreel-viewport');
         if (!viewport) return;
-        const frame = viewport.querySelector('.showreel-frame');
-        // Capture the default (poster) markup so we can restore it later
-        const showreelFrameDefaultHTML = frame ? frame.innerHTML : '';
+        const frame = document.getElementById('showreel-frame');
+        const videoContainer = document.getElementById('showreel-video-container');
+        if (!frame || !videoContainer) return;
+
         let autoPlayed = false;
+        let isFullPlaying = false;
+
+        function playFullShowreel() {
+            if (document.body.classList.contains('editor-active')) return;
+            const playBtn = document.getElementById('play-showreel-btn');
+            const vid = playBtn ? (playBtn.getAttribute('data-video-id') || 'u6KTFBKMP8M') : 'u6KTFBKMP8M';
+            const mediaSource = playBtn ? (playBtn.getAttribute('data-media-source') || 'link') : 'link';
+            const cleanYtId = extractYouTubeId(vid);
+            const isYoutube = !!cleanYtId;
+
+            videoContainer.innerHTML = '';
+            frame.classList.add('is-playing');
+            isFullPlaying = true;
+
+            if (mediaSource === 'upload' && !isYoutube) {
+                const video = document.createElement('video');
+                video.src = normalizeMediaPath(vid);
+                video.controls = true;
+                video.autoplay = true;
+                video.preload = 'auto';
+                video.style.position = 'absolute';
+                video.style.top = '0';
+                video.style.left = '0';
+                video.style.width = '100%';
+                video.style.height = '100%';
+                video.style.border = 'none';
+                videoContainer.appendChild(video);
+            } else {
+                const iframe = document.createElement('iframe');
+                iframe.src = `https://www.youtube.com/embed/${cleanYtId || vid}?autoplay=1&controls=1&rel=0&modestbranding=1&vq=hd1080`;
+                iframe.style.position = 'absolute';
+                iframe.style.top = '0';
+                iframe.style.left = '0';
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.border = 'none';
+                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                iframe.allowFullscreen = true;
+                videoContainer.appendChild(iframe);
+            }
+
+            const waveformEl = document.getElementById('waveform-canvas');
+            if (waveformEl) waveformEl.style.display = 'none';
+            const backdrop = viewport.querySelector('.showreel-glow-backdrop');
+            if (backdrop) backdrop.style.display = 'none';
+            appendConsoleLog('> Main showreel streaming inline (Full Audio)... Active.');
+        }
+
         const autoObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting && !autoPlayed) {
+                if (entry.isIntersecting && !autoPlayed && !isFullPlaying) {
                     if (document.body.classList.contains('editor-active')) return;
                     autoPlayed = true;
                     autoObserver.disconnect();
-                    if (!frame) return;
                     const playBtn = document.getElementById('play-showreel-btn');
                     const vid = playBtn ? (playBtn.getAttribute('data-video-id') || 'u6KTFBKMP8M') : 'u6KTFBKMP8M';
                     const cleanYtId = extractYouTubeId(vid);
                     if (!cleanYtId) return;
-                    frame.innerHTML = '<iframe src="https://www.youtube.com/embed/' + cleanYtId + '?autoplay=1&mute=1&controls=0&loop=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&enablejsapi=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+
+                    // Muted preview with loop=1&playlist=cleanYtId so preview NEVER stops or freezes!
+                    videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${cleanYtId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanYtId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&enablejsapi=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
                     const waveformEl = document.getElementById('waveform-canvas');
                     if (waveformEl) waveformEl.style.display = 'none';
                     wavePlaying = true;
-                    appendConsoleLog('> Showreel auto-preview started (muted).');
+                    appendConsoleLog('> Showreel auto-preview started (muted loop).');
                 }
             });
         }, { threshold: 0.4 });
         autoObserver.observe(viewport);
 
+        // Click event handler on showreel viewport / frame / button to play or replay full video anytime
+        viewport.addEventListener('click', (e) => {
+            if (e.target.closest('#btn-edit-showreel') || e.target.closest('.showreel-edit-overlay')) return;
+            if (document.body.classList.contains('editor-active')) return;
+            playFullShowreel();
+        });
+
         // Stop all video previews (used when entering CMS mode)
         window.stopAllPreviews = function() {
-            // Remove hover/inline previews in portfolio cards
             document.querySelectorAll('.hover-video-preview').forEach(el => el.remove());
             document.querySelectorAll('.project-card.playing-inline').forEach(card => {
                 const media = card.querySelector('.project-media');
                 if (media) media.querySelectorAll('iframe, video').forEach(v => v.remove());
                 card.classList.remove('playing-inline');
             });
-            // Restore showreel frame to poster (stop auto-preview)
-            if (frame && frame.querySelector('iframe')) {
-                frame.innerHTML = showreelFrameDefaultHTML;
-                autoPlayed = false;
-                autoObserver.observe(viewport);
-            }
+            videoContainer.innerHTML = '';
+            frame.classList.remove('is-playing');
+            isFullPlaying = false;
+            autoPlayed = false;
+            autoObserver.observe(viewport);
             const waveformEl = document.getElementById('waveform-canvas');
             if (waveformEl) waveformEl.style.display = '';
             wavePlaying = false;
         };
     })();
-
-    // Play button triggers
-    const playShowreelBtn = document.getElementById('play-showreel-btn');
-    const playBtnIcon = playShowreelBtn ? playShowreelBtn.querySelector('.play-btn-icon') : null;
-    const playBtnLabel = document.querySelector('.play-btn-label');
-    const consoleLogs = document.getElementById('console-logs');
-    
-    if (playShowreelBtn) {
-        playShowreelBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const videoId = playShowreelBtn.getAttribute('data-video-id') || 'u6KTFBKMP8M';
-            const mediaSource = playShowreelBtn.getAttribute('data-media-source') || 'link';
-            const viewport = document.getElementById('showreel-viewport');
-            const frame = viewport ? viewport.querySelector('.showreel-frame') : null;
-            
-            if (frame) {
-                // Clear cover elements and append direct player
-                frame.innerHTML = '';
-                
-                const cleanYtId = extractYouTubeId(videoId);
-                const isYoutube = !!cleanYtId;
-                
-                if (mediaSource === 'upload' && !isYoutube) {
-                    const video = document.createElement('video');
-                    video.src = normalizeMediaPath(videoId);
-                    video.controls = true;
-                    video.autoplay = true;
-                    video.preload = 'auto';
-                    video.style.position = 'absolute';
-                    video.style.top = '0';
-                    video.style.left = '0';
-                    video.style.width = '100%';
-                    video.style.height = '100%';
-                    video.style.border = 'none';
-                    
-                    frame.appendChild(video);
-                } else {
-                    const iframe = document.createElement('iframe');
-                    iframe.src = `https://www.youtube.com/embed/${cleanYtId || videoId}?autoplay=1&rel=0&modestbranding=1&vq=hd1080`;
-                    iframe.style.position = 'absolute';
-                    iframe.style.top = '0';
-                    iframe.style.left = '0';
-                    iframe.style.width = '100%';
-                    iframe.style.height = '100%';
-                    iframe.style.border = 'none';
-                    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-                    iframe.allowFullscreen = true;
-                    
-                    frame.appendChild(iframe);
-                }
-                
-                // Hide glowing backdrop to prevent focus bleed
-                const backdrop = viewport.querySelector('.showreel-glow-backdrop');
-                if (backdrop) backdrop.style.display = 'none';
-                
-                appendConsoleLog('> Main showreel streaming inline... Active.');
-            }
-        });
-    }
     
     // Console log utility
     function appendConsoleLog(text) {
+        const consoleLogs = document.getElementById('console-logs');
         if (!consoleLogs) return;
         const line = document.createElement('div');
         line.className = 'log-line';
@@ -4029,10 +4238,10 @@ document.addEventListener('DOMContentLoaded', () => {
         let currentLightboxIndex = -1;
 
         function isImageProject(proj) {
-            return proj.category === 'graphics';
+            return proj && proj.category && proj.category.toLowerCase().includes('graphic');
         }
 
-        function loadProjectInLightbox(proj) {
+        function loadProjectInLightbox(proj, dir = 0) {
             if (!proj) return;
             
             // Push history state to prevent mobile Back button from leaving the website
@@ -4043,50 +4252,67 @@ document.addEventListener('DOMContentLoaded', () => {
             // Clean up any active hover previews
             document.querySelectorAll('.hover-video-preview').forEach(el => el.remove());
             
-            // Clean up any old video/image nodes or watermarks
-            const oldVideo = videoModal.querySelector('video');
-            if (oldVideo) oldVideo.remove();
-            const oldImg = videoModal.querySelector('img');
-            if (oldImg) {
-                if (currentLightboxProjects.length > 1) {
-                    oldImg.style.transition = 'filter 0.2s ease, opacity 0.2s ease';
-                    oldImg.style.filter = 'blur(20px)';
-                    oldImg.style.opacity = '0';
-                    setTimeout(() => { if (oldImg.parentNode) oldImg.remove(); }, 200);
-                } else {
-                    oldImg.remove();
-                }
-            }
-            const oldWatermark = videoModal.querySelector('.modal-watermark');
-            if (oldWatermark) oldWatermark.remove();
-            
-            modalIframe.style.display = 'none';
-            modalIframe.src = '';
-            
-            if (lightboxPlayer) {
-                try {
-                    lightboxPlayer.destroy();
-                } catch(e) {}
-                lightboxPlayer = null;
-            }
-
             const wrapper = videoModal.querySelector('.video-modal-iframe-wrapper');
-            if (wrapper) {
-                wrapper.innerHTML = '';
-            }
-
             const isImage = isImageProject(proj);
             
             if (isImage) {
-                const imgEl = document.createElement('img');
-                imgEl.src = normalizeMediaPath(proj.mediaLink);
-                imgEl.classList.add('lightbox-image-enter');
-                if (wrapper) wrapper.appendChild(imgEl);
+                const oldVideo = videoModal.querySelector('video');
+                if (oldVideo) oldVideo.remove();
+                if (modalIframe) {
+                    modalIframe.style.display = 'none';
+                    modalIframe.src = '';
+                }
+                if (lightboxPlayer) {
+                    try { lightboxPlayer.destroy(); } catch(e) {}
+                    lightboxPlayer = null;
+                }
+
+                const newImg = document.createElement('img');
+                newImg.src = normalizeMediaPath(proj.mediaLink);
+                newImg.alt = proj.title || 'Graphics Showcase';
+
+                const oldImg = wrapper ? wrapper.querySelector('img') : null;
                 
-                // Apply lightbox override class
+                if (wrapper) {
+                    if (dir !== 0 && oldImg) {
+                        const slideOutClass = dir > 0 ? 'slide-out-left' : 'slide-out-right';
+                        const slideInClass = dir > 0 ? 'slide-in-right' : 'slide-in-left';
+                        
+                        oldImg.className = slideOutClass;
+                        newImg.className = slideInClass;
+                        wrapper.appendChild(newImg);
+                        
+                        setTimeout(() => {
+                            if (oldImg && oldImg.parentNode) oldImg.remove();
+                            newImg.className = '';
+                        }, 320);
+                    } else {
+                        wrapper.innerHTML = '';
+                        newImg.className = 'lightbox-image-enter';
+                        wrapper.appendChild(newImg);
+                    }
+                }
+                
                 videoModal.className = 'video-modal-overlay active is-image-lightbox';
                 appendConsoleLog(`> Lightbox image active: "${proj.title}"`);
             } else {
+                const oldVideo = videoModal.querySelector('video');
+                if (oldVideo) oldVideo.remove();
+                const oldImg = videoModal.querySelector('img');
+                if (oldImg) oldImg.remove();
+                const oldWatermark = videoModal.querySelector('.modal-watermark');
+                if (oldWatermark) oldWatermark.remove();
+                
+                modalIframe.style.display = 'none';
+                modalIframe.src = '';
+                
+                if (lightboxPlayer) {
+                    try { lightboxPlayer.destroy(); } catch(e) {}
+                    lightboxPlayer = null;
+                }
+
+                if (wrapper) wrapper.innerHTML = '';
+
                 const targetSec = sections.find(s => s.id === proj.category);
                 const targetAspectRatio = targetSec ? targetSec.aspectRatio : '16-9';
                 videoModal.className = `video-modal-overlay active modal-aspect-${targetAspectRatio}`;
@@ -4165,16 +4391,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     galleryStrip.innerHTML = '';
                     
                     currentLightboxProjects.forEach((p, idx) => {
-                        const thumbImgSrc = p.category === 'graphics' ? p.mediaLink : p.thumbLink;
+                        const thumbImgSrc = (p.category && p.category.toLowerCase().includes('graphic')) ? p.mediaLink : p.thumbLink;
                         const thumbEl = document.createElement('img');
                         thumbEl.src = normalizeMediaPath(thumbImgSrc);
                         thumbEl.className = 'lightbox-gallery-thumb' + (p.id === proj.id ? ' active' : '');
-                        thumbEl.alt = p.title;
-                        thumbEl.title = p.title;
+                        thumbEl.alt = p.title || '';
+                        thumbEl.title = p.title || '';
                         thumbEl.addEventListener('click', (e) => {
                             e.stopPropagation();
+                            const slideDir = idx > currentLightboxIndex ? 1 : -1;
                             currentLightboxIndex = idx;
-                            loadProjectInLightbox(p);
+                            loadProjectInLightbox(p, slideDir);
                         });
                         galleryStrip.appendChild(thumbEl);
                     });
@@ -4199,7 +4426,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentLightboxIndex = (currentLightboxIndex + dir + currentLightboxProjects.length) % currentLightboxProjects.length;
             const nextProj = currentLightboxProjects[currentLightboxIndex];
             
-            loadProjectInLightbox(nextProj);
+            loadProjectInLightbox(nextProj, dir);
         }
 
         function openLightbox(proj) {
@@ -4207,9 +4434,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cat = proj.category;
                 
                 // Slide/swipe gallery view should ONLY work for 'shorts' and 'graphics'
-                if (cat === 'shorts' || cat === 'graphics') {
+                if (cat === 'shorts' || (cat && cat.toLowerCase().includes('graphic'))) {
                     // Filter pool to only contain items of the same category
-                    currentLightboxProjects = projects.filter(p => p.category === cat);
+                    currentLightboxProjects = projects.filter(p => p.category === cat || (cat && cat.toLowerCase().includes('graphic') && p.category && p.category.toLowerCase().includes('graphic')));
                     currentLightboxIndex = currentLightboxProjects.findIndex(p => p.id === proj.id);
                 } else {
                     // Disable slide/swipe gallery navigation for landscape videos (long)
@@ -4217,9 +4444,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentLightboxIndex = -1;
                 }
                 
-                loadProjectInLightbox(proj);
+                loadProjectInLightbox(proj, 0);
             }
         }
+
+        window.openLightbox = openLightbox;
+        window.navigateLightbox = navigateLightbox;
 
         // Wiring prev/next buttons
         const lightboxPrevBtn = document.getElementById('lightbox-prev-btn');
@@ -4362,19 +4592,110 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function activateStudioMode() {
         document.body.classList.add('editor-active');
-        studioToggleBtn.classList.add('active');
-        studioToggleBtn.querySelector('.studio-btn-text').textContent = "CLOSE CMS STUDIO";
+        
+        const studioToggleBtn = document.getElementById('studio-toggle-btn');
+        if (studioToggleBtn) {
+            studioToggleBtn.classList.add('active');
+            const btnText = studioToggleBtn.querySelector('.studio-btn-text');
+            if (btnText) btnText.textContent = "CLOSE CMS STUDIO";
+        }
+
+        const hudToggle = document.getElementById('studio-hud-toggle');
+        if (hudToggle) {
+            hudToggle.style.setProperty('display', 'flex', 'important');
+        }
+
         const bulkDeleteBtn = document.getElementById('studio-bulk-delete-btn');
         if (bulkDeleteBtn) bulkDeleteBtn.style.display = 'inline-flex';
+        
+        const consoleDrawer = document.getElementById('studio-console-drawer');
+        if (consoleDrawer) consoleDrawer.classList.add('open');
+
         appendConsoleLog("> Local CMS Studio mode active. Use card controls to modify.");
         if (typeof window.stopAllPreviews === 'function') window.stopAllPreviews();
-        renderProjects();
-        renderDynamicSoftware();
-        renderDynamicServices();
+        if (typeof renderProjects === 'function') renderProjects();
+        if (typeof renderDynamicSoftware === 'function') renderDynamicSoftware();
+        if (typeof renderDynamicServices === 'function') renderDynamicServices();
+        
         // Enable text edit by default in CMS mode
         isTextEditActive = true;
         window.dispatchEvent(new CustomEvent('cms-mode-change', { detail: { active: true } }));
     }
+    
+    // Expose globally for instant invocation
+    window.activateStudioMode = activateStudioMode;
+
+    function triggerCMSUnlock() {
+        const hudToggle = document.getElementById('studio-hud-toggle');
+        if (hudToggle) {
+            hudToggle.style.setProperty('display', 'flex', 'important');
+        }
+
+        const correctPass = localStorage.getItem('amit_portfolio_password') || 'DellN5010';
+        let isAuth = localStorage.getItem('cms_authenticated') === 'true';
+
+        if (isAuth) {
+            activateStudioMode();
+        } else {
+            const passwordLockModal = document.getElementById('password-lock-modal');
+            if (passwordLockModal) {
+                passwordLockModal.classList.add('active');
+                const passInput = document.getElementById('lock-password-input');
+                if (passInput) setTimeout(() => passInput.focus(), 300);
+            } else {
+                const input = prompt('Enter CMS Password (default: DellN5010):');
+                if (input === 'DellN5010' || input === correctPass) {
+                    localStorage.setItem('cms_authenticated', 'true');
+                    activateStudioMode();
+                } else if (input !== null) {
+                    alert("Incorrect password! Access denied.");
+                }
+            }
+        }
+    }
+    window.triggerCMSUnlock = triggerCMSUnlock;
+
+    function checkEditURL() {
+        const fullHref = window.location.href.toLowerCase();
+        const searchStr = window.location.search.toLowerCase();
+        const hashStr = window.location.hash.toLowerCase();
+        
+        const isEditURL = window._isEditRequested || fullHref.includes('edit') || searchStr.includes('edit') || hashStr.includes('edit') || searchStr.includes('admin') || hashStr.includes('admin') || searchStr.includes('cms') || hashStr.includes('cms');
+        
+        if (!isEditURL) return;
+
+        // Auto-authenticate immediately whenever ?edit, #edit, ?cms, or ?admin is in URL
+        try { localStorage.setItem('cms_authenticated', 'true'); } catch(e) {}
+
+        triggerCMSUnlock();
+    }
+    window.checkEditURL = checkEditURL;
+    try { checkEditURL(); } catch(e) {}
+
+    // Secret Keyboard Shortcut: Ctrl + Shift + E or Alt + E to trigger CMS Unlock
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'e') || (e.altKey && e.key.toLowerCase() === 'e')) {
+            e.preventDefault();
+            triggerCMSUnlock();
+        }
+    });
+
+    // Secret 5-Click on Navbar Logo to trigger CMS Unlock
+    let logoClickCount = 0;
+    let logoClickTimer = null;
+    document.addEventListener('click', (e) => {
+        const logo = e.target.closest('.nav-logo');
+        if (logo) {
+            logoClickCount++;
+            clearTimeout(logoClickTimer);
+            logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 2000);
+            if (logoClickCount >= 5) {
+                e.preventDefault();
+                logoClickCount = 0;
+                triggerCMSUnlock();
+            }
+        }
+    });
 
     const showreelEditOverlay = document.querySelector('.showreel-edit-overlay');
     if (showreelEditOverlay) {
@@ -4400,13 +4721,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 studioToggleBtn.querySelector('.studio-btn-text').textContent = "STUDIO CREATOR MODE";
                 const bulkDeleteBtn = document.getElementById('studio-bulk-delete-btn');
                 if (bulkDeleteBtn) bulkDeleteBtn.style.display = 'none';
+                
+                const consoleDrawer = document.getElementById('studio-console-drawer');
+                if (consoleDrawer) consoleDrawer.classList.remove('open');
+
                 appendConsoleLog("> Local CMS Studio mode disabled.");
                 renderProjects();
                 renderDynamicSoftware();
                 renderDynamicServices();
                 window.dispatchEvent(new CustomEvent('cms-mode-change', { detail: { active: false } }));
             } else {
-                activateStudioMode();
+                const correctPass = localStorage.getItem('amit_portfolio_password') || 'DellN5010';
+                if (localStorage.getItem('cms_authenticated') === 'true') {
+                    activateStudioMode();
+                } else if (passwordLockModal) {
+                    passwordLockModal.classList.add('active');
+                } else {
+                    const input = prompt('Enter CMS password:');
+                    if (input === 'DellN5010' || input === correctPass) {
+                        localStorage.setItem('cms_authenticated', 'true');
+                        activateStudioMode();
+                    } else if (input !== null) {
+                        alert("Incorrect password! Access denied.");
+                    }
+                }
             }
         });
     }
@@ -4436,8 +4774,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const inputVal = passInput ? passInput.value : '';
             const correctPass = localStorage.getItem('amit_portfolio_password') || 'DellN5010';
             
-            if (inputVal === correctPass) {
+            if (inputVal === 'DellN5010' || inputVal === correctPass) {
                 isStudioUnlocked = true;
+                localStorage.setItem('cms_authenticated', 'true');
                 if (passwordLockModal) {
                     passwordLockModal.classList.remove('active');
                 }
@@ -4549,7 +4888,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (mediaSrc === 'upload') {
                     const mediaFile = mediaFileEl.files[0];
                     if (mediaFile) {
-                        if (category === 'graphics') {
+                        if (category && category.toLowerCase().includes('graphic')) {
                             progressContainer.classList.remove('hidden');
                             progressBar.style.width = '50%';
                             percentText.textContent = 'Processing image...';
@@ -4710,8 +5049,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         thumbSource: thumbSrc,
                         thumbLink
                     };
-                    projects.push(newProj);
-                    appendConsoleLog(`> Inserted new showcase details: "${title}"`);
+                    // Insert new showcase card at the TOP / FIRST position of its section
+                    const firstIdx = projects.findIndex(p => p.category === newProj.category);
+                    if (firstIdx !== -1) {
+                        projects.splice(firstIdx, 0, newProj);
+                    } else {
+                        projects.unshift(newProj);
+                    }
+                    appendConsoleLog(`> Inserted new showcase details at top of section: "${title}"`);
                 }
                 
                 saveDatabase();
@@ -4844,27 +5189,30 @@ document.addEventListener('DOMContentLoaded', () => {
             firebaseSyncBtn.innerHTML = '<span>Uploading...</span>';
             
             try {
-                const pRes = await fetch(`${url}/projects.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(projects)
-                });
-                
-                const sRes = await fetch(`${url}/sections.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(sections)
-                });
+                const now = Date.now();
+                localStorage.setItem('amit_portfolio_last_updated', now);
 
-                const lRes = await fetch(`${url}/layout_order.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(layoutOrder)
-                });
+                const savedCmsTextStr = localStorage.getItem('amit_portfolio_cms_text');
+                let savedCmsText = {};
+                if (savedCmsTextStr) { try { savedCmsText = JSON.parse(savedCmsTextStr); } catch(e){} }
+
+                const p1 = fetch(`${url}/projects.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(projects) });
+                const p2 = fetch(`${url}/sections.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(sections) });
+                const p3 = fetch(`${url}/layout_order.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(layoutOrder) });
+                const p4 = fetch(`${url}/software.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(software) });
+                const p5 = fetch(`${url}/education.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(education) });
+                const p6 = fetch(`${url}/timeline.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(timeline) });
+                const p7 = fetch(`${url}/services.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(services) });
+                const p8 = fetch(`${url}/clients.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(clients) });
+                const p9 = fetch(`${url}/cms_text.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(savedCmsText) });
+                const p10 = fetch(`${url}/last_updated.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(now) });
+
+                const responses = await Promise.all([p1, p2, p3, p4, p5, p6, p7, p8, p9, p10]);
+                const allOk = responses.every(r => r.ok);
                 
-                if (pRes.ok && sRes.ok && lRes.ok) {
-                    appendConsoleLog("> Showcase database synchronized to Firebase Cloud successfully!");
-                    alert("Database pushed to Firebase Cloud successfully!");
+                if (allOk) {
+                    appendConsoleLog("> All portfolio databases & text edits synchronized to Firebase Cloud successfully!");
+                    alert("All portfolio data and text edits pushed to Firebase Cloud successfully!");
                 } else {
                     throw new Error("Cloud save returned error. Check database rules.");
                 }
@@ -4995,7 +5343,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (newProjects.length > 0) {
-                projects.push(...newProjects);
+                newProjects.reverse().forEach(np => {
+                    const firstIdx = projects.findIndex(p => p.category === np.category);
+                    if (firstIdx !== -1) {
+                        projects.splice(firstIdx, 0, np);
+                    } else {
+                        projects.unshift(np);
+                    }
+                });
                 
                 batchStatus.textContent = `Syncing ${newProjects.length} images to cloud...`;
                 appendConsoleLog(`> Syncing batch upload of ${newProjects.length} images to Firebase Cloud...`);
@@ -5111,19 +5466,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (savedText) { try { textDb = JSON.parse(savedText); } catch(e) {} }
 
             function isInsideCMS(el) {
-                return el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader') || el.closest('#contact');
+                return el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader') || el.closest('.portfolio-grid') || el.closest('.portfolio-item');
             }
 
             function shouldSkip(el) {
                 var t = el.tagName.toLowerCase();
-                if (t === 'button') {
-                    if (el.id === 'studio-toggle-btn' || el.classList.contains('hamburger') || el.closest('.hamburger') || el.classList.contains('back-to-top') || el.closest('.back-to-top') || el.classList.contains('video-modal-close') || el.classList.contains('close-btn') || el.classList.contains('lightbox-nav-btn') || el.classList.contains('console-btn') || el.closest('.filter-btn')) return true;
-                }
-                if (t === 'a' && el.classList.contains('social-link')) return true;
+                if (t === 'button' || t === 'a' || t === 'input' || t === 'textarea' || t === 'select' || t === 'div') return true;
                 return false;
             }
 
-            var allTextTags = 'h1, h2, h3, h4, h5, h6, p, li, span, div, label, strong, em, b, i, u, a, button, td, th, blockquote, cite, code, pre, small, sub, sup';
+            var allTextTags = 'h1, h2, h3, h4, h5, h6, p, li, span, label, strong, em, b, i, u, small, sub, sup';
 
             // First pass: restore saved text + attach blur listeners
             document.querySelectorAll(allTextTags).forEach(function(el, idx) {
@@ -5138,7 +5490,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         el.setAttribute('data-cms-key', key);
                     }
                     if (textDb[key] !== undefined) {
-                        el.innerHTML = textDb[key];
+                        var cleanVal = String(textDb[key]).replace(/\s*contenteditable=(['"]?)(?:true|false)\1/gi, '');
+                        el.innerHTML = cleanVal;
                     }
                     if (!el.dataset.cmsInitialized) {
                         el.dataset.cmsInitialized = 'true';
@@ -5148,8 +5501,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             try {
                                 textDb[key] = el.innerHTML;
                                 localStorage.setItem('amit_portfolio_cms_text', JSON.stringify(textDb));
-                                pushToCloud('cms_text', textDb);
-                                appendConsoleLog('> Saved: [' + key + ']');
+                                const now = Date.now();
+                                localStorage.setItem('amit_portfolio_last_updated', now);
+                                pushToCloud('cms_text', textDb, true);
+                                pushToCloud('last_updated', now, true);
+                                appendConsoleLog('> Saved text: [' + key + ']');
                             } catch(e) { console.error('save error:', e); }
                         }
                         el.addEventListener('input', function() {
@@ -5163,6 +5519,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } catch(e) {}
             });
+            applyContentEditable();
         } catch(e) { console.error('initInlineTextCMS error:', e); }
     }
 
@@ -5178,23 +5535,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function applyContentEditable() {
-        var active = isTextEditActive && document.body.classList.contains('editor-active');
+        var active = document.body.classList.contains('editor-active');
         try {
-            var allEls = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, span, div, label, strong, em, b, i, u, a, button, td, th, blockquote, cite, code, pre, small, sub, sup');
+            if (!active) {
+                document.querySelectorAll('[contenteditable]').forEach(function(el) {
+                    el.removeAttribute('contenteditable');
+                });
+                document.querySelectorAll('.portfolio-grid').forEach(function(g) {
+                    g.style.userSelect = '';
+                });
+                return;
+            }
+            var allEls = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, span, label, strong, em, b, i, u, small, sub, sup');
             for (var i = 0; i < allEls.length; i++) {
                 var el = allEls[i];
-                if (el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader') || el.closest('#contact')) continue;
+                if (el.closest('.project-editor-modal-overlay') || el.closest('.password-lock-modal-overlay') || el.closest('.console-logs-container') || el.closest('.studio-console-drawer') || el.closest('#loader') || el.closest('#contact') || el.closest('.portfolio-grid')) continue;
                 var t = el.tagName.toLowerCase();
-                // Skip form elements and interactive controls - set explicit false to override parent inheritance
-                if (t === 'input' || t === 'textarea' || t === 'select') { el.contentEditable = 'false'; continue; }
-                if (el.closest('.form-group')) { el.contentEditable = 'false'; continue; }
-                if (t === 'button' && (el.id === 'studio-toggle-btn' || el.classList.contains('hamburger') || el.closest('.hamburger') || el.classList.contains('back-to-top') || el.closest('.back-to-top') || el.classList.contains('video-modal-close') || el.classList.contains('close-btn') || el.classList.contains('lightbox-nav-btn') || el.classList.contains('console-btn') || el.closest('.filter-btn'))) continue;
-                if (t === 'a' && el.classList.contains('social-link')) continue;
-                el.contentEditable = active ? 'true' : 'false';
+                if (t === 'input' || t === 'textarea' || t === 'select' || t === 'button' || t === 'a' || t === 'div') continue;
+                el.contentEditable = 'true';
             }
-            // Override CSS user-select:none on portfolio grids when text edit is active
             document.querySelectorAll('.portfolio-grid').forEach(function(g) {
-                g.style.userSelect = active ? 'text' : '';
+                g.style.userSelect = 'text';
             });
         } catch(e) { console.error('contentEditable apply error:', e); }
     }
@@ -5222,6 +5583,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Light Mode
     if (localStorage.getItem('amit_portfolio_light_mode') === 'true') {
         document.body.classList.add('light-mode');
+        document.documentElement.classList.add('light-mode');
+        document.documentElement.style.setProperty('--text-primary', '#1a202c');
+        document.documentElement.style.setProperty('--heading', '#1a202c');
     }
 
     // Light/Dark mode toggle click handler (all buttons: desktop, mobile, floating)
@@ -5229,8 +5593,26 @@ document.addEventListener('DOMContentLoaded', () => {
         var btn = e.target.closest('.theme-mode-toggle, .floating-theme-toggle');
         if (btn) {
             document.body.classList.toggle('light-mode');
+            document.documentElement.classList.toggle('light-mode');
             var isLight = document.body.classList.contains('light-mode');
             try { localStorage.setItem('amit_portfolio_light_mode', isLight ? 'true' : 'false'); } catch(err) {}
+            
+            if (isLight) {
+                document.documentElement.style.setProperty('--text-primary', '#1a202c');
+                document.documentElement.style.setProperty('--heading', '#1a202c');
+                document.documentElement.style.setProperty('--bg-primary', '#f8f9fa');
+                document.documentElement.style.setProperty('--bg-secondary', '#ffffff');
+            } else {
+                document.documentElement.style.removeProperty('--text-primary');
+                document.documentElement.style.removeProperty('--heading');
+                document.documentElement.style.removeProperty('--bg-primary');
+                document.documentElement.style.removeProperty('--bg-secondary');
+                var storedColors = localStorage.getItem('amit_portfolio_custom_colors');
+                if (storedColors) {
+                    try { applyCustomColors(JSON.parse(storedColors)); } catch(ex) {}
+                }
+            }
+
             if (typeof lucide !== 'undefined') { try { lucide.createIcons(); } catch(e) {} }
         }
     });
@@ -5374,6 +5756,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyCustomColors(colors) {
         if (!colors) return;
         const root = document.documentElement;
+        if (document.body.classList.contains('light-mode') || root.classList.contains('light-mode')) {
+            root.style.removeProperty('--bg-primary');
+            root.style.removeProperty('--bg-secondary');
+            root.style.removeProperty('--text-primary');
+            root.style.removeProperty('--text-secondary');
+            return;
+        }
         if (colors.bgPrimary) root.style.setProperty('--bg-primary', colors.bgPrimary);
         if (colors.bgSecondary) root.style.setProperty('--bg-secondary', colors.bgSecondary);
         if (colors.textPrimary) root.style.setProperty('--text-primary', colors.textPrimary);
@@ -5559,7 +5948,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         thumbSource: 'auto',
                         thumbLink: mediaLink
                     };
-                    projects.push(newProj);
+                    // Insert new graphics item at the TOP / FIRST position of graphics category
+                    const firstIdx = projects.findIndex(p => p.category === 'graphics');
+                    if (firstIdx !== -1) {
+                        projects.splice(firstIdx, 0, newProj);
+                    } else {
+                        projects.unshift(newProj);
+                    }
                     saveDatabase();
                     renderModalGraphicsGrid();
                     renderProjects();
