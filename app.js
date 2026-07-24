@@ -5,9 +5,7 @@
 const CMS_PASSWORD = "DellN5010";
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (typeof checkEditURL === 'function') {
-        checkEditURL();
-    }
+    // Note: checkEditURL() is called later after initDatabase() completes (lines 444, 4690)
 
     // Helper to extract YouTube video ID from any link style (including Shorts)
     function extractYouTubeId(link) {
@@ -367,7 +365,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function initDatabase() {
         // Resolve Firebase URL early (used for cloud pull below)
         const DEFAULT_FIREBASE_URL = 'https://amit-portfolio-f0d71-default-rtdb.firebaseio.com';
-        let firebaseDbUrl = localStorage.getItem('amit_portfolio_firebase_url') || DEFAULT_FIREBASE_URL;
+        let firebaseDbUrl = DEFAULT_FIREBASE_URL;
+        try { firebaseDbUrl = localStorage.getItem('amit_portfolio_firebase_url') || DEFAULT_FIREBASE_URL; } catch(e) {}
         if (firebaseDbUrl && firebaseDbUrl.endsWith('/')) {
             firebaseDbUrl = firebaseDbUrl.slice(0, -1);
         }
@@ -375,23 +374,28 @@ document.addEventListener('DOMContentLoaded', () => {
         // Automatic DB version upgrade migration (forces cache clear for new defaults)
         const DB_VERSION_KEY = 'amit_portfolio_db_version';
         const CURRENT_DB_VERSION = '20';
-        const storedVersion = localStorage.getItem(DB_VERSION_KEY);
+        let storedVersion;
+        try {
+            storedVersion = localStorage.getItem(DB_VERSION_KEY);
+        } catch(e) { storedVersion = null; }
         if (storedVersion !== CURRENT_DB_VERSION) {
-            localStorage.removeItem('amit_portfolio_projects');
-            localStorage.removeItem('amit_portfolio_sections');
-            localStorage.removeItem('amit_portfolio_showreel');
-            localStorage.removeItem('amit_portfolio_layout_order');
-            localStorage.removeItem('amit_portfolio_software');
-            localStorage.removeItem('amit_portfolio_deleted_software');
-            localStorage.removeItem('amit_portfolio_theme');
-            localStorage.removeItem('amit_portfolio_services');
-            localStorage.removeItem('amit_portfolio_cms_text');
-            localStorage.removeItem('amit_portfolio_education');
-            localStorage.removeItem('amit_portfolio_timeline');
-            localStorage.removeItem('amit_portfolio_clients');
-            localStorage.removeItem('amit_portfolio_last_updated');
-            localStorage.setItem(DB_VERSION_KEY, CURRENT_DB_VERSION);
-            console.log("Database version upgrade detected. LocalStorage cache cleared.");
+            try {
+                localStorage.removeItem('amit_portfolio_projects');
+                localStorage.removeItem('amit_portfolio_sections');
+                localStorage.removeItem('amit_portfolio_showreel');
+                localStorage.removeItem('amit_portfolio_layout_order');
+                localStorage.removeItem('amit_portfolio_software');
+                localStorage.removeItem('amit_portfolio_deleted_software');
+                localStorage.removeItem('amit_portfolio_theme');
+                localStorage.removeItem('amit_portfolio_services');
+                localStorage.removeItem('amit_portfolio_cms_text');
+                localStorage.removeItem('amit_portfolio_education');
+                localStorage.removeItem('amit_portfolio_timeline');
+                localStorage.removeItem('amit_portfolio_clients');
+                localStorage.removeItem('amit_portfolio_last_updated');
+                localStorage.setItem(DB_VERSION_KEY, CURRENT_DB_VERSION);
+                console.log("Database version upgrade detected. LocalStorage cache cleared.");
+            } catch(e) {}
             location.reload();
             return;
         }
@@ -3003,6 +3007,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (loader) loader.style.display = 'none';
     }
 
+    // Global catch: hide loader on any unhandled error so page is never stuck
+    window.addEventListener('error', () => { if (loader) loader.style.display = 'none'; });
+
     let count = 0;
     const counterInterval = setInterval(() => {
         count += Math.floor(Math.random() * 12) + 8;
@@ -4648,8 +4655,12 @@ document.addEventListener('DOMContentLoaded', () => {
             hudToggle.style.setProperty('display', 'flex', 'important');
         }
 
-        const correctPass = localStorage.getItem('amit_portfolio_password') || 'DellN5010';
-        let isAuth = localStorage.getItem('cms_authenticated') === 'true';
+        let correctPass = 'DellN5010';
+        let isAuth = false;
+        try {
+            correctPass = localStorage.getItem('amit_portfolio_password') || 'DellN5010';
+            isAuth = localStorage.getItem('cms_authenticated') === 'true';
+        } catch(e) {}
 
         if (isAuth) {
             activateStudioMode();
