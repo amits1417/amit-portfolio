@@ -1305,9 +1305,6 @@ document.addEventListener('DOMContentLoaded', () => {
         gridEl.innerHTML = '';
         const catProjects = projects.filter(p => p.category === category);
         
-        // Sort videos date & time wise: latest / most recent uploads first at the top
-        catProjects.sort((a, b) => getProjectTimestamp(b) - getProjectTimestamp(a));
-        
         catProjects.forEach((proj, idx) => {
             if (isEditorActive && copiedCard) {
                 const pasteSlot = document.createElement('div');
