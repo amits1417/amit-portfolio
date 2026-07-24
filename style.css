@@ -1540,8 +1540,13 @@ body.light-mode .grid-graphics .project-media {
     transition: opacity 0.3s ease;
 }
 
-.project-view-badge {
+.project-view-badge,
+.project-card .project-view-badge,
+.project-card:hover .project-view-badge {
     display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
 }
 
 .play-icon {
@@ -1560,10 +1565,7 @@ body.light-mode .grid-graphics .project-media {
 .project-card:hover .project-overlay-glow {
     opacity: 1;
 }
-.project-card:hover .project-view-badge {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-}
+/* project-view-badge is permanently hidden - play is only on click */
 
 .project-details {
     padding: 30px;
