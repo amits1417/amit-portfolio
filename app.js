@@ -2830,6 +2830,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedClass: 'sortable-selected', // Class for selected items
                 ghostClass: 'sortable-ghost',
                 dragClass: 'sortable-drag',
+                scroll: true, // Enable automatic page scrolling while dragging
+                scrollSensitivity: 150, // px distance to edge to trigger scrolling
+                scrollSpeed: 30, // scroll speed
+                bubbleScroll: true, // scroll window / parent containers
                 // Filter out non-draggable items like Add Card, Paste placeholders, or View More triggers
                 filter: '.paste-placeholder-card, .graphics-gallery-trigger-card, .portfolio-item:has(.btn-add-hud)',
                 onSelect: function (evt) {
@@ -2894,10 +2898,45 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderProjects();
                     renderModalGraphicsGrid();
                 }
-            });
-            sortableInstances.push(inst);
         });
     }
+
+    // Global Window & Modal Auto-Scroll during Drag Operations (Mouse & Touch)
+    function handleDragAutoScroll(e) {
+        if (!document.body.classList.contains('editor-active')) return;
+        const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : null);
+        if (clientY === null) return;
+        
+        // Only trigger scroll if actively dragging a sortable item
+        if (!document.querySelector('.sortable-drag, .sortable-ghost, .sortable-selected')) return;
+        
+        const viewportHeight = window.innerHeight;
+        const threshold = 150;
+        
+        if (clientY < threshold) {
+            // Near top edge of screen -> scroll UP
+            const speed = Math.max(12, Math.floor((threshold - clientY) * 0.6));
+            window.scrollBy(0, -speed);
+            const graphicsModal = document.getElementById('graphics-gallery-modal');
+            if (graphicsModal && graphicsModal.classList.contains('active')) {
+                graphicsModal.scrollTop -= speed;
+            }
+        } else if (clientY > viewportHeight - threshold) {
+            // Near bottom edge of screen -> scroll DOWN
+            const speed = Math.max(12, Math.floor((clientY - (viewportHeight - threshold)) * 0.6));
+            window.scrollBy(0, speed);
+            const graphicsModal = document.getElementById('graphics-gallery-modal');
+            if (graphicsModal && graphicsModal.classList.contains('active')) {
+                graphicsModal.scrollTop += speed;
+            }
+        }
+    }
+    
+    document.addEventListener('dragover', handleDragAutoScroll);
+    document.addEventListener('mousemove', (e) => {
+        if (e.buttons === 1) handleDragAutoScroll(e);
+    });
+    document.addEventListener('touchmove', handleDragAutoScroll, { passive: true });
 
     initDatabase();
     renderProjects();
