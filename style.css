@@ -1453,6 +1453,10 @@ html.light-mode .marquee-dot,
     opacity: 1;
 }
 
+/* Prevent hover preview YouTube iframes from showing native controls on interaction */
+.hover-video-preview {
+    pointer-events: none !important;
+}
 .project-media iframe.hover-video-preview {
     transform: scale(1.35); /* Hide YouTube logo & parameters */
 }
@@ -6292,6 +6296,11 @@ body.light-mode .graphics-view-more-btn:hover {
 }
 
 /* Full playing state for Showreel frame */
+/* Hide showreel overlay (blue play button) when preview video is loaded */
+.showreel-video-container:not(:empty) ~ .showreel-overlay {
+    display: none !important;
+}
+/* Hide showreel overlay when full video is playing */
 .showreel-frame.is-playing .showreel-overlay,
 .showreel-frame.is-playing .showreel-img,
 .showreel-frame.is-playing .waveform-canvas {

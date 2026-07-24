@@ -3606,6 +3606,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 previewEl.setAttribute('muted', '');
                 previewEl.setAttribute('playsinline', '');
                 previewEl.playsInline = true;
+                previewEl.controls = false;
                 previewEl.className = 'hover-video-preview loaded';
                 
                 mediaContainer.appendChild(previewEl);
