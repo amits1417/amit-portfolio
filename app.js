@@ -3620,22 +3620,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Preload visible cards immediately on initial call without waiting for scroll!
-        projectCards.forEach(card => loadCardPreview(card));
-
-        // Intersection Observer: Pre-load video previews generously before cards scroll into view
+        // Load previews as cards scroll into view, remove when scrolled far away
         if ('IntersectionObserver' in window) {
             const observerOptions = {
                 root: null,
-                rootMargin: '800px 0px', // Preload cards 800px ahead!
+                rootMargin: '200px 0px',
                 threshold: 0.01
             };
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     const card = entry.target;
+                    const container = card.querySelector('.project-media');
+                    if (!container) return;
                     if (entry.isIntersecting) {
-                        loadCardPreview(card);
+                        if (!container.querySelector('.hover-video-preview')) {
+                            loadCardPreview(card);
+                        }
+                    } else {
+                        container.querySelectorAll('.hover-video-preview').forEach(el => el.remove());
                     }
                 });
             }, observerOptions);
