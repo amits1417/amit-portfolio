@@ -2898,6 +2898,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderProjects();
                     renderModalGraphicsGrid();
                 }
+            });
+            sortableInstances.push(inst);
         });
     }
 
