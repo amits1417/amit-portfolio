@@ -36,12 +36,20 @@
                 document.body.classList.add('light-mode');
                 document.documentElement.classList.add('light-mode');
                 document.documentElement.style.setProperty('--text-primary', '#1a202c');
-        // Instant Edit Mode URL Detector
+        // Instant Edit Mode URL Detector & Preloader Emergency Failsafe
         var href = window.location.href.toLowerCase();
         if (href.indexOf('edit') !== -1 || href.indexOf('admin') !== -1 || href.indexOf('cms') !== -1) {
             window._isEditRequested = true;
             try { localStorage.setItem('cms_authenticated', 'true'); } catch(e) {}
         }
+        setTimeout(function() {
+            var l = document.getElementById('loader');
+            if (l && l.style.display !== 'none') {
+                l.style.opacity = '0';
+                l.style.pointerEvents = 'none';
+                setTimeout(function() { l.style.display = 'none'; }, 300);
+            }
+        }, 1500);
     })();
     </script>
     <button class="floating-theme-toggle" id="floating-theme-toggle" title="Toggle light/dark mode" aria-label="Toggle light/dark mode">
@@ -1449,7 +1457,7 @@
     <!-- Baked default portfolio data (cloud projects) -->
     <script src="data.js?v=1.0"></script>
     <!-- Custom Application Logic -->
-    <script src="app.js?v=12.3"></script>
+    <script src="app.js?v=12.4"></script>
 <script>
 // Batch YouTube Import - uses window.* exposed by app.js
 (function() {

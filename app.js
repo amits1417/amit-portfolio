@@ -2909,39 +2909,54 @@ document.addEventListener('DOMContentLoaded', () => {
     const loaderPercentage = document.getElementById('loader-percentage');
     const loaderProgressBar = document.getElementById('loader-progress-bar');
     
+    function hidePreloader() {
+        if (!loader || loader._hidden) return;
+        loader._hidden = true;
+        if (typeof gsap !== 'undefined' && loader) {
+            gsap.to(loader, {
+                yPercent: -100,
+                duration: 0.5,
+                ease: "power4.inOut",
+                onComplete: () => {
+                    if (loader) loader.style.display = 'none';
+                    if (typeof initHeroAnimations === 'function') {
+                        try { initHeroAnimations(); } catch(e) {}
+                    }
+                }
+            });
+        } else if (loader) {
+            loader.style.transition = 'transform 0.5s ease-in-out';
+            loader.style.transform = 'translateY(-100%)';
+            setTimeout(() => {
+                if (loader) loader.style.display = 'none';
+                if (typeof initHeroAnimations === 'function') {
+                    try { initHeroAnimations(); } catch(e) {}
+                }
+            }, 500);
+        }
+    }
+    window.hidePreloader = hidePreloader;
+
+    // Emergency Failsafe: Hide preloader max 1.2s after script load
+    setTimeout(hidePreloader, 1200);
+
+    // Instant hide if edit mode is active or requested
+    if (window._isEditRequested || window.location.href.toLowerCase().includes('edit')) {
+        if (loader) loader.style.display = 'none';
+    }
+
     let count = 0;
     const counterInterval = setInterval(() => {
-        count += Math.floor(Math.random() * 8) + 2; // Random increments
+        count += Math.floor(Math.random() * 12) + 8;
         if (count >= 100) {
             count = 100;
             clearInterval(counterInterval);
-            
-            // Hide Loader with GSAP
-            if (typeof gsap !== 'undefined') {
-                gsap.to(loader, {
-                    yPercent: -100,
-                    duration: 0.8,
-                    ease: "power4.inOut",
-                    onComplete: () => {
-                        loader.style.display = 'none';
-                        // Start Hero Animations
-                        initHeroAnimations();
-                    }
-                });
-            } else {
-                loader.style.transition = 'transform 0.8s ease-in-out';
-                loader.style.transform = 'translateY(-100%)';
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                    initHeroAnimations();
-                }, 800);
-            }
+            hidePreloader();
         }
         
-        // Update labels
-        loaderPercentage.textContent = count < 10 ? '0' + count : count;
-        loaderProgressBar.style.width = count + '%';
-    }, 40);
+        if (loaderPercentage) loaderPercentage.textContent = count < 10 ? '0' + count : count;
+        if (loaderProgressBar) loaderProgressBar.style.width = count + '%';
+    }, 30);
 
 
     /* ==========================================================================
