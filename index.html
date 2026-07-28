@@ -20,7 +20,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="vendor/plyr.css">
-    <link rel="stylesheet" href="style.css?v=7.6">
+    <link rel="stylesheet" href="style.css?v=7.7">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="manifest" href="/site.webmanifest">
@@ -939,7 +939,7 @@
 
     <!-- Studio Console Drawer / Local CMS Admin -->
     <div id="studio-console-drawer" class="studio-console-drawer">
-        <div class="console-drawer-header" id="console-drawer-trigger">
+        <div class="console-drawer-header" id="console-drawer-trigger" title="Click anywhere on this bar to Minimize or Expand the CMS Panel">
             <div class="console-drawer-title" style="display: flex; align-items: center; gap: 10px;">
                 <span class="console-dot-green"></span>
                 <span>STUDIO DEVELOPER HUB / LOCAL CMS</span>
@@ -948,7 +948,11 @@
                     <span class="sync-status-text">Saved</span>
                 </div>
             </div>
-            <div class="console-drawer-arrow">
+            <div class="console-drawer-arrow" style="display: flex; align-items: center; gap: 10px;">
+                <button type="button" id="btn-minimize-cms" class="cms-minimize-pill-btn" title="Minimize / Expand CMS Panel" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #fff; border-radius: 6px; padding: 4px 10px; font-size: 0.7rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; pointer-events: auto; transition: all 0.2s ease;">
+                    <i data-lucide="chevron-down" id="cms-minimize-icon" style="width: 14px; height: 14px;"></i>
+                    <span id="cms-minimize-text">Minimize Panel</span>
+                </button>
                 <i data-lucide="chevron-up" id="console-drawer-arrow-icon"></i>
             </div>
         </div>
@@ -1169,7 +1173,7 @@
     <!-- Baked default portfolio data (cloud projects) -->
     <script src="data.js?v=3.0"></script>
     <!-- Custom Application Logic -->
-    <script src="app.js?v=13.2"></script>
+    <script src="app.js?v=13.3"></script>
 <script>
 // Batch YouTube Import - uses window.* exposed by app.js
 (function() {

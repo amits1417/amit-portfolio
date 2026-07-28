@@ -5142,10 +5142,22 @@ document.addEventListener('DOMContentLoaded', () => {
        ========================================================================== */
     const consoleDrawerTrigger = document.getElementById('console-drawer-trigger');
     const consoleDrawer = document.getElementById('studio-console-drawer');
-    if (consoleDrawerTrigger && consoleDrawer) {
-        consoleDrawerTrigger.addEventListener('click', () => {
-            consoleDrawer.classList.toggle('open');
-        });
+    const cmsMinimizeBtn = document.getElementById('btn-minimize-cms');
+    const cmsMinimizeText = document.getElementById('cms-minimize-text');
+
+    function toggleCMSDrawer(e) {
+        if (!consoleDrawer) return;
+        const isOpen = consoleDrawer.classList.toggle('open');
+        if (cmsMinimizeText) {
+            cmsMinimizeText.textContent = isOpen ? 'Minimize Panel' : 'Expand Panel';
+        }
+        if (typeof appendConsoleLog === 'function') {
+            appendConsoleLog(`> CMS Panel ${isOpen ? 'expanded' : 'minimized'}.`);
+        }
+    }
+
+    if (consoleDrawerTrigger) {
+        consoleDrawerTrigger.addEventListener('click', toggleCMSDrawer);
     }
 
     const consoleResetBtn = document.getElementById('console-reset-btn');

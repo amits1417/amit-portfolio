@@ -6396,10 +6396,6 @@ body.light-mode .graphics-view-more-btn:hover {
     opacity: 1 !important;
 }
 
-body.editor-active #studio-console-drawer {
-    transform: translateX(0) !important;
-}
-
 body.editor-active .card-edit-overlay {
     display: flex !important;
     opacity: 1 !important;
