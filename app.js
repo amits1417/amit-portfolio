@@ -115,42 +115,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const defaultSoftware = [
         // Video Editing Tools
-        { id: "soft_1", name: "Adobe Premiere Pro", category: "video", icon: "https://upload.wikimedia.org/wikipedia/commons/4/40/Adobe_Premiere_Pro_CC_icon.svg", color: "#9999FF", level: 100 },
-        { id: "soft_2", name: "Adobe After Effects", category: "video", icon: "https://upload.wikimedia.org/wikipedia/commons/c/cb/Adobe_After_Effects_CC_icon.svg", color: "#D291FF", level: 100 },
+        { id: "soft_1", name: "Adobe Premiere Pro", category: "video", icon: "https://upload.wikimedia.org/wikipedia/commons/4/40/Adobe_Premiere_Pro_CC_icon.svg", color: "#9999FF", level: 20 },
+        { id: "soft_2", name: "Adobe After Effects", category: "video", icon: "https://upload.wikimedia.org/wikipedia/commons/c/cb/Adobe_After_Effects_CC_icon.svg", color: "#D291FF", level: 60 },
         { id: "soft_3", name: "Filmora", category: "video", icon: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Filmora_logo.svg", color: "#00C4CC", level: 100 },
-        { id: "soft_4", name: "DaVinci Resolve", category: "video", icon: "https://upload.wikimedia.org/wikipedia/commons/4/4d/DaVinci_Resolve_17_logo.svg", color: "#FF9A00", level: 100 },
-        { id: "soft_27", name: "Final Cut Pro", category: "video", icon: "https://upload.wikimedia.org/wikipedia/commons/3/39/Final_Cut_Pro_X_Logo.png", color: "#FF3366", level: 100 },
-        { id: "soft_28", name: "CapCut", category: "video", icon: "https://cdn.simpleicons.org/capcut", color: "#00C4CC", level: 100 },
+        { id: "soft_4", name: "DaVinci Resolve", category: "video", icon: "https://upload.wikimedia.org/wikipedia/commons/4/4d/DaVinci_Resolve_17_logo.svg", color: "#FF9A00", level: 40 },
+        { id: "soft_27", name: "Final Cut Pro", category: "video", icon: "https://upload.wikimedia.org/wikipedia/commons/3/39/Final_Cut_Pro_X_Logo.png", color: "#FF3366", level: 40 },
+        { id: "soft_28", name: "CapCut", category: "video", icon: "https://cdn.simpleicons.org/capcut", color: "#00C4CC", level: 80 },
 
         // Graphics Design
         { id: "soft_5", name: "Adobe Photoshop", category: "graphics", icon: "https://www.vectorlogo.zone/logos/adobe_photoshop/adobe_photoshop-icon.svg", color: "#31A8FF", level: 100 },
-        { id: "soft_6", name: "Adobe Illustrator", category: "graphics", icon: "https://www.vectorlogo.zone/logos/adobe_illustrator/adobe_illustrator-icon.svg", color: "#FF9A00", level: 100 },
-        { id: "soft_7", name: "CorelDRAW", category: "graphics", icon: "https://cdn.simpleicons.org/coreldraw", color: "#FFB900", level: 100 },
+        { id: "soft_6", name: "Adobe Illustrator", category: "graphics", icon: "https://www.vectorlogo.zone/logos/adobe_illustrator/adobe_illustrator-icon.svg", color: "#FF9A00", level: 60 },
+        { id: "soft_7", name: "CorelDRAW", category: "graphics", icon: "https://cdn.simpleicons.org/coreldraw", color: "#FFB900", level: 80 },
         { id: "soft_8", name: "Canva", category: "graphics", icon: "https://www.vectorlogo.zone/logos/canva/canva-icon.svg", color: "#00C4CC", level: 100 },
-        { id: "soft_9", name: "Adobe Express", category: "graphics", icon: "https://www.vectorlogo.zone/logos/adobe/adobe-icon.svg", color: "#FF0000", level: 100 },
-        { id: "soft_10", name: "Figma", category: "graphics", icon: "https://cdn.simpleicons.org/figma", color: "#F24E1E", level: 100 },
+        { id: "soft_9", name: "Adobe Express", category: "graphics", icon: "https://www.vectorlogo.zone/logos/adobe/adobe-icon.svg", color: "#FF0000", level: 80 },
+        { id: "soft_10", name: "Figma", category: "graphics", icon: "https://cdn.simpleicons.org/figma", color: "#F24E1E", level: 40 },
 
         // AI Tools
-        { id: "soft_11", name: "HeyGen AI", category: "ai", icon: "https://www.vectorlogo.zone/logos/openai/openai-icon.svg", color: "#74AA9C", level: 100 },
-        { id: "soft_12", name: "ChatGPT", category: "ai", icon: "https://www.vectorlogo.zone/logos/openai/openai-icon.svg", color: "#00A67E", level: 100 },
-        { id: "soft_13", name: "Gemini", category: "ai", icon: "https://www.vectorlogo.zone/logos/google_gemini/google_gemini-icon.svg", color: "#1A73E8", level: 100 },
-        { id: "soft_14", name: "Grok", category: "ai", icon: "https://cdn.simpleicons.org/x/ffffff", color: "#FFFFFF", level: 100 },
-        { id: "soft_15", name: "Google Flow", category: "ai", icon: "https://www.vectorlogo.zone/logos/google/google-icon.svg", color: "#4285F4", level: 100 },
-        { id: "soft_16", name: "GenTube", category: "ai", icon: "https://www.vectorlogo.zone/logos/youtube/youtube-icon.svg", color: "#FF0000", level: 100 },
+        { id: "soft_11", name: "HeyGen AI", category: "ai", icon: "https://www.vectorlogo.zone/logos/openai/openai-icon.svg", color: "#74AA9C", level: 80 },
+        { id: "soft_12", name: "ChatGPT", category: "ai", icon: "https://www.vectorlogo.zone/logos/openai/openai-icon.svg", color: "#00A67E", level: 80 },
+        { id: "soft_13", name: "Gemini", category: "ai", icon: "https://www.vectorlogo.zone/logos/google_gemini/google_gemini-icon.svg", color: "#1A73E8", level: 80 },
+        { id: "soft_14", name: "Grok", category: "ai", icon: "https://cdn.simpleicons.org/x/ffffff", color: "#FFFFFF", level: 80 },
+        { id: "soft_15", name: "Google Flow", category: "ai", icon: "https://www.vectorlogo.zone/logos/google/google-icon.svg", color: "#4285F4", level: 60 },
+        { id: "soft_16", name: "GenTube", category: "ai", icon: "https://www.vectorlogo.zone/logos/youtube/youtube-icon.svg", color: "#FF0000", level: 60 },
         { id: "soft_17", name: "OpenFM", category: "ai", icon: "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg", color: "#1DB954", level: 100 },
-        { id: "soft_18", name: "Narakeet", category: "ai", icon: "https://www.vectorlogo.zone/logos/audacity/audacity-icon.svg", color: "#0000CC", level: 100 },
-        { id: "soft_19", name: "ElevenLabs", category: "ai", icon: "https://cdn.simpleicons.org/elevenlabs", color: "#FEE75C", level: 100 },
-        { id: "soft_20", name: "Google Antigravity", category: "ai", icon: "https://www.vectorlogo.zone/logos/google_cloud/google_cloud-icon.svg", color: "#1A73E8", level: 100 },
-        { id: "soft_29", name: "Midjourney", category: "ai", icon: "https://cdn.simpleicons.org/midjourney", color: "#FFFFFF", level: 100 },
-        { id: "soft_30", name: "Runway", category: "ai", icon: "https://cdn.simpleicons.org/runway", color: "#FFFFFF", level: 100 },
-        { id: "soft_31", name: "Google Veo", category: "ai", icon: "https://www.vectorlogo.zone/logos/google/google-icon.svg", color: "#4285F4", level: 100 },
+        { id: "soft_18", name: "Narakeet", category: "ai", icon: "https://www.vectorlogo.zone/logos/audacity/audacity-icon.svg", color: "#0000CC", level: 80 },
+        { id: "soft_19", name: "ElevenLabs", category: "ai", icon: "https://cdn.simpleicons.org/elevenlabs", color: "#FEE75C", level: 80 },
+        { id: "soft_20", name: "Google Antigravity", category: "ai", icon: "https://www.vectorlogo.zone/logos/google_cloud/google_cloud-icon.svg", color: "#1A73E8", level: 80 },
+        { id: "soft_29", name: "Midjourney", category: "ai", icon: "https://cdn.simpleicons.org/midjourney", color: "#FFFFFF", level: 60 },
+        { id: "soft_30", name: "Runway", category: "ai", icon: "https://cdn.simpleicons.org/runway", color: "#FFFFFF", level: 60 },
+        { id: "soft_31", name: "Google Veo", category: "ai", icon: "https://www.vectorlogo.zone/logos/google/google-icon.svg", color: "#4285F4", level: 60 },
 
         // Other Tools
-        { id: "soft_21", name: "OBS Studio", category: "other", icon: "https://www.vectorlogo.zone/logos/obsproject/obsproject-icon.svg", color: "#FFFFFF", level: 100 },
-        { id: "soft_22", name: "Streamlabs", category: "other", icon: "https://www.vectorlogo.zone/logos/streamlabs/streamlabs-icon.svg", color: "#09D261", level: 100 },
-        { id: "soft_23", name: "Microsoft Office", category: "other", icon: "https://www.vectorlogo.zone/logos/microsoft/microsoft-icon.svg", color: "#D83B01", level: 100 },
-        { id: "soft_24", name: "Blender", category: "other", icon: "https://www.vectorlogo.zone/logos/blender/blender-icon.svg", color: "#E87D0D", level: 100 },
-        { id: "soft_25", name: "Audacity", category: "other", icon: "https://www.vectorlogo.zone/logos/audacity/audacity-icon.svg", color: "#0000CC", level: 100 },
+        { id: "soft_21", name: "OBS Studio", category: "other", icon: "https://www.vectorlogo.zone/logos/obsproject/obsproject-icon.svg", color: "#FFFFFF", level: 80 },
+        { id: "soft_22", name: "Streamlabs", category: "other", icon: "https://www.vectorlogo.zone/logos/streamlabs/streamlabs-icon.svg", color: "#09D261", level: 80 },
+        { id: "soft_23", name: "Microsoft Office", category: "other", icon: "https://www.vectorlogo.zone/logos/microsoft/microsoft-icon.svg", color: "#D83B01", level: 80 },
+        { id: "soft_24", name: "Blender", category: "other", icon: "https://www.vectorlogo.zone/logos/blender/blender-icon.svg", color: "#E87D0D", level: 40 },
+        { id: "soft_25", name: "Audacity", category: "other", icon: "https://www.vectorlogo.zone/logos/audacity/audacity-icon.svg", color: "#0000CC", level: 60 },
         { id: "soft_26", name: "VS Code", category: "other", icon: "https://www.vectorlogo.zone/logos/visualstudio_code/visualstudio_code-icon.svg", color: "#007ACC", level: 100 }
     ];
 
@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Automatic DB version upgrade migration (forces cache clear for new defaults)
         const DB_VERSION_KEY = 'amit_portfolio_db_version';
-        const CURRENT_DB_VERSION = '20';
+        const CURRENT_DB_VERSION = '21';
         let storedVersion;
         try {
             storedVersion = localStorage.getItem(DB_VERSION_KEY);
