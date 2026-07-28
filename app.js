@@ -1320,7 +1320,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return 0;
     }
-    window.getProjectTimestamp = getProjectTimestamp;
+    // High-Performance Lazy Image Intersection Observer
+    const lazyImageObserver = (typeof IntersectionObserver !== 'undefined') ? new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                const dataSrc = img.getAttribute('data-src');
+                if (dataSrc) {
+                    img.src = dataSrc;
+                    img.removeAttribute('data-src');
+                }
+                observer.unobserve(img);
+            }
+        });
+    }, { rootMargin: '300px 0px' }) : null;
 
     function renderGridCategory(gridEl, category, isEditorActive, aspectRatio) {
         gridEl.innerHTML = '';
@@ -1383,6 +1396,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const hasDetailsText = (proj.title && proj.title.trim() !== '') || (proj.client && proj.client.trim() !== '') || (proj.role && proj.role.trim() !== '') || (proj.tools && proj.tools.trim() !== '') || (proj.desc && proj.desc.trim() !== '');
             const hideDetails = !hasDetailsText || category === 'shorts' || isGraphicsCat;
+            
+            const isEager = idx < 6 || isEditorActive;
+            const imgSrc = normalizeMediaPath(thumbImgSrc);
+            const imgTagHTML = isEager
+                ? `<img src="${imgSrc}" alt="${proj.title}" loading="lazy" decoding="async" onerror="this.src='./assets/showreel_cover_compelling.png'">`
+                : `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3C/svg%3E" data-src="${imgSrc}" alt="${proj.title}" class="lazy-load-img" loading="lazy" decoding="async" onerror="this.src='./assets/showreel_cover_compelling.png'">`;
+
             itemEl.innerHTML = `
                 <div class="project-card video-trigger-card" data-project-id="${proj.id}">
                     <!-- Multi-select delete checkbox overlay (direct child of card, high z-index) -->
@@ -1390,7 +1410,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <input type="checkbox" class="cms-delete-checkbox" data-id="${proj.id}" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent-cyan);" />
                     </div>
                     <div class="project-media ${aspectClass}">
-                        <img src="${normalizeMediaPath(thumbImgSrc)}" alt="${proj.title}" loading="lazy" decoding="async" onerror="this.src='./assets/showreel_cover_compelling.png'">
+                        ${imgTagHTML}
                         <canvas class="preview-canvas"></canvas>
                         <div class="video-watermark">Amit Sharma</div>
                         <div class="project-overlay-glow"></div>
@@ -1420,6 +1440,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             gridEl.appendChild(itemEl);
+            const lazyImg = itemEl.querySelector('.lazy-load-img');
+            if (lazyImg && lazyImageObserver) {
+                lazyImageObserver.observe(lazyImg);
+            }
             // Direct click listener on card (more reliable than delegation/onclick)
             const cardEl = itemEl.firstElementChild;
             if (cardEl) {
@@ -1495,7 +1519,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (btnIcon) btnIcon.setAttribute('data-lucide', nowOpen ? 'chevron-up' : 'chevron-down');
                     if (typeof lucide !== 'undefined') lucide.createIcons();
                     
-                    if (!nowOpen) {
+                    if (nowOpen) {
+                        gridEl.querySelectorAll('.lazy-load-img').forEach(img => {
+                            const d = img.getAttribute('data-src');
+                            if (d) {
+                                img.src = d;
+                                img.removeAttribute('data-src');
+                            }
+                        });
+                    } else {
                         gridEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                 });
