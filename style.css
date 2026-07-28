@@ -5138,7 +5138,7 @@ body.light-mode .vertical-tool-row .vertical-tool-name {
 body.light-mode .vertical-tool-row:hover .vertical-tool-name {
     color: var(--text-primary) !important;
 }
-body.light-mode .prof-segment-block.unfilled {
+body.light-mode .prof-segment-block {
     background: rgba(0, 0, 0, 0.08) !important;
     box-shadow: none !important;
 }
