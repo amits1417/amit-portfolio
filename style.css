@@ -964,18 +964,20 @@ body.hover-interactive .custom-cursor-glow {
 }
 
 .vertical-tool-info {
-    width: 110px;
-    flex-shrink: 0;
+    flex: 1;
+    min-width: 0;
 }
 
 .vertical-tool-name {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 600;
     color: var(--text-primary);
     transition: color 0.3s ease;
-    white-space: normal;
-    word-break: break-word;
-    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    line-height: 1.2;
 }
 
 .vertical-tool-row:hover .vertical-tool-name {
