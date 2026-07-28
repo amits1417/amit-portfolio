@@ -1390,7 +1390,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <input type="checkbox" class="cms-delete-checkbox" data-id="${proj.id}" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent-cyan);" />
                     </div>
                     <div class="project-media ${aspectClass}">
-                        <img src="${normalizeMediaPath(thumbImgSrc)}" alt="${proj.title}" onerror="this.src='./assets/showreel_cover_compelling.png'">
+                        <img src="${normalizeMediaPath(thumbImgSrc)}" alt="${proj.title}" loading="lazy" decoding="async" onerror="this.src='./assets/showreel_cover_compelling.png'">
                         <canvas class="preview-canvas"></canvas>
                         <div class="video-watermark">Amit Sharma</div>
                         <div class="project-overlay-glow"></div>
