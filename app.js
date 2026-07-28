@@ -1908,9 +1908,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let toolsHtml = '';
             catSoftware.forEach(item => {
-                const activeThemeName = localStorage.getItem('amit_portfolio_theme') || 'neon-cyber';
-                const isPurpleTheme = activeThemeName === 'neon-cyber' || activeThemeName === 'royal-purple';
-                const brandColor = isPurpleTheme ? (item.color || 'var(--accent-cyan)') : 'var(--accent-cyan)';
+                const rawColor = (item.color && item.color !== '#000000' && item.color !== '#000') ? item.color : 'var(--accent-cyan)';
+                const brandColor = rawColor;
                 
                 const isUrl = item.icon && (item.icon.startsWith('http') || item.icon.includes('/'));
                 const iconHtml = isUrl 
@@ -1929,28 +1928,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 
                 // Calculate 5 segments
-                const level = item.level || 80;
+                const rawLevel = (item.level !== undefined && item.level !== null) ? parseInt(item.level, 10) : 80;
+                const level = isNaN(rawLevel) ? 80 : rawLevel;
                 const filledCount = Math.min(5, Math.max(0, Math.round(level / 20)));
                 
                 let segmentsHtml = '';
                 for (let i = 1; i <= 5; i++) {
                     const isFilled = i <= filledCount;
                     const fillStyle = isFilled 
-                        ? `background: ${brandColor};`
-                        : `background: rgba(255, 255, 255, 0.08);`;
-                    segmentsHtml += `<div class="prof-segment-block" data-index="${i}" data-tool-id="${item.id}" style="${fillStyle}"></div>`;
+                        ? `background: ${brandColor} !important; box-shadow: 0 0 8px ${brandColor}; opacity: 1;`
+                        : `background: rgba(255, 255, 255, 0.12) !important; box-shadow: none; opacity: 0.5;`;
+                    segmentsHtml += `<div class="prof-segment-block ${isFilled ? 'filled' : 'unfilled'}" data-index="${i}" data-tool-id="${item.id}" style="${fillStyle}"></div>`;
                 }
                 
                 toolsHtml += `
                     <div class="vertical-tool-row cms-item-wrapper" style="--brand-color: ${brandColor};">
                         ${logoWrapperHtml}
-                        <div class="vertical-tool-info">
+                        <div class="vertical-tool-info" style="display: flex; align-items: center; justify-content: space-between; flex: 1; margin-right: 12px;">
                             <span class="vertical-tool-name" data-cms-key="soft-name-${item.id}">${item.name}</span>
+                            <span class="tool-level-badge" style="font-size: 0.7rem; font-weight: 700; color: ${brandColor}; opacity: 0.9;">${level}%</span>
                         </div>
-                        <div class="tool-proficiency-segments">
+                        <div class="tool-proficiency-segments" title="Proficiency: ${level}%">
                             ${segmentsHtml}
                         </div>
-                        <input type="range" class="cms-tool-level-slider cms-only-slider" data-id="${item.id}" min="0" max="5" step="1" value="${filledCount}" title="Drag to adjust level" />
+                        <input type="range" class="cms-tool-level-slider cms-only-slider" data-id="${item.id}" min="0" max="5" step="1" value="${filledCount}" title="Drag to adjust level (${level}%)" />
                         <button type="button" class="cms-delete-btn btn-delete-soft" data-id="${item.id}" title="Delete Skill">
                             <i data-lucide="trash-2"></i>
                         </button>
@@ -2022,37 +2023,50 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Wire up range slider changes (snapped to 5 steps)
         container.querySelectorAll('.cms-tool-level-slider').forEach(slider => {
-            slider.addEventListener('input', (e) => {
+            const handleSliderChange = (e, shouldSave = false) => {
                 const id = slider.getAttribute('data-id');
                 const val = parseInt(e.target.value); // 0 to 5
                 const pctVal = val * 20; // 0% to 100%
                 
-                // Find tool and update level
                 const toolItem = software.find(x => x.id === id);
                 if (toolItem) {
                     toolItem.level = pctVal;
                     
-                    // Update segment blocks in real-time
                     const cardRow = slider.closest('.vertical-tool-row');
                     if (cardRow) {
+                        // Update badge text
+                        const badge = cardRow.querySelector('.tool-level-badge');
+                        if (badge) badge.textContent = `${pctVal}%`;
+                        
+                        // Update segment blocks in real-time
+                        const bColor = (toolItem.color && toolItem.color !== '#000000' && toolItem.color !== '#000') ? toolItem.color : 'var(--accent-cyan)';
                         const blocks = cardRow.querySelectorAll('.prof-segment-block');
                         blocks.forEach((block, idx) => {
                             const isFilled = (idx + 1) <= val;
                             if (isFilled) {
-                                block.style.background = toolItem.color || 'var(--accent-cyan)';
-                                block.style.boxShadow = `0 0 8px ${toolItem.color || 'var(--accent-cyan)'}`;
+                                block.style.setProperty('background', bColor, 'important');
+                                block.style.boxShadow = `0 0 8px ${bColor}`;
+                                block.style.opacity = '1';
+                                block.classList.add('filled');
+                                block.classList.remove('unfilled');
                             } else {
-                                block.style.background = 'rgba(255, 255, 255, 0.08)';
+                                block.style.setProperty('background', 'rgba(255, 255, 255, 0.12)', 'important');
                                 block.style.boxShadow = 'none';
+                                block.style.opacity = '0.5';
+                                block.classList.add('unfilled');
+                                block.classList.remove('filled');
                             }
                         });
                     }
+                    if (shouldSave) {
+                        saveSoftware();
+                        appendConsoleLog(`> Updated rating of "${toolItem.name}" to ${pctVal}% (${val}/5).`);
+                    }
                 }
-            });
-            
-            slider.addEventListener('change', () => {
-                saveSoftware();
-            });
+            };
+
+            slider.addEventListener('input', (e) => handleSliderChange(e, false));
+            slider.addEventListener('change', (e) => handleSliderChange(e, true));
         });
 
         // Wire up interactive segment block clicks
@@ -2070,7 +2084,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     saveSoftware();
                     renderDynamicSoftware();
                     initInlineTextCMS();
-                    appendConsoleLog(`> Updated rating of "${toolItem.name}" to ${val}/5.`);
+                    appendConsoleLog(`> Updated rating of "${toolItem.name}" to ${pctVal}% (${val}/5).`);
                 }
             });
         });
