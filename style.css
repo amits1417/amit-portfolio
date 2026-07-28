@@ -829,14 +829,14 @@ body.hover-interactive .custom-cursor-glow {
 
 /* Card Header with curvy wave styling */
 .category-card-header {
-    padding: 30px 20px;
+    padding: 22px 20px;
     position: relative;
-    text-align: center;
+    text-align: left;
     color: #ffffff;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     border-bottom: 3px solid rgba(0, 0, 0, 0.15);
 }
 
@@ -859,11 +859,12 @@ body.hover-interactive .custom-cursor-glow {
     letter-spacing: 0.05em;
     font-family: var(--font-heading);
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     margin: 0;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    text-align: left;
 }
 
 .category-header-title svg {
@@ -879,15 +880,17 @@ body.hover-interactive .custom-cursor-glow {
     flex-direction: row;
     flex-wrap: wrap;
     gap: 8px;
-    justify-content: center;
+    justify-content: flex-start;
     align-content: flex-start;
     flex-grow: 1;
+    text-align: left;
 }
 
 /* List Item Tool Row (Now styled as premium glassmorphic tag pills) */
 .vertical-tool-row {
     display: inline-flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 8px;
     padding: 6px 12px;
     background: rgba(255, 255, 255, 0.03);
@@ -896,6 +899,7 @@ body.hover-interactive .custom-cursor-glow {
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     cursor: default;
+    text-align: left;
 }
 
 .vertical-tool-row:hover {
@@ -966,6 +970,7 @@ body.hover-interactive .custom-cursor-glow {
 .vertical-tool-info {
     flex: 1;
     min-width: 0;
+    text-align: left;
 }
 
 .vertical-tool-name {
@@ -978,6 +983,7 @@ body.hover-interactive .custom-cursor-glow {
     text-overflow: ellipsis;
     display: block;
     line-height: 1.2;
+    text-align: left;
 }
 
 .vertical-tool-row:hover .vertical-tool-name {
