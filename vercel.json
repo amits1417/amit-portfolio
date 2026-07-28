@@ -7,20 +7,50 @@
   ],
   "headers": [
     {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Vary",
+          "value": "Accept-Encoding"
+        }
+      ]
+    },
+    {
       "source": "/(assets|node_modules)/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "Expires",
+          "value": "Thu, 31 Dec 2037 23:59:59 GMT"
         }
       ]
     },
     {
-      "source": "/(.*)\\.(png|jpg|jpeg|gif|webp|svg|mp4|webm|woff2|woff|ttf)",
+      "source": "/(.*)\\.(png|jpg|jpeg|gif|webp|svg|mp4|webm|woff2|woff|ttf|ico|webmanifest)",
       "headers": [
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "Expires",
+          "value": "Thu, 31 Dec 2037 23:59:59 GMT"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)\\.(js|css)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "Expires",
+          "value": "Thu, 31 Dec 2037 23:59:59 GMT"
         }
       ]
     },
