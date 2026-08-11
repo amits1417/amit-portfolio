@@ -4909,7 +4909,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const passInput = document.getElementById('lock-password-input');
                 if (passInput) setTimeout(() => passInput.focus(), 300);
             } else {
-                const input = prompt('Enter CMS Password (default: DellN5010):');
+                const input = prompt('Enter CMS Password:');
                 if (input === 'DellN5010' || input === correctPass) {
                     localStorage.setItem('cms_authenticated', 'true');
                     activateStudioMode();
