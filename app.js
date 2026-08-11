@@ -4930,9 +4930,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (!isEditURL) return;
 
-        // Auto-authenticate immediately whenever ?edit, #edit, ?cms, or ?admin is in URL
-        try { localStorage.setItem('cms_authenticated', 'true'); } catch(e) {}
-
+        // Require password authentication for ?edit URL access
         triggerCMSUnlock();
     }
     window.checkEditURL = checkEditURL;
@@ -4983,6 +4981,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isActive = document.body.classList.contains('editor-active');
             if (isActive) {
                 document.body.classList.remove('editor-active');
+                try { localStorage.removeItem('cms_authenticated'); } catch(e) {}
                 studioToggleBtn.classList.remove('active');
                 studioToggleBtn.querySelector('.studio-btn-text').textContent = "STUDIO CREATOR MODE";
                 const bulkDeleteBtn = document.getElementById('studio-bulk-delete-btn');
