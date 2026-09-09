@@ -1638,16 +1638,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? `<img src="${imgSrc}" alt="${proj.title}" loading="lazy" decoding="async" onerror="this.src='./assets/showreel_cover_compelling.png'">`
                 : `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3C/svg%3E" data-src="${imgSrc}" alt="${proj.title}" class="lazy-load-img" loading="lazy" decoding="async" onerror="this.src='./assets/showreel_cover_compelling.png'">`;
 
+            const cmsCheckboxHTML = isEditorActive ? `
+                <div class="cms-checkbox-wrapper" style="pointer-events: auto;">
+                    <input type="checkbox" class="cms-delete-checkbox" data-id="${proj.id}" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent-cyan);" />
+                </div>
+            ` : '';
+
+            const cmsMediaDeleteBtnHTML = isEditorActive ? `
+                <button type="button" class="cms-media-delete-btn btn-delete-hud" data-id="${proj.id}" title="Delete Media">
+                    <i data-lucide="trash-2"></i>
+                </button>
+            ` : '';
+
+            const cardEditOverlayHTML = isEditorActive ? `
+                <div class="card-edit-overlay">
+                    <div class="card-actions-row">
+                        <button type="button" class="card-hud-btn btn-edit-hud" data-id="${proj.id}"><i data-lucide="edit-2"></i> Edit</button>
+                        <button type="button" class="card-hud-btn btn-delete-hud" data-id="${proj.id}"><i data-lucide="trash-2"></i> Delete</button>
+                    </div>
+                </div>
+            ` : '';
+
             itemEl.innerHTML = `
                 <div class="project-card video-trigger-card" data-project-id="${proj.id}">
-                    <!-- Multi-select delete checkbox overlay (direct child of card, high z-index) -->
-                    <div class="cms-checkbox-wrapper" style="display: none; pointer-events: auto;">
-                        <input type="checkbox" class="cms-delete-checkbox" data-id="${proj.id}" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent-cyan);" />
-                    </div>
-                    <!-- Direct Media Delete Button (Top-Right in CMS Mode) -->
-                    <button type="button" class="cms-media-delete-btn btn-delete-hud" data-id="${proj.id}" title="Delete Media">
-                        <i data-lucide="trash-2"></i>
-                    </button>
+                    ${cmsCheckboxHTML}
+                    ${cmsMediaDeleteBtnHTML}
                     <div class="project-media ${aspectClass}">
                         ${imgTagHTML}
                         <canvas class="preview-canvas"></canvas>
@@ -1670,12 +1685,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ` : ''}
                         ${likeButtonHTML}
                     </div>
-                    <div class="card-edit-overlay">
-                        <div class="card-actions-row">
-                            <button type="button" class="card-hud-btn btn-edit-hud" data-id="${proj.id}"><i data-lucide="edit-2"></i> Edit</button>
-                            <button type="button" class="card-hud-btn btn-delete-hud" data-id="${proj.id}"><i data-lucide="trash-2"></i> Delete</button>
-                        </div>
-                    </div>
+                    ${cardEditOverlayHTML}
                 </div>
             `;
             gridEl.appendChild(itemEl);
