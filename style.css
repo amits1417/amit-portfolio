@@ -1451,7 +1451,7 @@ html.light-mode .marquee-dot,
     width: 100%;
     height: 100%;
     object-fit: cover;
-    pointer-events: none;
+    pointer-events: none !important;
     z-index: 5;
     opacity: 0;
     transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1461,10 +1461,13 @@ html.light-mode .marquee-dot,
     opacity: 1;
 }
 
-/* Prevent hover preview YouTube iframes from showing native controls on interaction */
-.hover-video-preview {
+.project-media iframe.hover-video-preview,
+.project-media video.hover-video-preview {
     pointer-events: none !important;
+    user-select: none !important;
+    touch-action: manipulation;
 }
+
 .project-media iframe.hover-video-preview {
     transform: scale(1.35); /* Hide YouTube logo & parameters */
 }

@@ -3911,10 +3911,6 @@ document.addEventListener('DOMContentLoaded', () => {
        PORTFOLIO HOVER RENDERING PREVIEW (AUTO-PLAY VIDEO TRAILERS)
        ========================================================================== */
     function initPreviewCanvases() {
-        // Disable hover video preview on touch devices to prevent mobile touch interception and conserve data
-        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
-        if (isTouchDevice) return;
-
         const projectCards = document.querySelectorAll('.project-card');
         
         function loadCardPreview(card) {
@@ -3959,10 +3955,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const streamableId = extractStreamableId(proj.mediaLink);
                 if (streamableId) {
                     previewEl = document.createElement('iframe');
-                    previewEl.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&controls=0`;
+                    previewEl.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&controls=0&playsinline=1`;
                     previewEl.className = 'hover-video-preview loaded';
                     previewEl.style.border = 'none';
                     previewEl.style.pointerEvents = 'none';
+                    previewEl.setAttribute('allow', 'autoplay; fullscreen; encrypted-media');
+                    previewEl.setAttribute('playsinline', '1');
+                    previewEl.setAttribute('webkit-playsinline', '1');
                     mediaContainer.appendChild(previewEl);
                 } else if (cleanId) {
                     previewEl = document.createElement('iframe');
@@ -4750,7 +4749,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         iframe.style.width = '100%';
                         iframe.style.height = '100%';
                         iframe.style.border = 'none';
-                        iframe.setAttribute('allow', 'autoplay *; fullscreen *; picture-in-picture *; encrypted-media *; accelerometer *; gyroscope *');
+                        iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope');
                         iframe.setAttribute('allowfullscreen', 'true');
                         iframe.setAttribute('webkitallowfullscreen', 'true');
                         iframe.setAttribute('mozallowfullscreen', 'true');
@@ -4762,7 +4761,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         if (wrapper) {
                             wrapper.appendChild(iframe);
-                            wrapper.appendChild(watermarkEl);
                         }
                         
                         appendConsoleLog(`> Lightbox Streamable clean native embed active: "${proj.title}"`);
