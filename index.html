@@ -842,14 +842,14 @@
                     <div class="modal-form-group">
                         <label for="modal-media-source">Media Stream Source</label>
                         <select id="modal-media-source">
-                            <option value="link">External URL / YouTube ID</option>
+                            <option value="link">External URL (YouTube / Streamable / Embed)</option>
                             <option value="upload">Upload File (Video / Image)</option>
                         </select>
                     </div>
                     
                     <div class="modal-form-group" id="media-link-container">
-                        <label for="modal-media-link">YouTube ID or Video Link</label>
-                        <input type="text" id="modal-media-link" placeholder="e.g. nV6XN3XC7bA">
+                        <label for="modal-media-link">YouTube / Streamable Link or Embed Code</label>
+                        <input type="text" id="modal-media-link" placeholder="e.g. https://streamable.com/... or YouTube link / Embed code">
                     </div>
                     
                     <div class="modal-form-group hidden" id="media-upload-container">
@@ -865,7 +865,7 @@
                     <div class="modal-form-group">
                         <label for="modal-thumb-source">Thumbnail Source</label>
                         <select id="modal-thumb-source">
-                            <option value="auto">Auto-detect (YouTube) / Link</option>
+                            <option value="auto">Auto-detect (YouTube / Streamable) / Link</option>
                             <option value="upload">Upload Custom Image</option>
                             <option value="timeline">Select from Video Timeline</option>
                         </select>
@@ -873,7 +873,7 @@
                     
                     <div class="modal-form-group" id="thumb-link-container">
                         <label for="modal-thumb-link">Thumbnail Image URL</label>
-                        <input type="text" id="modal-thumb-link" placeholder="e.g. https://img.youtube.com/vi/...">
+                        <input type="text" id="modal-thumb-link" placeholder="e.g. https://img.youtube.com/vi/... or Streamable thumb URL">
                     </div>
                     
                     <div class="modal-form-group hidden" id="thumb-upload-container">
@@ -1030,17 +1030,17 @@
                     </div>
                 </div>
 
-                <!-- Batch YouTube Import -->
+                <!-- Batch Video Import (YouTube & Streamable) -->
                 <div class="console-column">
-                    <h4 class="console-col-title">Batch YouTube Import</h4>
-                    <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 8px; line-height: 1.3;">Paste multiple YouTube links (one per line) to add all at once.</p>
+                    <h4 class="console-col-title">Batch Video Import (YouTube / Streamable)</h4>
+                    <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 8px; line-height: 1.3;">Paste multiple YouTube or Streamable links / embed codes (one per line) to add all at once.</p>
                     <div style="display: flex; flex-direction: column; gap: 8px;">
                         <select id="batch-yt-category" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: #fff; padding: 6px; border-radius: 4px; font-size: 0.75rem; outline: none; width: 100%;">
                             <option value="long">16:9 Landscape</option>
                             <option value="shorts">9:16 Shorts</option>
                             <option value="graphics">4:3 Graphics</option>
                         </select>
-                        <textarea id="batch-yt-urls" rows="4" placeholder="https://youtube.com/watch?v=...&#10;https://youtu.be/...&#10;https://youtube.com/shorts/..." style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: #fff; padding: 6px; border-radius: 4px; font-size: 0.75rem; outline: none; width: 100%; resize: vertical; font-family: inherit;"></textarea>
+                        <textarea id="batch-yt-urls" rows="4" placeholder="https://youtube.com/watch?v=...&#10;https://streamable.com/...&#10;https://youtu.be/...&#10;https://youtube.com/shorts/..." style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: #fff; padding: 6px; border-radius: 4px; font-size: 0.75rem; outline: none; width: 100%; resize: vertical; font-family: inherit;"></textarea>
                         <button type="button" class="console-btn btn-success" id="btn-batch-yt-import" style="padding: 8px; width: 100%; margin: 0; background: var(--accent-cyan); color: var(--bg-primary); font-weight: 700; border: none; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 4px; cursor: pointer;">
                             <i data-lucide="video"></i>
                             <span>Import All Videos</span>
@@ -1193,23 +1193,35 @@
                     return;
                 }
                 var raw = ta.value.trim();
-                if (!raw) { st.textContent = 'Paste at least one YouTube link.'; return; }
+                if (!raw) { st.textContent = 'Paste at least one YouTube or Streamable link.'; return; }
                 var lines = raw.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
                 var cat = sel.value;
                 var added = 0, failed = 0;
                 for (var i = 0; i < lines.length; i++) {
                     var line = lines[i];
-                    var ytId = window.extractYouTubeId(line);
-                    if (!ytId) { failed++; continue; }
+                    var ytId = window.extractYouTubeId ? window.extractYouTubeId(line) : '';
+                    var stId = window.extractStreamableId ? window.extractStreamableId(line) : '';
+                    if (!ytId && !stId) { failed++; continue; }
+                    
+                    var mediaLink = '';
+                    var thumbLink = '';
+                    if (ytId) {
+                        mediaLink = 'https://youtu.be/' + ytId;
+                        thumbLink = 'https://img.youtube.com/vi/' + ytId + '/maxresdefault.jpg';
+                    } else if (stId) {
+                        mediaLink = 'https://streamable.com/' + stId;
+                        thumbLink = 'https://cdn-cf-east.streamable.com/image/' + stId + '.jpg';
+                    }
+
                     var newObj = {
                         id: 'proj_' + Date.now() + '_' + Math.floor(Math.random() * 100000),
                         title: '',
                         category: cat,
                         year: '',
                         mediaSource: 'link',
-                        mediaLink: 'https://youtu.be/' + ytId,
+                        mediaLink: mediaLink,
                         thumbSource: 'auto',
-                        thumbLink: 'https://img.youtube.com/vi/' + ytId + '/maxresdefault.jpg'
+                        thumbLink: thumbLink
                     };
                     var firstIdx = window.projects.findIndex(function(p){ return p.category === cat; });
                     if (firstIdx !== -1) {
@@ -1235,7 +1247,7 @@
                     st.textContent = '\u2713 ' + added + ' video(s) added.' + (failed ? ' ' + failed + ' invalid skipped.' : '');
                     if (window.appendConsoleLog) window.appendConsoleLog('> Batch import complete: ' + added + ' added, ' + failed + ' failed.');
                 } else {
-                    st.textContent = failed > 0 ? 'No valid YouTube links found (' + failed + ' invalid).' : 'No valid YouTube links found.';
+                    st.textContent = failed > 0 ? 'No valid YouTube or Streamable links found (' + failed + ' invalid).' : 'No valid YouTube or Streamable links found.';
                 }
                 ta.value = '';
             } catch (err) {

@@ -1,4 +1,4 @@
-// Vercel auto-deployment pipeline verification
+﻿// Vercel auto-deployment pipeline verification
 
 
 // CMS password protection – hard‑coded for this personal portfolio
@@ -28,6 +28,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (/^[a-zA-Z0-9_-]{11}$/.test(cleanId)) {
             return cleanId;
+        }
+        return '';
+    }
+
+    // Helper to extract Streamable video ID from direct link, embed URL, or iframe embed code
+    function extractStreamableId(link) {
+        if (!link) return '';
+        let clean = link.trim();
+        // If iframe or HTML embed snippet is pasted
+        const iframeMatch = clean.match(/src=["'](?:https?:)?\/\/(?:www\.)?streamable\.com\/(?:e\/|o\/|m\/)?([a-zA-Z0-9_-]+)/i);
+        if (iframeMatch && iframeMatch[1]) {
+            return iframeMatch[1].split('?')[0].split('&')[0];
+        }
+        // Direct Streamable URL patterns (e.g. streamable.com/abc, streamable.com/e/abc, etc.)
+        const urlMatch = clean.match(/(?:https?:\/\/)?(?:www\.)?streamable\.com\/(?:e\/|o\/|m\/)?([a-zA-Z0-9_-]+)/i);
+        if (urlMatch && urlMatch[1]) {
+            return urlMatch[1].split('?')[0].split('&')[0];
         }
         return '';
     }
@@ -1353,13 +1370,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function deleteProject(projectId) {
-        const project = projects.find(p => p.id === projectId);
+        const targetIdStr = String(projectId);
+        const project = projects.find(p => String(p.id) === targetIdStr);
         if (!project) return;
         
-        projects = projects.filter(p => p.id !== projectId);
-        saveDatabase();
-        renderProjects();
-        appendConsoleLog(`> Record deleted: "${project.title}"`);
+        const titleText = project.title || project.client || 'this media creation';
+        if (confirm(`Are you sure you want to delete "${titleText}"?`)) {
+            projects = projects.filter(p => String(p.id) !== targetIdStr);
+            saveDatabase();
+            renderProjects();
+            if (typeof renderModalGraphicsGrid === 'function') {
+                renderModalGraphicsGrid();
+            }
+            appendConsoleLog(`> Record deleted: "${titleText}"`);
+            if (typeof showCmsToast === 'function') {
+                showCmsToast(`Deleted: "${titleText}"`, "success");
+            }
+        }
     }
 
     function addSection(name, aspectRatio) {
@@ -1617,6 +1644,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="cms-checkbox-wrapper" style="display: none; pointer-events: auto;">
                         <input type="checkbox" class="cms-delete-checkbox" data-id="${proj.id}" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent-cyan);" />
                     </div>
+                    <!-- Direct Media Delete Button (Top-Right in CMS Mode) -->
+                    <button type="button" class="cms-media-delete-btn btn-delete-hud" data-id="${proj.id}" title="Delete Media">
+                        <i data-lucide="trash-2"></i>
+                    </button>
                     <div class="project-media ${aspectClass}">
                         ${imgTagHTML}
                         <canvas class="preview-canvas"></canvas>
@@ -1656,7 +1687,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const cardEl = itemEl.firstElementChild;
             if (cardEl) {
                 cardEl.addEventListener('click', function(ev) {
-                    if (ev.target.closest('.card-hud-btn') || ev.target.closest('.cms-checkbox-wrapper') || ev.target.classList.contains('cms-delete-checkbox')) return;
+                    if (ev.target.closest('.card-hud-btn') || ev.target.closest('.cms-checkbox-wrapper') || ev.target.classList.contains('cms-delete-checkbox') || ev.target.closest('.cms-media-delete-btn')) return;
                     if (document.body.classList.contains('editor-active')) {
                         return;
                     }
@@ -2843,6 +2874,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    async function getStreamableDetails(streamableId) {
+        if (!streamableId) return null;
+        try {
+            const res = await fetch(`https://api.streamable.com/oembed.json?url=https://streamable.com/${streamableId}`);
+            if (res.ok) {
+                const data = await res.json();
+                let thumb = data.thumbnail_url || '';
+                if (thumb && thumb.startsWith('//')) {
+                    thumb = 'https:' + thumb;
+                }
+                return {
+                    title: data.title || '',
+                    thumbnail: thumb,
+                    width: data.width,
+                    height: data.height
+                };
+            }
+        } catch (err) {
+            console.warn('Could not fetch Streamable details:', err);
+        }
+        return {
+            title: '',
+            thumbnail: `https://cdn-cf-east.streamable.com/image/${streamableId}.jpg`
+        };
+    }
+
+    function getBestStreamableThumbnail(streamableId) {
+        return new Promise((resolve) => {
+            getStreamableDetails(streamableId).then(details => {
+                if (details && details.thumbnail) {
+                    resolve(details.thumbnail);
+                } else {
+                    resolve(`https://cdn-cf-east.streamable.com/image/${streamableId}.jpg`);
+                }
+            }).catch(() => {
+                resolve(`https://cdn-cf-east.streamable.com/image/${streamableId}.jpg`);
+            });
+        });
+    }
+
     let timelineCapturedDataUrl = '';
     let timelineYtPlayer = null;
     let timelineYtReady = false;
@@ -2864,6 +2935,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const mediaLinkInput = document.getElementById('modal-media-link').value.trim();
         const youtubeId = extractYouTubeId(mediaLinkInput);
 
+        const streamableId = extractStreamableId(mediaLinkInput);
+
         if (mediaSrc === 'link' && youtubeId) {
             errorEl.textContent = 'Loading YouTube player...';
             // Destroy previous player if any
@@ -2884,6 +2957,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // Set a loading state
             rangeEl.min = 0; rangeEl.max = 100; rangeEl.value = 0;
             timeEl.textContent = 'Loading...';
+            return;
+        }
+
+        if (mediaSrc === 'link' && streamableId) {
+            errorEl.textContent = 'Loading Streamable preview...';
+            getBestStreamableThumbnail(streamableId).then(thumbUrl => {
+                if (youtubeImg) {
+                    errorEl.style.display = 'none';
+                    youtubeImg.style.display = 'block';
+                    youtubeImg.src = thumbUrl;
+                }
+            });
             return;
         }
 
@@ -3857,12 +3942,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 mediaContainer.appendChild(previewEl);
             } else {
                 const cleanId = extractYouTubeId(proj.mediaLink);
-                if (!cleanId) return;
-                previewEl = document.createElement('iframe');
-                previewEl.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&vq=hd1080`;
-                previewEl.className = 'hover-video-preview loaded';
-                
-                mediaContainer.appendChild(previewEl);
+                const streamableId = extractStreamableId(proj.mediaLink);
+                if (streamableId) {
+                    previewEl = document.createElement('iframe');
+                    previewEl.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&controls=0`;
+                    previewEl.className = 'hover-video-preview loaded';
+                    previewEl.style.border = 'none';
+                    previewEl.style.pointerEvents = 'none';
+                    mediaContainer.appendChild(previewEl);
+                } else if (cleanId) {
+                    previewEl = document.createElement('iframe');
+                    previewEl.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&vq=hd1080`;
+                    previewEl.className = 'hover-video-preview loaded';
+                    mediaContainer.appendChild(previewEl);
+                }
             }
         }
 
@@ -3981,7 +4074,10 @@ document.addEventListener('DOMContentLoaded', () => {
             frame.classList.add('is-playing');
             isFullPlaying = true;
 
-            if (mediaSource === 'upload' && !isYoutube) {
+            const streamableId = extractStreamableId(vid);
+            const isStreamable = !!streamableId;
+
+            if (mediaSource === 'upload' && !isYoutube && !isStreamable) {
                 const video = document.createElement('video');
                 video.src = normalizeMediaPath(vid);
                 video.controls = true;
@@ -3994,6 +4090,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 video.style.height = '100%';
                 video.style.border = 'none';
                 videoContainer.appendChild(video);
+            } else if (isStreamable) {
+                const iframe = document.createElement('iframe');
+                iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1`;
+                iframe.style.position = 'absolute';
+                iframe.style.top = '0';
+                iframe.style.left = '0';
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.border = 'none';
+                iframe.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+                iframe.allowFullscreen = true;
+                videoContainer.appendChild(iframe);
             } else {
                 const iframe = document.createElement('iframe');
                 iframe.src = `https://www.youtube.com/embed/${cleanYtId || vid}?autoplay=1&controls=1&rel=0&modestbranding=1&vq=hd1080`;
@@ -4612,23 +4720,44 @@ document.addEventListener('DOMContentLoaded', () => {
                     appendConsoleLog(`> Lightbox video active: "${proj.title}"`);
                 } else {
                     const cleanId = extractYouTubeId(proj.mediaLink);
-                    const iframe = document.createElement('iframe');
-                    iframe.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&controls=1&rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&vq=hd1080`;
-                    iframe.style.position = 'absolute';
-                    iframe.style.top = '0';
-                    iframe.style.left = '0';
-                    iframe.style.width = '100%';
-                    iframe.style.height = '100%';
-                    iframe.style.border = 'none';
-                    iframe.allowFullscreen = true;
-                    iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
-                    
-                    if (wrapper) {
-                        wrapper.appendChild(iframe);
-                        wrapper.appendChild(watermarkEl);
+                    const streamableId = extractStreamableId(proj.mediaLink);
+                    if (streamableId) {
+                        const iframe = document.createElement('iframe');
+                        iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1`;
+                        iframe.style.position = 'absolute';
+                        iframe.style.top = '0';
+                        iframe.style.left = '0';
+                        iframe.style.width = '100%';
+                        iframe.style.height = '100%';
+                        iframe.style.border = 'none';
+                        iframe.allowFullscreen = true;
+                        iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+                        
+                        if (wrapper) {
+                            wrapper.appendChild(iframe);
+                            wrapper.appendChild(watermarkEl);
+                        }
+                        
+                        appendConsoleLog(`> Lightbox Streamable clean native embed active: "${proj.title}"`);
+                    } else {
+                        const iframe = document.createElement('iframe');
+                        iframe.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&controls=1&rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&vq=hd1080`;
+                        iframe.style.position = 'absolute';
+                        iframe.style.top = '0';
+                        iframe.style.left = '0';
+                        iframe.style.width = '100%';
+                        iframe.style.height = '100%';
+                        iframe.style.border = 'none';
+                        iframe.allowFullscreen = true;
+                        iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+                        
+                        if (wrapper) {
+                            wrapper.appendChild(iframe);
+                            wrapper.appendChild(watermarkEl);
+                        }
+                        
+                        appendConsoleLog(`> Lightbox YouTube clean native embed active: "${proj.title}"`);
                     }
-                    
-                    appendConsoleLog(`> Lightbox YouTube clean native embed active: "${proj.title}"`);
                 }
             }
             
@@ -4814,8 +4943,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 1. Handle edit actions (HUD buttons on overlay)
-        const hudBtn = e.target.closest('.card-hud-btn');
+        // 1. Handle edit actions (HUD buttons on overlay and media top-right buttons)
+        const hudBtn = e.target.closest('.card-hud-btn') || e.target.closest('.cms-media-delete-btn') || e.target.closest('.cms-delete-btn');
         if (hudBtn) {
             e.stopPropagation();
             const id = hudBtn.getAttribute('data-id');
@@ -4823,7 +4952,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 openProjectModalForEdit(id);
             } else if (hudBtn.classList.contains('btn-copy-hud')) {
                 copyProject(id);
-            } else if (hudBtn.classList.contains('btn-delete-hud')) {
+            } else if (hudBtn.classList.contains('btn-delete-hud') || hudBtn.classList.contains('cms-media-delete-btn') || hudBtn.classList.contains('cms-delete-btn')) {
                 deleteProject(id);
             } else if (hudBtn.classList.contains('btn-move-prev')) {
                 moveProject(id, 'prev');
@@ -5022,11 +5151,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Please select at least one project checkbox to delete.");
                 return;
             }
-            
-            const idsToDelete = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-id'));
-            projects = projects.filter(p => !idsToDelete.includes(p.id));
+            const idsToDelete = Array.from(checkedBoxes).map(cb => String(cb.getAttribute('data-id')));
+            projects = projects.filter(p => !idsToDelete.includes(String(p.id)));
             saveDatabase();
             renderProjects();
+            if (typeof renderModalGraphicsGrid === 'function') {
+                renderModalGraphicsGrid();
+            }
             appendConsoleLog(`> Bulk deleted ${idsToDelete.length} records.`);
             alert(`Successfully deleted ${idsToDelete.length} selected project(s)!`);
         });
@@ -5195,7 +5326,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } else {
                     mediaLink = document.getElementById('modal-media-link').value.trim();
-                    if (!mediaLink) throw new Error("Please enter a media link / YouTube ID.");
+                    if (!mediaLink) throw new Error("Please enter a media link / YouTube or Streamable link.");
+                    const cleanStreamableId = extractStreamableId(mediaLink);
+                    if (cleanStreamableId) {
+                        mediaLink = `https://streamable.com/${cleanStreamableId}`;
+                        if (!title) {
+                            try {
+                                const details = await getStreamableDetails(cleanStreamableId);
+                                if (details && details.title) title = details.title;
+                            } catch(e) {}
+                        }
+                    }
                 }
                 
                 // Upload Thumbnail file if source is upload
@@ -5236,8 +5377,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     if (thumbSrc === 'auto') {
                         const cleanYtId = extractYouTubeId(mediaLink);
+                        const cleanStreamableId = extractStreamableId(mediaLink);
                         if (cleanYtId) {
                             thumbLink = await getBestYoutubeThumbnail(cleanYtId);
+                        } else if (cleanStreamableId) {
+                            thumbLink = await getBestStreamableThumbnail(cleanStreamableId);
                         } else if (mediaSrc === 'upload') {
                             // Automatically extract thumbnail from the uploaded video file!
                             try {
@@ -6313,8 +6457,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 
                 if (confirm(`Are you sure you want to delete the ${checkedBoxes.length} selected graphic(s)?`)) {
-                    const idsToDelete = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-id'));
-                    projects = projects.filter(p => !idsToDelete.includes(p.id));
+                    const idsToDelete = Array.from(checkedBoxes).map(cb => String(cb.getAttribute('data-id')));
+                    projects = projects.filter(p => !idsToDelete.includes(String(p.id)));
                     saveDatabase();
                     
                     renderModalGraphicsGrid();
@@ -6373,8 +6517,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Text editing is always active in CMS mode (handled by applyContentEditable)
 
+    // Real-time auto-fetch on typing/pasting Streamable link or embed snippet
+    const mediaLinkInputEl = document.getElementById('modal-media-link');
+    if (mediaLinkInputEl) {
+        const handleMediaInput = async () => {
+            const rawVal = mediaLinkInputEl.value.trim();
+            const sId = extractStreamableId(rawVal);
+            const titleInput = document.getElementById('modal-project-title');
+            const thumbInput = document.getElementById('modal-thumb-link');
+            const thumbSrcSel = document.getElementById('modal-thumb-source');
+
+            if (sId) {
+                if (rawVal.includes('<iframe') || rawVal.includes('/e/')) {
+                    mediaLinkInputEl.value = `https://streamable.com/${sId}`;
+                }
+                const details = await getStreamableDetails(sId);
+                if (details) {
+                    if (titleInput && !titleInput.value.trim() && details.title) {
+                        titleInput.value = details.title;
+                    }
+                    if (thumbInput && thumbSrcSel && thumbSrcSel.value === 'auto' && details.thumbnail) {
+                        thumbInput.value = details.thumbnail;
+                    }
+                }
+            }
+        };
+        mediaLinkInputEl.addEventListener('blur', handleMediaInput);
+        mediaLinkInputEl.addEventListener('change', handleMediaInput);
+        mediaLinkInputEl.addEventListener('paste', () => setTimeout(handleMediaInput, 150));
+    }
+
     // Expose to window so inline script can access them
     window.extractYouTubeId = extractYouTubeId;
+    window.extractStreamableId = extractStreamableId;
+    window.getStreamableDetails = getStreamableDetails;
+    window.getBestStreamableThumbnail = getBestStreamableThumbnail;
     window.saveDatabase = saveDatabase;
     window.renderProjects = renderProjects;
     window.appendConsoleLog = appendConsoleLog;
