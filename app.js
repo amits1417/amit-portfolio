@@ -3911,6 +3911,10 @@ document.addEventListener('DOMContentLoaded', () => {
        PORTFOLIO HOVER RENDERING PREVIEW (AUTO-PLAY VIDEO TRAILERS)
        ========================================================================== */
     function initPreviewCanvases() {
+        // Disable hover video preview on touch devices to prevent mobile touch interception and conserve data
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+        if (isTouchDevice) return;
+
         const projectCards = document.querySelectorAll('.project-card');
         
         function loadCardPreview(card) {
@@ -4102,15 +4106,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 videoContainer.appendChild(video);
             } else if (isStreamable) {
                 const iframe = document.createElement('iframe');
-                iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1`;
+                iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&playsinline=1`;
                 iframe.style.position = 'absolute';
                 iframe.style.top = '0';
                 iframe.style.left = '0';
                 iframe.style.width = '100%';
                 iframe.style.height = '100%';
                 iframe.style.border = 'none';
-                iframe.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
-                iframe.allowFullscreen = true;
+                iframe.setAttribute('allow', 'autoplay *; fullscreen *; picture-in-picture *; encrypted-media *; accelerometer *; gyroscope *');
+                iframe.setAttribute('allowfullscreen', 'true');
+                iframe.setAttribute('webkitallowfullscreen', 'true');
+                iframe.setAttribute('mozallowfullscreen', 'true');
+                iframe.setAttribute('playsinline', '1');
+                iframe.setAttribute('webkit-playsinline', '1');
+                iframe.setAttribute('scrolling', 'no');
+                iframe.setAttribute('frameborder', '0');
                 videoContainer.appendChild(iframe);
             } else {
                 const iframe = document.createElement('iframe');
@@ -4733,15 +4743,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     const streamableId = extractStreamableId(proj.mediaLink);
                     if (streamableId) {
                         const iframe = document.createElement('iframe');
-                        iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1`;
+                        iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&playsinline=1`;
                         iframe.style.position = 'absolute';
                         iframe.style.top = '0';
                         iframe.style.left = '0';
                         iframe.style.width = '100%';
                         iframe.style.height = '100%';
                         iframe.style.border = 'none';
-                        iframe.allowFullscreen = true;
-                        iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+                        iframe.setAttribute('allow', 'autoplay *; fullscreen *; picture-in-picture *; encrypted-media *; accelerometer *; gyroscope *');
+                        iframe.setAttribute('allowfullscreen', 'true');
+                        iframe.setAttribute('webkitallowfullscreen', 'true');
+                        iframe.setAttribute('mozallowfullscreen', 'true');
+                        iframe.setAttribute('playsinline', '1');
+                        iframe.setAttribute('webkit-playsinline', '1');
+                        iframe.setAttribute('scrolling', 'no');
+                        iframe.setAttribute('frameborder', '0');
+                        iframe.setAttribute('title', proj.title || 'Streamable Video');
                         
                         if (wrapper) {
                             wrapper.appendChild(iframe);
