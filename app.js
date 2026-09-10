@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const mediaIdMatch = clean.match(/media-id=["']([a-zA-Z0-9_-]+)["']/i);
         if (mediaIdMatch && mediaIdMatch[1]) return mediaIdMatch[1];
         const scriptMatch = clean.match(/\/embed\/(?:medias\/)?([a-zA-Z0-9_-]+)(?:\.js|\.json)?/i);
-        if (scriptMatch && scriptMatch[1] && scriptMatch[1] !== 'player') return scriptMatch[1];
+        if (scriptMatch && scriptMatch[1] && scriptMatch[1] !== 'player' && scriptMatch[1] !== 'iframe') return scriptMatch[1];
         const urlMatch = clean.match(/(?:wistia\.(?:com|net)\/(?:medias|embed\/iframe)\/)([a-zA-Z0-9_-]+)/i);
         if (urlMatch && urlMatch[1]) return urlMatch[1];
         const shareMatch = clean.match(/(?:wistia\.(?:com|net)\/s\/)([a-zA-Z0-9_-]+)/i);
