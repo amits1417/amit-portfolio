@@ -3966,7 +3966,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const streamableId = extractStreamableId(proj.mediaLink);
                 if (streamableId) {
                     previewEl = document.createElement('iframe');
-                    previewEl.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&mute=1&controls=0&nocontrols=1&playsinline=1&loop=1`;
+                    previewEl.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&nocontrols=1`;
                     previewEl.className = 'hover-video-preview loaded';
                     previewEl.style.position = 'absolute';
                     previewEl.style.top = '0';
@@ -3976,6 +3976,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     previewEl.style.border = 'none';
                     previewEl.style.pointerEvents = 'none';
                     previewEl.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture');
+                    previewEl.setAttribute('allowfullscreen', 'true');
                     previewEl.setAttribute('playsinline', '1');
                     previewEl.setAttribute('webkit-playsinline', '1');
                     previewEl.setAttribute('scrolling', 'no');
@@ -4145,7 +4146,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 videoContainer.appendChild(video);
             } else if (isStreamable) {
                 const iframe = document.createElement('iframe');
-                iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&playsinline=1`;
+                iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1`;
                 iframe.style.position = 'absolute';
                 iframe.style.top = '0';
                 iframe.style.left = '0';
@@ -4782,7 +4783,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const streamableId = extractStreamableId(proj.mediaLink);
                     if (streamableId) {
                         const iframe = document.createElement('iframe');
-                        iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&playsinline=1`;
+                        iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1`;
                         iframe.style.position = 'absolute';
                         iframe.style.top = '0';
                         iframe.style.left = '0';
