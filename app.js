@@ -5085,6 +5085,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         iframe.style.width = '100%';
                         iframe.style.height = '100%';
                         iframe.style.border = 'none';
+                        iframe.style.opacity = '0';
+                        iframe.style.transition = 'opacity 0.3s ease';
+                        iframe.style.backgroundColor = '#000';
                         iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope; clipboard-write');
                         iframe.setAttribute('allowfullscreen', 'true');
                         iframe.setAttribute('webkitallowfullscreen', 'true');
@@ -5094,6 +5097,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         iframe.setAttribute('scrolling', 'no');
                         iframe.setAttribute('frameborder', '0');
                         iframe.setAttribute('title', proj.title || 'Streamable Video');
+                        iframe.onload = function() {
+                            setTimeout(function() { iframe.style.opacity = '1'; }, 100);
+                        };
                         
                         if (wrapper) {
                             wrapper.appendChild(iframe);
@@ -5108,6 +5114,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         iframe.style.width = '100%';
                         iframe.style.height = '100%';
                         iframe.style.border = 'none';
+                        iframe.style.opacity = '0';
+                        iframe.style.transition = 'opacity 0.3s ease';
+                        iframe.style.backgroundColor = '#000';
                         iframe.allowFullscreen = true;
                         iframe.allow = 'autoplay; fullscreen; picture-in-picture';
                         iframe.setAttribute('allowfullscreen', 'true');
@@ -5115,6 +5124,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         iframe.setAttribute('mozallowfullscreen', 'true');
                         iframe.setAttribute('playsinline', '1');
                         iframe.setAttribute('webkit-playsinline', '1');
+                        iframe.onload = function() {
+                            setTimeout(function() { iframe.style.opacity = '1'; }, 100);
+                        };
                         if (wrapper) {
                             wrapper.appendChild(iframe);
                             wrapper.appendChild(watermarkEl);
@@ -5129,8 +5141,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         iframe.style.width = '100%';
                         iframe.style.height = '100%';
                         iframe.style.border = 'none';
+                        iframe.style.opacity = '0';
+                        iframe.style.transition = 'opacity 0.3s ease';
+                        iframe.style.backgroundColor = '#000';
                         iframe.allowFullscreen = true;
                         iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+                        iframe.onload = function() {
+                            setTimeout(function() { iframe.style.opacity = '1'; }, 100);
+                        };
                         if (wrapper) {
                             wrapper.appendChild(iframe);
                             wrapper.appendChild(watermarkEl);
@@ -5145,8 +5163,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         iframe.style.width = '100%';
                         iframe.style.height = '100%';
                         iframe.style.border = 'none';
+                        iframe.style.opacity = '0';
+                        iframe.style.transition = 'opacity 0.3s ease';
+                        iframe.style.backgroundColor = '#000';
                         iframe.allowFullscreen = true;
                         iframe.allow = 'autoplay';
+                        iframe.onload = function() {
+                            setTimeout(function() { iframe.style.opacity = '1'; }, 100);
+                        };
                         if (wrapper) {
                             wrapper.appendChild(iframe);
                         }
@@ -5160,8 +5184,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         iframe.style.width = '100%';
                         iframe.style.height = '100%';
                         iframe.style.border = 'none';
+                        iframe.style.opacity = '0';
+                        iframe.style.transition = 'opacity 0.3s ease';
+                        iframe.style.backgroundColor = '#000';
                         iframe.allowFullscreen = true;
                         iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+                        iframe.onload = function() {
+                            setTimeout(function() { iframe.style.opacity = '1'; }, 100);
+                        };
                         
                         if (wrapper) {
                             wrapper.appendChild(iframe);
