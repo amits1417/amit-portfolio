@@ -1676,6 +1676,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <i data-lucide="${iconName}" class="play-icon"></i>
                             <span>${viewLabel}</span>
                         </div>
+                        <div class="project-media-click-shield"></div>
                     </div>
                     <div class="project-details" ${hideDetails ? 'style="display: none !important;"' : ''}>
                         <h3 class="project-title">${proj.title}</h3>
@@ -3915,10 +3916,6 @@ document.addEventListener('DOMContentLoaded', () => {
        PORTFOLIO HOVER RENDERING PREVIEW (AUTO-PLAY VIDEO TRAILERS)
        ========================================================================== */
     function initPreviewCanvases() {
-        // Prevent background iframe previews on touch / mobile devices to prevent touch event swallowing and ensure instant tap-to-play modal opening
-        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || (window.innerWidth <= 768);
-        if (isTouchDevice) return;
-
         const projectCards = document.querySelectorAll('.project-card');
         
         function loadCardPreview(card) {
@@ -3948,44 +3945,69 @@ document.addEventListener('DOMContentLoaded', () => {
                 previewEl = document.createElement('video');
                 previewEl.src = normalizeMediaPath(proj.mediaLink);
                 previewEl.muted = true;
+                previewEl.defaultMuted = true;
                 previewEl.loop = true;
                 previewEl.autoplay = true;
                 previewEl.preload = 'auto';
                 previewEl.setAttribute('muted', '');
                 previewEl.setAttribute('playsinline', '');
+                previewEl.setAttribute('webkit-playsinline', '');
                 previewEl.playsInline = true;
                 previewEl.controls = false;
                 previewEl.className = 'hover-video-preview loaded';
                 
                 mediaContainer.appendChild(previewEl);
+                try {
+                    const p = previewEl.play();
+                    if (p !== undefined) p.catch(() => {});
+                } catch(e) {}
             } else {
                 const cleanId = extractYouTubeId(proj.mediaLink);
                 const streamableId = extractStreamableId(proj.mediaLink);
                 if (streamableId) {
                     previewEl = document.createElement('iframe');
-                    previewEl.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&controls=0&playsinline=1`;
+                    previewEl.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&mute=1&controls=0&nocontrols=1&playsinline=1&loop=1`;
                     previewEl.className = 'hover-video-preview loaded';
+                    previewEl.style.position = 'absolute';
+                    previewEl.style.top = '0';
+                    previewEl.style.left = '0';
+                    previewEl.style.width = '100%';
+                    previewEl.style.height = '100%';
                     previewEl.style.border = 'none';
                     previewEl.style.pointerEvents = 'none';
-                    previewEl.setAttribute('allow', 'autoplay; fullscreen; encrypted-media');
+                    previewEl.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture');
                     previewEl.setAttribute('playsinline', '1');
                     previewEl.setAttribute('webkit-playsinline', '1');
+                    previewEl.setAttribute('scrolling', 'no');
+                    previewEl.setAttribute('frameborder', '0');
                     mediaContainer.appendChild(previewEl);
                 } else if (cleanId) {
                     previewEl = document.createElement('iframe');
                     previewEl.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&vq=hd1080`;
                     previewEl.className = 'hover-video-preview loaded';
+                    previewEl.style.position = 'absolute';
+                    previewEl.style.top = '0';
+                    previewEl.style.left = '0';
+                    previewEl.style.width = '100%';
+                    previewEl.style.height = '100%';
+                    previewEl.style.border = 'none';
+                    previewEl.style.pointerEvents = 'none';
+                    previewEl.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture');
+                    previewEl.setAttribute('playsinline', '1');
+                    previewEl.setAttribute('webkit-playsinline', '1');
+                    previewEl.setAttribute('scrolling', 'no');
+                    previewEl.setAttribute('frameborder', '0');
                     mediaContainer.appendChild(previewEl);
                 }
             }
         }
 
-        // Load previews as cards scroll into view, remove when scrolled far away
+        // Load previews as cards scroll into view (works for mobile & desktop), remove when scrolled far away
         if ('IntersectionObserver' in window) {
             const observerOptions = {
                 root: null,
-                rootMargin: '200px 0px',
-                threshold: 0.01
+                rootMargin: '100px 0px',
+                threshold: 0.05
             };
 
             const observer = new IntersectionObserver((entries) => {
@@ -4005,6 +4027,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             projectCards.forEach(card => observer.observe(card));
         }
+
+        // Desktop mouse hover immediate preview
+        projectCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const container = card.querySelector('.project-media');
+                if (container && !container.querySelector('.hover-video-preview')) {
+                    loadCardPreview(card);
+                }
+            });
+        });
     }
 
 
