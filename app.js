@@ -1,4 +1,4 @@
-﻿// Vercel auto-deployment pipeline verification
+// Vercel auto-deployment pipeline verification
 
 
 // CMS password protection – hard‑coded for this personal portfolio
@@ -37,14 +37,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!link) return '';
         let clean = link.trim();
         // If iframe or HTML embed snippet is pasted
-        const iframeMatch = clean.match(/src=["'](?:https?:)?\/\/(?:www\.)?streamable\.com\/(?:e\/|o\/|m\/)?([a-zA-Z0-9_-]+)/i);
+        const iframeMatch = clean.match(/src=["'](?:https?:)?\/\/(?:www\.|app\.)?streamable\.com\/(?:e\/|o\/|m\/|l\/|video\/)?([a-zA-Z0-9_-]+)/i);
         if (iframeMatch && iframeMatch[1]) {
             return iframeMatch[1].split('?')[0].split('&')[0];
         }
-        // Direct Streamable URL patterns (e.g. streamable.com/abc, streamable.com/e/abc, etc.)
-        const urlMatch = clean.match(/(?:https?:\/\/)?(?:www\.)?streamable\.com\/(?:e\/|o\/|m\/)?([a-zA-Z0-9_-]+)/i);
+        // Direct or embed Streamable URL patterns (e.g. streamable.com/abc, streamable.com/e/abc, app.streamable.com/abc, etc.)
+        const urlMatch = clean.match(/(?:https?:\/\/)?(?:www\.|app\.)?streamable\.com\/(?:e\/|o\/|m\/|l\/|video\/)?([a-zA-Z0-9_-]+)/i);
         if (urlMatch && urlMatch[1]) {
             return urlMatch[1].split('?')[0].split('&')[0];
+        }
+        // If already raw 5-10 character alphanumeric streamable ID
+        if (/^[a-zA-Z0-9_-]{5,10}$/.test(clean) && !clean.includes('.') && !clean.includes('/')) {
+            return clean;
         }
         return '';
     }
@@ -3911,6 +3915,10 @@ document.addEventListener('DOMContentLoaded', () => {
        PORTFOLIO HOVER RENDERING PREVIEW (AUTO-PLAY VIDEO TRAILERS)
        ========================================================================== */
     function initPreviewCanvases() {
+        // Prevent background iframe previews on touch / mobile devices to prevent touch event swallowing and ensure instant tap-to-play modal opening
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || (window.innerWidth <= 768);
+        if (isTouchDevice) return;
+
         const projectCards = document.querySelectorAll('.project-card');
         
         function loadCardPreview(card) {
@@ -4749,7 +4757,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         iframe.style.width = '100%';
                         iframe.style.height = '100%';
                         iframe.style.border = 'none';
-                        iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope');
+                        iframe.setAttribute('allow', 'autoplay *; fullscreen *; picture-in-picture *; encrypted-media *; accelerometer *; gyroscope *; clipboard-write *');
                         iframe.setAttribute('allowfullscreen', 'true');
                         iframe.setAttribute('webkitallowfullscreen', 'true');
                         iframe.setAttribute('mozallowfullscreen', 'true');
