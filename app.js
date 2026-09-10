@@ -513,6 +513,19 @@ document.addEventListener('DOMContentLoaded', () => {
             thumbLink: ""
         },
         {
+            id: "proj_streamable_yweov4",
+            title: "Motion Graphics Short",
+            category: "shorts",
+            client: "Personal Brand",
+            role: "Motion Designer",
+            tools: "After Effects, Premiere Pro",
+            desc: "Dynamic vertical short format video created for mobile reels & stories.",
+            mediaSource: "link",
+            mediaLink: "https://streamable.com/yweov4",
+            thumbSource: "auto",
+            thumbLink: "https://cdn-cf-east.streamable.com/image/yweov4.jpg"
+        },
+        {
             id: "proj_streamable_aig5fr",
             title: "Fxcore Motion Graphics Reel",
             category: "shorts",
@@ -683,13 +696,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (storedProjects) {
             try {
                 projects = JSON.parse(storedProjects);
-                if (!projects.some(p => p.mediaLink && p.mediaLink.includes('aig5fr'))) {
-                    const streamableProj = defaultProjects.find(p => p.mediaLink && p.mediaLink.includes('aig5fr'));
-                    if (streamableProj) {
-                        projects.unshift(streamableProj);
-                        localStorage.setItem('amit_portfolio_projects', JSON.stringify(projects));
+                ['aig5fr', 'yweov4'].forEach(sId => {
+                    if (!projects.some(p => p.mediaLink && p.mediaLink.includes(sId))) {
+                        const streamableProj = defaultProjects.find(p => p.mediaLink && p.mediaLink.includes(sId));
+                        if (streamableProj) {
+                            projects.unshift(streamableProj);
+                            localStorage.setItem('amit_portfolio_projects', JSON.stringify(projects));
+                        }
                     }
-                }
+                });
             } catch(e) {
                 projects = JSON.parse(JSON.stringify(bakedData));
             }
@@ -2962,7 +2977,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = controller ? setTimeout(() => controller.abort(), 3000) : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 1200) : null;
             const res = await fetch(`https://api.streamable.com/videos/${streamableId}`, {
                 signal: controller ? controller.signal : undefined
             });
