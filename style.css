@@ -3140,21 +3140,21 @@ footer {
 
 /* Dynamic Aspect Ratio overrides for the video modal */
 .video-modal-overlay.modal-aspect-16-9 .video-modal-container {
-    max-width: min(960px, 85vh * 16 / 9);
+    max-width: min(960px, calc(85vh * 16 / 9));
 }
 .video-modal-overlay.modal-aspect-16-9 .video-modal-iframe-wrapper {
     padding-top: 56.25%;
 }
 
 .video-modal-overlay.modal-aspect-9-16 .video-modal-container {
-    max-width: min(400px, 85vh * 9 / 16);
+    max-width: min(400px, calc(85vh * 9 / 16));
 }
 .video-modal-overlay.modal-aspect-9-16 .video-modal-iframe-wrapper {
     padding-top: 177.77%;
 }
 
 .video-modal-overlay.modal-aspect-4-3 .video-modal-container {
-    max-width: min(800px, 85vh * 4 / 3);
+    max-width: min(800px, calc(85vh * 4 / 3));
 }
 .video-modal-overlay.modal-aspect-4-3 .video-modal-iframe-wrapper {
     padding-top: 75%;
@@ -3339,7 +3339,7 @@ footer {
         max-width: 95vw;
     }
     .video-modal-overlay.modal-aspect-9-16 .video-modal-container {
-        max-width: min(92vw, 82vh * 9 / 16);
+        max-width: min(92vw, calc(82vh * 9 / 16));
     }
     .video-modal-overlay.modal-aspect-16-9 .video-modal-container {
         max-width: 95vw;

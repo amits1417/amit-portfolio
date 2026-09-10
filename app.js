@@ -51,6 +51,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return m ? m[1] : '';
     }
 
+    const wistiaDetailsCache = {
+        'aolfgnqehaqcj6t': { id: '1h12yvgyx9', title: 'Block chain wallet', thumb: 'https://embed-ssl.wistia.com/deliveries/3ceeaf65d79bbddcfe28bbd0e4ff8d171058bf9c.jpg?image_crop_resized=720x1280' }
+    };
+
     // Helper to extract Wistia video ID from link, embed code, or player snippet
     function extractWistiaId(link) {
         if (!link) return '';
@@ -61,10 +65,62 @@ document.addEventListener('DOMContentLoaded', () => {
         if (scriptMatch && scriptMatch[1] && scriptMatch[1] !== 'player') return scriptMatch[1];
         const urlMatch = clean.match(/(?:wistia\.(?:com|net)\/(?:medias|embed\/iframe)\/)([a-zA-Z0-9_-]+)/i);
         if (urlMatch && urlMatch[1]) return urlMatch[1];
+        const shareMatch = clean.match(/(?:wistia\.(?:com|net)\/s\/)([a-zA-Z0-9_-]+)/i);
+        if (shareMatch && shareMatch[1]) {
+            if (wistiaDetailsCache[shareMatch[1]]) {
+                return wistiaDetailsCache[shareMatch[1]].id;
+            }
+            return shareMatch[1];
+        }
         if (/^[a-zA-Z0-9]{10}$/.test(clean)) {
             return clean;
         }
         return '';
+    }
+
+    async function getWistiaDetails(linkOrId) {
+        if (!linkOrId) return null;
+        const clean = linkOrId.trim();
+        if (wistiaDetailsCache[clean]) return wistiaDetailsCache[clean];
+        
+        let targetUrl = clean;
+        if (!clean.startsWith('http')) {
+            targetUrl = `https://fast.wistia.com/embed/medias/${clean}`;
+        }
+        
+        try {
+            const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 2500) : null;
+            const res = await fetch(`https://fast.wistia.net/oembed.json?url=${encodeURIComponent(targetUrl)}`, {
+                signal: controller ? controller.signal : undefined
+            });
+            if (timeoutId) clearTimeout(timeoutId);
+            if (res.ok) {
+                const data = await res.json();
+                let realId = '';
+                if (data.html) {
+                    const m = data.html.match(/\/embed\/iframe\/([a-zA-Z0-9_-]+)/);
+                    if (m && m[1]) realId = m[1];
+                }
+                const result = {
+                    id: realId || clean,
+                    title: data.title || '',
+                    thumbnail: data.thumbnail_url || `https://fast.wistia.com/embed/medias/${realId || clean}/swatch`,
+                    width: data.width,
+                    height: data.height
+                };
+                wistiaDetailsCache[clean] = result;
+                if (realId) wistiaDetailsCache[realId] = result;
+                return result;
+            }
+        } catch (err) {
+            console.warn('Could not fetch Wistia oembed:', err);
+        }
+        return {
+            id: clean,
+            title: '',
+            thumbnail: `https://fast.wistia.com/embed/medias/${clean}/swatch`
+        };
     }
 
     // Helper to detect direct MP4 / WebM / video URLs (e.g. catbox.moe, cdn, aws, cloudflare)
@@ -555,6 +611,19 @@ document.addEventListener('DOMContentLoaded', () => {
             thumbLink: ""
         },
         {
+            id: "proj_wistia_1h12yvgyx9",
+            title: "Block Chain Wallet",
+            category: "shorts",
+            client: "Crypto Fintech",
+            role: "Motion Designer & Editor",
+            tools: "After Effects, Premiere Pro",
+            desc: "High-energy vertical fintech reel showcasing cryptocurrency wallet features, security animations, and fast mobile UX.",
+            mediaSource: "link",
+            mediaLink: "https://fast.wistia.net/embed/iframe/1h12yvgyx9",
+            thumbSource: "auto",
+            thumbLink: "https://embed-ssl.wistia.com/deliveries/3ceeaf65d79bbddcfe28bbd0e4ff8d171058bf9c.jpg?image_crop_resized=720x1280"
+        },
+        {
             id: "proj_streamable_yweov4",
             title: "Motion Graphics Short",
             category: "shorts",
@@ -738,11 +807,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (storedProjects) {
             try {
                 projects = JSON.parse(storedProjects);
-                ['aig5fr', 'yweov4'].forEach(sId => {
+                ['aig5fr', 'yweov4', '1h12yvgyx9'].forEach(sId => {
                     if (!projects.some(p => p.mediaLink && p.mediaLink.includes(sId))) {
-                        const streamableProj = defaultProjects.find(p => p.mediaLink && p.mediaLink.includes(sId));
-                        if (streamableProj) {
-                            projects.unshift(streamableProj);
+                        const defaultProj = defaultProjects.find(p => p.mediaLink && p.mediaLink.includes(sId));
+                        if (defaultProj) {
+                            projects.unshift(defaultProj);
                             localStorage.setItem('amit_portfolio_projects', JSON.stringify(projects));
                         }
                     }
@@ -4087,6 +4156,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 const cleanId = extractYouTubeId(proj.mediaLink);
                 const streamableId = extractStreamableId(proj.mediaLink);
+                const wistiaId = extractWistiaId(proj.mediaLink);
                 const driveId = extractGoogleDriveId(proj.mediaLink);
                 const vimeoId = extractVimeoId(proj.mediaLink);
                 
@@ -4113,7 +4183,37 @@ document.addEventListener('DOMContentLoaded', () => {
                         iframe.setAttribute('frameborder', '0');
                         mediaContainer.appendChild(iframe);
                     };
-                    createStreamableIframe();
+
+                    getStreamableDirectUrl(streamableId, 'mobile').then(directUrl => {
+                        if (!mediaContainer || mediaContainer.querySelector('.hover-video-preview')) return;
+                        previewEl = document.createElement('video');
+                        previewEl.muted = true;
+                        previewEl.defaultMuted = true;
+                        previewEl.loop = true;
+                        previewEl.autoplay = true;
+                        previewEl.preload = 'auto';
+                        previewEl.setAttribute('muted', '');
+                        previewEl.setAttribute('playsinline', '');
+                        previewEl.setAttribute('webkit-playsinline', '');
+                        previewEl.playsInline = true;
+                        previewEl.controls = false;
+                        previewEl.className = 'hover-video-preview loaded';
+                        previewEl.style.objectFit = 'cover';
+                        previewEl.style.width = '100%';
+                        previewEl.style.height = '100%';
+                        previewEl.style.position = 'absolute';
+                        previewEl.style.top = '0';
+                        previewEl.style.left = '0';
+                        previewEl.src = directUrl;
+                        
+                        mediaContainer.appendChild(previewEl);
+                        try {
+                            const p = previewEl.play();
+                            if (p !== undefined) p.catch(() => {});
+                        } catch(e) {}
+                    }).catch(() => {
+                        createStreamableIframe();
+                    });
                 } else if (wistiaId) {
                     previewEl = document.createElement('iframe');
                     previewEl.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&muted=true&silentAutoPlay=true&playbar=false&smallPlayButton=false&controlsVisibleOnLoad=false&endVideoBehavior=loop`;
@@ -4396,15 +4496,47 @@ document.addEventListener('DOMContentLoaded', () => {
                     autoObserver.disconnect();
                     const playBtn = document.getElementById('play-showreel-btn');
                     const vid = playBtn ? (playBtn.getAttribute('data-video-id') || 'u6KTFBKMP8M') : 'u6KTFBKMP8M';
+                    const mediaSource = playBtn ? (playBtn.getAttribute('data-media-source') || 'link') : 'link';
                     const cleanYtId = extractYouTubeId(vid);
-                    if (!cleanYtId) return;
+                    const streamableId = extractStreamableId(vid);
+                    const wistiaId = extractWistiaId(vid);
 
-                    // Muted preview with loop=1&playlist=cleanYtId so preview NEVER stops or freezes!
-                    videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${cleanYtId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanYtId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-                    const waveformEl = document.getElementById('waveform-canvas');
-                    if (waveformEl) waveformEl.style.display = 'none';
-                    wavePlaying = true;
-                    appendConsoleLog('> Showreel auto-preview started (muted loop).');
+                    if (streamableId) {
+                        getStreamableDirectUrl(streamableId, 'mobile').then(directUrl => {
+                            if (!isFullPlaying && autoPlayed && videoContainer) {
+                                videoContainer.innerHTML = `<video src="${directUrl}" muted autoplay loop playsinline webkit-playsinline style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;pointer-events:none;"></video>`;
+                                const waveformEl = document.getElementById('waveform-canvas');
+                                if (waveformEl) waveformEl.style.display = 'none';
+                                wavePlaying = true;
+                                appendConsoleLog('> Showreel auto-preview started (Streamable direct loop).');
+                            }
+                        }).catch(() => {
+                            if (!isFullPlaying && autoPlayed && videoContainer) {
+                                videoContainer.innerHTML = `<iframe src="https://streamable.com/e/${streamableId}?autoplay=1&muted=1&loop=1&nocontrols=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+                                const waveformEl = document.getElementById('waveform-canvas');
+                                if (waveformEl) waveformEl.style.display = 'none';
+                                wavePlaying = true;
+                            }
+                        });
+                    } else if (cleanYtId) {
+                        videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${cleanYtId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanYtId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+                        const waveformEl = document.getElementById('waveform-canvas');
+                        if (waveformEl) waveformEl.style.display = 'none';
+                        wavePlaying = true;
+                        appendConsoleLog('> Showreel auto-preview started (YouTube muted loop).');
+                    } else if (wistiaId) {
+                        videoContainer.innerHTML = `<iframe src="https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&muted=true&silentAutoPlay=true&playbar=false&smallPlayButton=false&controlsVisibleOnLoad=false&endVideoBehavior=loop" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+                        const waveformEl = document.getElementById('waveform-canvas');
+                        if (waveformEl) waveformEl.style.display = 'none';
+                        wavePlaying = true;
+                        appendConsoleLog('> Showreel auto-preview started (Wistia loop).');
+                    } else if (mediaSource === 'upload' || isDirectVideoUrl(vid)) {
+                        videoContainer.innerHTML = `<video src="${normalizeMediaPath(vid)}" muted autoplay loop playsinline webkit-playsinline style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;pointer-events:none;"></video>`;
+                        const waveformEl = document.getElementById('waveform-canvas');
+                        if (waveformEl) waveformEl.style.display = 'none';
+                        wavePlaying = true;
+                        appendConsoleLog('> Showreel auto-preview started (uploaded video loop).');
+                    }
                 }
             });
         }, { threshold: 0.4 });
@@ -4989,6 +5121,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     const cleanId = extractYouTubeId(proj.mediaLink);
                     const streamableId = extractStreamableId(proj.mediaLink);
+                    const wistiaId = extractWistiaId(proj.mediaLink);
                     const driveId = extractGoogleDriveId(proj.mediaLink);
                     const vimeoId = extractVimeoId(proj.mediaLink);
                     
@@ -4996,7 +5129,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const createStreamableLightboxIframe = () => {
                             if (wrapper) wrapper.innerHTML = '';
                             const iframe = document.createElement('iframe');
-                            iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&loop=1`;
+                            iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=0&loop=1`;
                             iframe.style.position = 'absolute';
                             iframe.style.top = '0';
                             iframe.style.left = '0';
@@ -5018,7 +5151,42 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                             appendConsoleLog(`> Lightbox Streamable embed active: "${proj.title}"`);
                         };
-                        createStreamableLightboxIframe();
+
+                        getStreamableDirectUrl(streamableId, 'hd').then(directUrl => {
+                            if (!videoModal || !videoModal.classList.contains('active')) return;
+                            if (wrapper) wrapper.innerHTML = '';
+                            const videoEl = document.createElement('video');
+                            videoEl.id = 'lightbox-plyr-player';
+                            videoEl.src = directUrl;
+                            videoEl.controls = true;
+                            videoEl.autoplay = true;
+                            videoEl.playsInline = true;
+                            videoEl.preload = 'auto';
+                            videoEl.style.position = 'absolute';
+                            videoEl.style.top = '0';
+                            videoEl.style.left = '0';
+                            videoEl.style.width = '100%';
+                            videoEl.style.height = '100%';
+                            videoEl.style.backgroundColor = '#000';
+                            
+                            if (wrapper) {
+                                wrapper.appendChild(videoEl);
+                                wrapper.appendChild(watermarkEl);
+                            }
+                            
+                            lightboxPlayer = new Plyr('#lightbox-plyr-player', {
+                                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
+                                settings: ['quality'],
+                                quality: { default: 1080, options: [4320, 2160, 1440, 1080, 720, 576, 480, 360, 240] }
+                            });
+                            try {
+                                const p = videoEl.play();
+                                if (p !== undefined) p.catch(() => {});
+                            } catch(e) {}
+                            appendConsoleLog(`> Lightbox Streamable direct HD player active: "${proj.title}"`);
+                        }).catch(() => {
+                            createStreamableLightboxIframe();
+                        });
                     } else if (wistiaId) {
                         const iframe = document.createElement('iframe');
                         iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&playsinline=true`;
