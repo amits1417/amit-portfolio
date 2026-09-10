@@ -4162,30 +4162,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (streamableId) {
                     if (!mediaContainer || mediaContainer.querySelector('.hover-video-preview')) return;
-                    const iframe = document.createElement('iframe');
-                    iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&loop=1&nocontrols=1`;
-                    iframe.className = 'hover-video-preview';
-                    iframe.style.position = 'absolute';
-                    iframe.style.top = '0';
-                    iframe.style.left = '0';
-                    iframe.style.width = '100%';
-                    iframe.style.height = '100%';
-                    iframe.style.border = 'none';
-                    iframe.style.pointerEvents = 'none';
-                    iframe.style.opacity = '0';
-                    iframe.style.transition = 'opacity 0.3s ease';
-                    iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope');
-                    iframe.setAttribute('allowfullscreen', 'true');
-                    iframe.setAttribute('webkitallowfullscreen', 'true');
-                    iframe.setAttribute('mozallowfullscreen', 'true');
-                    iframe.setAttribute('playsinline', '1');
-                    iframe.setAttribute('webkit-playsinline', '1');
-                    iframe.setAttribute('scrolling', 'no');
-                    iframe.setAttribute('frameborder', '0');
-                    iframe.onload = function() {
-                        setTimeout(function() { iframe.style.opacity = '1'; }, 100);
-                    };
-                    mediaContainer.appendChild(iframe);
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                    if (!isMobile) {
+                        const iframe = document.createElement('iframe');
+                        iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&loop=1&nocontrols=1`;
+                        iframe.className = 'hover-video-preview';
+                        iframe.style.position = 'absolute';
+                        iframe.style.top = '0';
+                        iframe.style.left = '0';
+                        iframe.style.width = '100%';
+                        iframe.style.height = '100%';
+                        iframe.style.border = 'none';
+                        iframe.style.pointerEvents = 'none';
+                        iframe.style.opacity = '0';
+                        iframe.style.transition = 'opacity 0.3s ease';
+                        iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope');
+                        iframe.setAttribute('allowfullscreen', 'true');
+                        iframe.setAttribute('webkitallowfullscreen', 'true');
+                        iframe.setAttribute('mozallowfullscreen', 'true');
+                        iframe.setAttribute('playsinline', '1');
+                        iframe.setAttribute('webkit-playsinline', '1');
+                        iframe.setAttribute('scrolling', 'no');
+                        iframe.setAttribute('frameborder', '0');
+                        iframe.onload = function() {
+                            setTimeout(function() { iframe.style.opacity = '1'; }, 100);
+                        };
+                        mediaContainer.appendChild(iframe);
+                    }
                 } else if (wistiaId) {
                     previewEl = document.createElement('iframe');
                     previewEl.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&muted=true&silentAutoPlay=true&playbar=false&smallPlayButton=false&controlsVisibleOnLoad=false&endVideoBehavior=loop`;
