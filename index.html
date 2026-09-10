@@ -897,9 +897,14 @@
                                 <input type="range" id="timeline-picker-range" min="0" max="100" value="0" style="width: 100%; accent-color: var(--accent-cyan); cursor: pointer;">
                                 <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-muted);">
                                     <span id="timeline-picker-time">0:00</span>
-                                    <button type="button" id="btn-capture-frame" class="console-btn btn-primary" style="padding: 4px 10px; font-size: 0.7rem; margin: 0; display: inline-flex; align-items: center; gap: 4px;">
-                                        <i data-lucide="camera" style="width: 12px; height: 12px;"></i> Capture Frame
-                                    </button>
+                                    <div style="display: flex; gap: 6px;">
+                                        <button type="button" id="btn-fetch-wistia-thumb" class="console-btn" style="padding: 4px 10px; font-size: 0.7rem; margin: 0; display: none; align-items: center; gap: 4px; background: var(--accent-purple, #9b59b6); color: white;">
+                                            <i data-lucide="image" style="width: 12px; height: 12px;"></i> Fetch Wistia Frame
+                                        </button>
+                                        <button type="button" id="btn-capture-frame" class="console-btn btn-primary" style="padding: 4px 10px; font-size: 0.7rem; margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+                                            <i data-lucide="camera" style="width: 12px; height: 12px;"></i> Capture Frame
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1173,7 +1178,7 @@
     <!-- Baked default portfolio data (cloud projects) -->
     <script src="data.js?v=3.0"></script>
     <!-- Custom Application Logic -->
-    <script src="app.js?v=16.0"></script>
+    <script src="app.js?v=17.0"></script>
 <script>
 // Batch YouTube Import - uses window.* exposed by app.js
 (function() {

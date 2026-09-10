@@ -3182,6 +3182,29 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const wistiaId = extractWistiaId(mediaLinkInput);
+        if (mediaSrc === 'link' && wistiaId) {
+            errorEl.textContent = 'Loading Wistia player...';
+            const wistiaFetchBtn = document.getElementById('btn-fetch-wistia-thumb');
+            if (wistiaFetchBtn) wistiaFetchBtn.style.display = 'inline-flex';
+            const container = document.getElementById('timeline-picker-video').parentElement;
+            let wistiaFrame = container.querySelector('.timeline-wistia-frame');
+            if (wistiaFrame) wistiaFrame.remove();
+            wistiaFrame = document.createElement('iframe');
+            wistiaFrame.src = `https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=0&mute=0&controls=1&playsinline=1`;
+            wistiaFrame.className = 'timeline-wistia-frame';
+            wistiaFrame.style.cssText = 'width:100%;height:100%;position:absolute;top:0;left:0;border:none;border-radius:4px;';
+            wistiaFrame.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+            wistiaFrame.setAttribute('playsinline', '1');
+            container.style.position = 'relative';
+            container.appendChild(wistiaFrame);
+            videoEl.style.display = 'none';
+            errorEl.style.display = 'none';
+            rangeEl.min = 0; rangeEl.max = 100; rangeEl.value = 0;
+            timeEl.textContent = 'Use Wistia player or click Fetch Frame';
+            return;
+        }
+
         if (mediaSrc === 'upload') {
             const uploadFile = document.getElementById('modal-media-file').files[0];
             if (uploadFile) {
@@ -3353,6 +3376,57 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Wistia Fetch Thumbnail button — loads a Wistia frame into the timeline picker
+    const wistiaFetchBtn = document.getElementById('btn-fetch-wistia-thumb');
+    if (wistiaFetchBtn) {
+        wistiaFetchBtn.addEventListener('click', () => {
+            const mediaLinkInput = document.getElementById('modal-media-link').value.trim();
+            const wistiaId = extractWistiaId(mediaLinkInput);
+            if (!wistiaId) { alert('Please enter a valid Wistia link first.'); return; }
+            const container = document.getElementById('timeline-picker-video').parentElement;
+            const errorEl = document.getElementById('timeline-picker-error');
+            const videoEl = document.getElementById('timeline-picker-video');
+            const youtubeImg = document.getElementById('timeline-picker-youtube-img');
+            const rangeEl = document.getElementById('timeline-picker-range');
+            const timeEl = document.getElementById('timeline-picker-time');
+            // Remove old frame if exists
+            const oldFrame = container.querySelector('.timeline-wistia-frame');
+            if (oldFrame) oldFrame.remove();
+            if (videoEl) videoEl.style.display = 'none';
+            if (youtubeImg) youtubeImg.style.display = 'none';
+            if (errorEl) errorEl.style.display = 'none';
+            // Load Wistia embed
+            container.style.position = 'relative';
+            const frame = document.createElement('iframe');
+            frame.src = `https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=0&mute=0&controls=1&playsinline=1`;
+            frame.className = 'timeline-wistia-frame';
+            frame.style.cssText = 'width:100%;height:100%;position:absolute;top:0;left:0;border:none;border-radius:4px;';
+            frame.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+            frame.setAttribute('playsinline', '1');
+            container.appendChild(frame);
+            if (rangeEl) { rangeEl.min = 0; rangeEl.max = 100; rangeEl.value = 0; }
+            if (timeEl) timeEl.textContent = 'Use Wistia player controls';
+            // Also set thumbnail field with Wistia swatch
+            const thumbLinkInput = document.getElementById('modal-thumb-link');
+            if (thumbLinkInput && !thumbLinkInput.value.trim()) {
+                thumbLinkInput.value = `https://fast.wistia.com/embed/medias/${wistiaId}/swatch`;
+            }
+            appendConsoleLog(`> Wistia player loaded for frame selection: ${wistiaId}`);
+        });
+    }
+
+    // Show/hide Wistia fetch button based on media link input
+    document.addEventListener('input', (e) => {
+        if (e.target && e.target.id === 'modal-media-link') {
+            const wistiaBtn = document.getElementById('btn-fetch-wistia-thumb');
+            if (wistiaBtn) {
+                const val = e.target.value.trim();
+                const isWistia = val.includes('wistia.com') || val.includes('wistia.');
+                wistiaBtn.style.display = isWistia ? 'inline-flex' : 'none';
+            }
+        }
+    });
+
     // Initialize drag-and-drop sortable grids using SortableJS library
     let sortableInstances = [];
     
@@ -3495,8 +3569,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('touchmove', handleDragAutoScroll, { passive: true });
 
     initDatabase();
-    /* renderProjects() removed — deferred to fetchFirebaseCloudData completion
-       to prevent flashing old/default data before cloud data arrives. */
+    renderProjects();
 
     /* ==========================================================================
        PRELOADER & COUNTER
@@ -4210,22 +4283,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         createStreamableIframe();
                     }
                 } else if (wistiaId) {
-                    const thumbUrl = proj.thumbLink || `https://fast.wistia.com/embed/medias/${wistiaId}/swatch`;
-                    const img = document.createElement('img');
-                    img.src = thumbUrl;
-                    img.className = 'hover-video-preview';
-                    img.style.position = 'absolute';
-                    img.style.top = '0';
-                    img.style.left = '0';
-                    img.style.width = '100%';
-                    img.style.height = '100%';
-                    img.style.objectFit = 'cover';
-                    img.style.pointerEvents = 'none';
-                    img.style.opacity = '0';
-                    img.style.transition = 'opacity 0.3s ease';
-                    img.onerror = function() { img.style.display = 'none'; };
-                    img.onload = function() { setTimeout(function() { img.style.opacity = '1'; }, 50); };
-                    mediaContainer.appendChild(img);
+                    previewEl = document.createElement('iframe');
+                    previewEl.src = `https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=1&mute=1&loop=1&controls=0&playsinline=1`;
+                    previewEl.className = 'hover-video-preview';
+                    previewEl.style.position = 'absolute';
+                    previewEl.style.top = '0';
+                    previewEl.style.left = '0';
+                    previewEl.style.width = '100%';
+                    previewEl.style.height = '100%';
+                    previewEl.style.border = 'none';
+                    previewEl.style.pointerEvents = 'none';
+                    previewEl.style.opacity = '0';
+                    previewEl.style.transition = 'opacity 0.3s ease';
+                    previewEl.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+                    previewEl.setAttribute('playsinline', '1');
+                    previewEl.setAttribute('webkit-playsinline', '1');
+                    previewEl.onload = function() { setTimeout(function() { previewEl.style.opacity = '1'; }, 100); };
+                    mediaContainer.appendChild(previewEl);
                 } else if (vimeoId) {
                     previewEl = document.createElement('iframe');
                     previewEl.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=1&loop=1&autopause=0&background=1`;
