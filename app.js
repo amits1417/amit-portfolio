@@ -51,6 +51,22 @@ document.addEventListener('DOMContentLoaded', () => {
         return m ? m[1] : '';
     }
 
+    // Helper to extract Wistia video ID from link, embed code, or player snippet
+    function extractWistiaId(link) {
+        if (!link) return '';
+        const clean = link.trim();
+        const mediaIdMatch = clean.match(/media-id=["']([a-zA-Z0-9_-]+)["']/i);
+        if (mediaIdMatch && mediaIdMatch[1]) return mediaIdMatch[1];
+        const scriptMatch = clean.match(/\/embed\/(?:medias\/)?([a-zA-Z0-9_-]+)(?:\.js|\.json)?/i);
+        if (scriptMatch && scriptMatch[1] && scriptMatch[1] !== 'player') return scriptMatch[1];
+        const urlMatch = clean.match(/(?:wistia\.(?:com|net)\/(?:medias|embed\/iframe)\/)([a-zA-Z0-9_-]+)/i);
+        if (urlMatch && urlMatch[1]) return urlMatch[1];
+        if (/^[a-zA-Z0-9]{10}$/.test(clean)) {
+            return clean;
+        }
+        return '';
+    }
+
     // Helper to detect direct MP4 / WebM / video URLs (e.g. catbox.moe, cdn, aws, cloudflare)
     function isDirectVideoUrl(link) {
         if (!link) return false;
@@ -4098,6 +4114,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         mediaContainer.appendChild(iframe);
                     };
                     createStreamableIframe();
+                } else if (wistiaId) {
+                    previewEl = document.createElement('iframe');
+                    previewEl.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&muted=true&silentAutoPlay=true&playbar=false&smallPlayButton=false&controlsVisibleOnLoad=false&endVideoBehavior=loop`;
+                    previewEl.className = 'hover-video-preview loaded';
+                    previewEl.style.position = 'absolute';
+                    previewEl.style.top = '0';
+                    previewEl.style.left = '0';
+                    previewEl.style.width = '100%';
+                    previewEl.style.height = '100%';
+                    previewEl.style.border = 'none';
+                    previewEl.style.pointerEvents = 'none';
+                    previewEl.setAttribute('allow', 'autoplay; fullscreen');
+                    previewEl.setAttribute('allowfullscreen', 'true');
+                    previewEl.setAttribute('playsinline', '1');
+                    previewEl.setAttribute('webkit-playsinline', '1');
+                    mediaContainer.appendChild(previewEl);
                 } else if (vimeoId) {
                     previewEl = document.createElement('iframe');
                     previewEl.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=1&loop=1&autopause=0&background=1`;
@@ -4987,6 +5019,27 @@ document.addEventListener('DOMContentLoaded', () => {
                             appendConsoleLog(`> Lightbox Streamable embed active: "${proj.title}"`);
                         };
                         createStreamableLightboxIframe();
+                    } else if (wistiaId) {
+                        const iframe = document.createElement('iframe');
+                        iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&playsinline=true`;
+                        iframe.style.position = 'absolute';
+                        iframe.style.top = '0';
+                        iframe.style.left = '0';
+                        iframe.style.width = '100%';
+                        iframe.style.height = '100%';
+                        iframe.style.border = 'none';
+                        iframe.allowFullscreen = true;
+                        iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+                        iframe.setAttribute('allowfullscreen', 'true');
+                        iframe.setAttribute('webkitallowfullscreen', 'true');
+                        iframe.setAttribute('mozallowfullscreen', 'true');
+                        iframe.setAttribute('playsinline', '1');
+                        iframe.setAttribute('webkit-playsinline', '1');
+                        if (wrapper) {
+                            wrapper.appendChild(iframe);
+                            wrapper.appendChild(watermarkEl);
+                        }
+                        appendConsoleLog(`> Lightbox Wistia clean embed active: "${proj.title}"`);
                     } else if (vimeoId) {
                         const iframe = document.createElement('iframe');
                         iframe.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1`;
@@ -5605,9 +5658,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } else {
                     mediaLink = document.getElementById('modal-media-link').value.trim();
-                    if (!mediaLink) throw new Error("Please enter a media link / YouTube or Streamable link.");
+                    if (!mediaLink) throw new Error("Please enter a video link (YouTube, Wistia, Google Drive, Vimeo, or Streamable).");
+                    
+                    const cleanWistiaId = extractWistiaId(mediaLink);
                     const cleanStreamableId = extractStreamableId(mediaLink);
-                    if (cleanStreamableId) {
+                    const cleanGoogleDriveId = extractGoogleDriveId(mediaLink);
+                    const cleanVimeoId = extractVimeoId(mediaLink);
+                    
+                    if (cleanWistiaId) {
+                        mediaLink = `https://fast.wistia.net/embed/iframe/${cleanWistiaId}`;
+                    } else if (cleanStreamableId) {
                         mediaLink = `https://streamable.com/${cleanStreamableId}`;
                         if (!title) {
                             try {
@@ -5615,6 +5675,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 if (details && details.title) title = details.title;
                             } catch(e) {}
                         }
+                    } else if (cleanGoogleDriveId) {
+                        mediaLink = `https://drive.google.com/file/d/${cleanGoogleDriveId}/preview`;
+                    } else if (cleanVimeoId) {
+                        mediaLink = `https://vimeo.com/${cleanVimeoId}`;
                     }
                 }
                 
@@ -5656,9 +5720,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     if (thumbSrc === 'auto') {
                         const cleanYtId = extractYouTubeId(mediaLink);
+                        const cleanWistiaId = extractWistiaId(mediaLink);
+                        const cleanGoogleDriveId = extractGoogleDriveId(mediaLink);
                         const cleanStreamableId = extractStreamableId(mediaLink);
+                        
                         if (cleanYtId) {
                             thumbLink = await getBestYoutubeThumbnail(cleanYtId);
+                        } else if (cleanWistiaId) {
+                            thumbLink = `https://fast.wistia.com/embed/medias/${cleanWistiaId}/swatch`;
+                        } else if (cleanGoogleDriveId) {
+                            thumbLink = `https://drive.google.com/thumbnail?id=${cleanGoogleDriveId}&sz=w1280`;
                         } else if (cleanStreamableId) {
                             thumbLink = await getBestStreamableThumbnail(cleanStreamableId);
                         } else if (mediaSrc === 'upload') {
