@@ -4238,7 +4238,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     mediaContainer.appendChild(previewEl);
                 } else if (driveId) {
                     previewEl = document.createElement('iframe');
-                    previewEl.src = `https://drive.google.com/file/d/${driveId}/preview`;
+                    previewEl.src = `https://drive.google.com/file/d/${driveId}/preview?usp=sharing`;
                     previewEl.className = 'hover-video-preview';
                     previewEl.style.position = 'absolute';
                     previewEl.style.top = '0';
@@ -4249,7 +4249,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     previewEl.style.pointerEvents = 'none';
                     previewEl.style.opacity = '0';
                     previewEl.style.transition = 'opacity 0.3s ease';
-                    previewEl.setAttribute('allow', 'autoplay');
+                    previewEl.setAttribute('allow', 'autoplay; fullscreen; encrypted-media');
+                    previewEl.setAttribute('allowfullscreen', 'true');
+                    previewEl.setAttribute('playsinline', '1');
+                    previewEl.setAttribute('webkit-playsinline', '1');
                     previewEl.onload = function() {
                         setTimeout(function() { previewEl.style.opacity = '1'; }, 100);
                     };
@@ -4291,12 +4294,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     const card = entry.target;
                     const container = card.querySelector('.project-media');
                     if (!container) return;
+                    const previews = container.querySelectorAll('.hover-video-preview');
                     if (entry.isIntersecting) {
+                        previews.forEach(el => { el.style.display = ''; });
                         if (!container.querySelector('.hover-video-preview')) {
                             loadCardPreview(card);
                         }
                     } else {
-                        container.querySelectorAll('.hover-video-preview').forEach(el => el.remove());
+                        previews.forEach(el => { el.style.display = 'none'; });
                     }
                 });
             }, observerOptions);
@@ -4308,8 +4313,18 @@ document.addEventListener('DOMContentLoaded', () => {
         projectCards.forEach(card => {
             card.addEventListener('mouseenter', () => {
                 const container = card.querySelector('.project-media');
-                if (container && !container.querySelector('.hover-video-preview')) {
-                    loadCardPreview(card);
+                if (container) {
+                    const existing = container.querySelectorAll('.hover-video-preview');
+                    existing.forEach(el => { el.style.display = ''; });
+                    if (!container.querySelector('.hover-video-preview')) {
+                        loadCardPreview(card);
+                    }
+                }
+            });
+            card.addEventListener('mouseleave', () => {
+                const container = card.querySelector('.project-media');
+                if (container) {
+                    container.querySelectorAll('.hover-video-preview').forEach(el => { el.style.display = 'none'; });
                 }
             });
         });
@@ -4530,7 +4545,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Stop all video previews (used when entering CMS mode)
         window.stopAllPreviews = function() {
-            document.querySelectorAll('.hover-video-preview').forEach(el => el.remove());
+            document.querySelectorAll('.hover-video-preview').forEach(el => { el.style.display = 'none'; });
             document.querySelectorAll('.project-card.playing-inline').forEach(card => {
                 const media = card.querySelector('.project-media');
                 if (media) media.querySelectorAll('iframe, video').forEach(v => v.remove());
@@ -5166,7 +5181,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         appendConsoleLog(`> Lightbox Vimeo clean native embed active: "${proj.title}"`);
                     } else if (driveId) {
                         const iframe = document.createElement('iframe');
-                        iframe.src = `https://drive.google.com/file/d/${driveId}/preview`;
+                        iframe.src = `https://drive.google.com/file/d/${driveId}/preview?usp=sharing`;
                         iframe.style.position = 'absolute';
                         iframe.style.top = '0';
                         iframe.style.left = '0';
@@ -5177,7 +5192,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         iframe.style.transition = 'opacity 0.3s ease';
                         iframe.style.backgroundColor = '#000';
                         iframe.allowFullscreen = true;
-                        iframe.allow = 'autoplay';
+                        iframe.allow = 'autoplay; fullscreen; encrypted-media';
+                        iframe.setAttribute('playsinline', '1');
+                        iframe.setAttribute('webkit-playsinline', '1');
                         iframe.onload = function() {
                             setTimeout(function() { iframe.style.opacity = '1'; }, 100);
                         };
