@@ -4172,6 +4172,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     iframe.style.height = '100%';
                     iframe.style.border = 'none';
                     iframe.style.pointerEvents = 'none';
+                    iframe.style.opacity = '0';
+                    iframe.style.transition = 'opacity 0.3s ease';
                     iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope');
                     iframe.setAttribute('allowfullscreen', 'true');
                     iframe.setAttribute('webkitallowfullscreen', 'true');
@@ -4180,7 +4182,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     iframe.setAttribute('webkit-playsinline', '1');
                     iframe.setAttribute('scrolling', 'no');
                     iframe.setAttribute('frameborder', '0');
-                    iframe.onload = function() { iframe.classList.add('loaded'); };
+                    iframe.onload = function() {
+                        setTimeout(function() { iframe.style.opacity = '1'; }, 100);
+                    };
                     mediaContainer.appendChild(iframe);
                 } else if (wistiaId) {
                     previewEl = document.createElement('iframe');
@@ -4193,11 +4197,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     previewEl.style.height = '100%';
                     previewEl.style.border = 'none';
                     previewEl.style.pointerEvents = 'none';
+                    previewEl.style.opacity = '0';
+                    previewEl.style.transition = 'opacity 0.3s ease';
                     previewEl.setAttribute('allow', 'autoplay; fullscreen');
                     previewEl.setAttribute('allowfullscreen', 'true');
                     previewEl.setAttribute('playsinline', '1');
                     previewEl.setAttribute('webkit-playsinline', '1');
-                    previewEl.onload = function() { previewEl.classList.add('loaded'); };
+                    previewEl.onload = function() {
+                        setTimeout(function() { previewEl.style.opacity = '1'; }, 100);
+                    };
                     mediaContainer.appendChild(previewEl);
                 } else if (vimeoId) {
                     previewEl = document.createElement('iframe');
