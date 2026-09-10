@@ -737,6 +737,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const gridsContainer = document.getElementById('portfolio-grids-container');
     const portfolioFilters = document.getElementById('portfolio-filters');
 
+    // Cloud sync flag — renderProjects() will NOT render until Firebase data arrives
+    let _cloudReady = false;
+    let _pendingRender = false;
+
     // Load from localStorage or default
     function initDatabase() {
         // Resolve Firebase URL early (used for cloud pull below)
@@ -1178,7 +1182,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
              // Always render after cloud sync completes (even if no changes)
-            // to ensure first-time visitors see cloud data instead of defaults.
+             // to ensure first-time visitors see cloud data instead of defaults.
+            _cloudReady = true;
             renderProjects();
             reorderDOMSections();
             if (typeof renderDynamicSoftware === 'function') {
@@ -1209,6 +1214,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             console.warn(`Cloud sync warning: ${err.message}`);
             // Fallback: render with local/default data so page isn't blank
+            _cloudReady = true;
             renderProjects();
             if (typeof reorderDOMSections === 'function') reorderDOMSections();
         }
@@ -2758,6 +2764,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderProjects() {
+        // Block rendering until Firebase cloud data has loaded
+        if (!_cloudReady) {
+            _pendingRender = true;
+            return;
+        }
+        _pendingRender = false;
         const isEditorActive = document.body.classList.contains('editor-active');
         
         // Render Filters Dynamically
@@ -3187,7 +3199,11 @@ document.addEventListener('DOMContentLoaded', () => {
             errorEl.textContent = 'Loading Wistia player...';
             const wistiaFetchBtn = document.getElementById('btn-fetch-wistia-thumb');
             if (wistiaFetchBtn) wistiaFetchBtn.style.display = 'inline-flex';
-            const container = document.getElementById('timeline-picker-video').parentElement;
+            const captureBtn = document.getElementById('btn-capture-frame');
+            if (captureBtn) captureBtn.style.display = 'none';
+            const videoParent = videoEl ? videoEl.parentElement : null;
+            if (!videoParent) { errorEl.textContent = 'Timeline picker container not found'; return; }
+            const container = videoParent;
             let wistiaFrame = container.querySelector('.timeline-wistia-frame');
             if (wistiaFrame) wistiaFrame.remove();
             wistiaFrame = document.createElement('iframe');
@@ -3201,7 +3217,7 @@ document.addEventListener('DOMContentLoaded', () => {
             videoEl.style.display = 'none';
             errorEl.style.display = 'none';
             rangeEl.min = 0; rangeEl.max = 100; rangeEl.value = 0;
-            timeEl.textContent = 'Use Wistia player or click Fetch Frame';
+            timeEl.textContent = 'Click "Fetch Wistia Frame" to set thumbnail';
             return;
         }
 
@@ -3383,9 +3399,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const mediaLinkInput = document.getElementById('modal-media-link').value.trim();
             const wistiaId = extractWistiaId(mediaLinkInput);
             if (!wistiaId) { alert('Please enter a valid Wistia link first.'); return; }
-            const container = document.getElementById('timeline-picker-video').parentElement;
-            const errorEl = document.getElementById('timeline-picker-error');
             const videoEl = document.getElementById('timeline-picker-video');
+            const videoParent = videoEl ? videoEl.parentElement : null;
+            if (!videoParent) { alert('Timeline picker not found.'); return; }
+            const container = videoParent;
+            const errorEl = document.getElementById('timeline-picker-error');
             const youtubeImg = document.getElementById('timeline-picker-youtube-img');
             const rangeEl = document.getElementById('timeline-picker-range');
             const timeEl = document.getElementById('timeline-picker-time');
@@ -3395,22 +3413,22 @@ document.addEventListener('DOMContentLoaded', () => {
             if (videoEl) videoEl.style.display = 'none';
             if (youtubeImg) youtubeImg.style.display = 'none';
             if (errorEl) errorEl.style.display = 'none';
-            // Load Wistia embed
+            // Set thumbnail field with Wistia swatch
+            const thumbLinkInput = document.getElementById('modal-thumb-link');
+            if (thumbLinkInput) {
+                thumbLinkInput.value = `https://fast.wistia.com/embed/medias/${wistiaId}/swatch`;
+            }
+            // Load Wistia embed for visual reference
             container.style.position = 'relative';
             const frame = document.createElement('iframe');
-            frame.src = `https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=0&mute=1&muted=0&controls=1&playsinline=1`;
+            frame.src = `https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=0&mute=1&muted=1&controls=1&playsinline=1`;
             frame.className = 'timeline-wistia-frame';
             frame.style.cssText = 'width:100%;height:100%;position:absolute;top:0;left:0;border:none;border-radius:4px;';
             frame.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
             frame.setAttribute('playsinline', '1');
             container.appendChild(frame);
             if (rangeEl) { rangeEl.min = 0; rangeEl.max = 100; rangeEl.value = 0; }
-            if (timeEl) timeEl.textContent = 'Use Wistia player controls';
-            // Also set thumbnail field with Wistia swatch
-            const thumbLinkInput = document.getElementById('modal-thumb-link');
-            if (thumbLinkInput && !thumbLinkInput.value.trim()) {
-                thumbLinkInput.value = `https://fast.wistia.com/embed/medias/${wistiaId}/swatch`;
-            }
+            if (timeEl) timeEl.textContent = 'Thumbnail URL set from Wistia swatch';
             appendConsoleLog(`> Wistia player loaded for frame selection: ${wistiaId}`);
         });
     }
