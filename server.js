@@ -57,6 +57,27 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (parsedUrl.pathname === '/api/streamable-proxy') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    if (req.method === 'OPTIONS') { res.writeHead(200); res.end(); return; }
+    let videoUrl = parsedUrl.searchParams.get('url');
+    if (!videoUrl) { res.writeHead(400, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'Missing url' })); return; }
+    if (videoUrl.startsWith('//')) videoUrl = 'https:' + videoUrl;
+    const proto = videoUrl.startsWith('https') ? https : require('http');
+    proto.get(videoUrl, { headers: { 'Referer': 'https://streamable.com/', 'User-Agent': 'Mozilla/5.0' } }, (videoRes) => {
+      if (videoRes.statusCode >= 300 && videoRes.statusCode < 400 && videoRes.headers.location) {
+        proto.get(videoRes.headers.location, { headers: { 'Referer': 'https://streamable.com/', 'User-Agent': 'Mozilla/5.0' } }, (redirRes) => {
+          res.writeHead(redirRes.statusCode, { 'Content-Type': redirRes.headers['content-type'] || 'video/mp4', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'public, max-age=3600' });
+          redirRes.pipe(res);
+        }).on('error', () => { if (!res.headersSent) { res.writeHead(502); res.end('Proxy error'); } });
+        return;
+      }
+      res.writeHead(videoRes.statusCode, { 'Content-Type': videoRes.headers['content-type'] || 'video/mp4', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'public, max-age=3600' });
+      videoRes.pipe(res);
+    }).on('error', () => { if (!res.headersSent) { res.writeHead(502); res.end('Proxy error'); } });
+    return;
+  }
+
   let url = parsedUrl.pathname;
   if (url === '/') url = '/index.html';
   

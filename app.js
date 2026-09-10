@@ -3081,9 +3081,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!streamableId) throw new Error('No streamable ID provided');
         if (streamableVideoCache[streamableId]) {
             const cached = streamableVideoCache[streamableId];
-            if (quality === 'hd' && cached.hd) return cached.hd;
-            if (quality === 'mobile' && cached.mobile) return cached.mobile;
-            return cached.url || cached.hd || cached.mobile;
+            const raw = (quality === 'hd' && cached.hd) ? cached.hd : ((quality === 'mobile' && cached.mobile) ? cached.mobile : (cached.hd || cached.mobile));
+            return '/api/streamable-proxy?url=' + encodeURIComponent(raw);
         }
 
         try {
@@ -3102,7 +3101,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         hd: data.hd,
                         mobile: data.mobile
                     };
-                    return (quality === 'hd' && data.hd) ? data.hd : ((quality === 'mobile' && data.mobile) ? data.mobile : (data.mobile || data.hd));
+                    const raw = (quality === 'hd' && data.hd) ? data.hd : ((quality === 'mobile' && data.mobile) ? data.mobile : (data.mobile || data.hd));
+                    return '/api/streamable-proxy?url=' + encodeURIComponent(raw);
                 }
             }
         } catch (err) {
