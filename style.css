@@ -1469,7 +1469,11 @@ html.light-mode .marquee-dot,
 }
 
 .project-media iframe.hover-video-preview {
-    transform: scale(1.35); /* Hide YouTube logo & parameters */
+    transform: scale(1.35); /* Hide YouTube logo & parameters on landscape */
+}
+
+.project-media.aspect-9-16 iframe.hover-video-preview {
+    transform: scale(1.05) !important; /* Fit 9:16 vertical shorts cleanly */
 }
 
 /* Transparent click shield layer ensures 100% reliable tap/click detection over active preview iframes */

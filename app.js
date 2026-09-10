@@ -4639,14 +4639,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         wavePlaying = false;
+        const playShowreelBtn = document.getElementById('play-showreel-btn');
         if (playShowreelBtn) {
             playShowreelBtn.style.backgroundColor = 'var(--accent-cyan)';
+            const playBtnIcon = playShowreelBtn.querySelector('i');
             if (playBtnIcon) {
                 playBtnIcon.setAttribute('data-lucide', 'play');
                 playBtnIcon.style.color = '#050505';
                 playBtnIcon.style.fill = '#050505';
-                lucide.createIcons({ attrs: { class: 'play-btn-icon' } });
+                if (typeof lucide !== 'undefined') lucide.createIcons({ attrs: { class: 'play-btn-icon' } });
             }
+            const playBtnLabel = playShowreelBtn.querySelector('.play-btn-text');
             if (playBtnLabel) playBtnLabel.textContent = 'STREAM SHOWREEL';
         }
         
