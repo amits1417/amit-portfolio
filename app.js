@@ -3191,7 +3191,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let wistiaFrame = container.querySelector('.timeline-wistia-frame');
             if (wistiaFrame) wistiaFrame.remove();
             wistiaFrame = document.createElement('iframe');
-            wistiaFrame.src = `https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=0&mute=0&controls=1&playsinline=1`;
+            wistiaFrame.src = `https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=0&mute=1&muted=0&controls=1&playsinline=1`;
             wistiaFrame.className = 'timeline-wistia-frame';
             wistiaFrame.style.cssText = 'width:100%;height:100%;position:absolute;top:0;left:0;border:none;border-radius:4px;';
             wistiaFrame.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
@@ -3398,7 +3398,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Load Wistia embed
             container.style.position = 'relative';
             const frame = document.createElement('iframe');
-            frame.src = `https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=0&mute=0&controls=1&playsinline=1`;
+            frame.src = `https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=0&mute=1&muted=0&controls=1&playsinline=1`;
             frame.className = 'timeline-wistia-frame';
             frame.style.cssText = 'width:100%;height:100%;position:absolute;top:0;left:0;border:none;border-radius:4px;';
             frame.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
@@ -4284,7 +4284,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } else if (wistiaId) {
                     previewEl = document.createElement('iframe');
-                    previewEl.src = `https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=1&mute=1&loop=1&controls=0&playsinline=1`;
+                    previewEl.src = `https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=1&mute=1&muted=1&loop=1&controls=0&playsinline=1&silentAutoPlay=true`;
                     previewEl.className = 'hover-video-preview';
                     previewEl.style.position = 'absolute';
                     previewEl.style.top = '0';
@@ -4586,7 +4586,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         wavePlaying = true;
                         appendConsoleLog('> Showreel auto-preview started (YouTube muted loop).');
                     } else if (wistiaId) {
-                        videoContainer.innerHTML = `<iframe src="https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&muted=true&silentAutoPlay=true&playbar=false&smallPlayButton=false&controlsVisibleOnLoad=false&endVideoBehavior=loop" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+                        videoContainer.innerHTML = `<iframe src="https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&muted=true&mute=1&silentAutoPlay=true&playbar=false&smallPlayButton=false&controlsVisibleOnLoad=false&endVideoBehavior=loop" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
                         const waveformEl = document.getElementById('waveform-canvas');
                         if (waveformEl) waveformEl.style.display = 'none';
                         wavePlaying = true;
@@ -5212,7 +5212,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         createStreamableLightboxIframe();
                     } else if (wistiaId) {
                         const iframe = document.createElement('iframe');
-                        iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&playsinline=true`;
+                        iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&playsinline=true&mute=1&muted=1&silentAutoPlay=true`;
                         iframe.style.position = 'absolute';
                         iframe.style.top = '0';
                         iframe.style.left = '0';

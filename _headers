@@ -1,0 +1,11 @@
+/index.html
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0, s-maxage=0
+  Surrogate-Control: no-store
+
+/app.js
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0, s-maxage=0
+  Surrogate-Control: no-store
+
+/style.css
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0, s-maxage=0
+  Surrogate-Control: no-store
