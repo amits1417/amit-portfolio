@@ -4164,7 +4164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!mediaContainer || mediaContainer.querySelector('.hover-video-preview')) return;
                     const iframe = document.createElement('iframe');
                     iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&loop=1&nocontrols=1`;
-                    iframe.className = 'hover-video-preview loaded';
+                    iframe.className = 'hover-video-preview';
                     iframe.style.position = 'absolute';
                     iframe.style.top = '0';
                     iframe.style.left = '0';
@@ -4180,11 +4180,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     iframe.setAttribute('webkit-playsinline', '1');
                     iframe.setAttribute('scrolling', 'no');
                     iframe.setAttribute('frameborder', '0');
+                    iframe.onload = function() { iframe.classList.add('loaded'); };
                     mediaContainer.appendChild(iframe);
                 } else if (wistiaId) {
                     previewEl = document.createElement('iframe');
                     previewEl.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&muted=true&silentAutoPlay=true&playbar=false&smallPlayButton=false&controlsVisibleOnLoad=false&endVideoBehavior=loop`;
-                    previewEl.className = 'hover-video-preview loaded';
+                    previewEl.className = 'hover-video-preview';
                     previewEl.style.position = 'absolute';
                     previewEl.style.top = '0';
                     previewEl.style.left = '0';
@@ -4196,6 +4197,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     previewEl.setAttribute('allowfullscreen', 'true');
                     previewEl.setAttribute('playsinline', '1');
                     previewEl.setAttribute('webkit-playsinline', '1');
+                    previewEl.onload = function() { previewEl.classList.add('loaded'); };
                     mediaContainer.appendChild(previewEl);
                 } else if (vimeoId) {
                     previewEl = document.createElement('iframe');
