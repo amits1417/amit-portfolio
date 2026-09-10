@@ -1,4 +1,5 @@
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
@@ -22,8 +23,41 @@ const MIME = {
   '.ico': 'image/x-icon'
 };
 
+function fetchStreamable(id, callback) {
+  const url = `https://api.streamable.com/videos/${id}`;
+  https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (apiRes) => {
+    let body = '';
+    apiRes.on('data', chunk => body += chunk);
+    apiRes.on('end', () => {
+      try {
+        const data = JSON.parse(body);
+        const hd = data.files && data.files.mp4 ? (data.files.mp4.url.startsWith('//') ? 'https:' + data.files.mp4.url : data.files.mp4.url) : null;
+        const mobile = data.files && data.files['mp4-mobile'] ? (data.files['mp4-mobile'].url.startsWith('//') ? 'https:' + data.files['mp4-mobile'].url : data.files['mp4-mobile'].url) : null;
+        const thumb = data.thumbnail_url || null;
+        callback(null, { hd, mobile, thumb });
+      } catch(e) { callback(e); }
+    });
+  }).on('error', (e) => callback(e));
+}
+
 const server = http.createServer((req, res) => {
-  let url = req.url.split('?')[0];
+  const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
+
+  if (parsedUrl.pathname === '/api/streamable') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    if (req.method === 'OPTIONS') { res.writeHead(200); res.end(); return; }
+    const id = parsedUrl.searchParams.get('id');
+    if (!id) { res.writeHead(400, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'Missing id' })); return; }
+    fetchStreamable(id, (err, data) => {
+      if (err) { res.writeHead(502, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'Failed' })); return; }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(data));
+    });
+    return;
+  }
+
+  let url = parsedUrl.pathname;
   if (url === '/') url = '/index.html';
   
   const filePath = path.join(__dirname, url);

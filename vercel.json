@@ -1,5 +1,10 @@
 {
   "cleanUrls": false,
+  "functions": {
+    "api/streamable.js": {
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
     { "source": "/edit", "destination": "/index.html?edit" },
     { "source": "/admin", "destination": "/index.html?edit" },
