@@ -4210,7 +4210,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (vimeoId) {
                     previewEl = document.createElement('iframe');
                     previewEl.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=1&loop=1&autopause=0&background=1`;
-                    previewEl.className = 'hover-video-preview loaded';
+                    previewEl.className = 'hover-video-preview';
                     previewEl.style.position = 'absolute';
                     previewEl.style.top = '0';
                     previewEl.style.left = '0';
@@ -4218,12 +4218,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     previewEl.style.height = '100%';
                     previewEl.style.border = 'none';
                     previewEl.style.pointerEvents = 'none';
+                    previewEl.style.opacity = '0';
+                    previewEl.style.transition = 'opacity 0.3s ease';
                     previewEl.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+                    previewEl.setAttribute('playsinline', '1');
+                    previewEl.setAttribute('webkit-playsinline', '1');
+                    previewEl.onload = function() {
+                        setTimeout(function() { previewEl.style.opacity = '1'; }, 100);
+                    };
                     mediaContainer.appendChild(previewEl);
                 } else if (driveId) {
                     previewEl = document.createElement('iframe');
                     previewEl.src = `https://drive.google.com/file/d/${driveId}/preview`;
-                    previewEl.className = 'hover-video-preview loaded';
+                    previewEl.className = 'hover-video-preview';
                     previewEl.style.position = 'absolute';
                     previewEl.style.top = '0';
                     previewEl.style.left = '0';
@@ -4231,12 +4238,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     previewEl.style.height = '100%';
                     previewEl.style.border = 'none';
                     previewEl.style.pointerEvents = 'none';
+                    previewEl.style.opacity = '0';
+                    previewEl.style.transition = 'opacity 0.3s ease';
                     previewEl.setAttribute('allow', 'autoplay');
+                    previewEl.onload = function() {
+                        setTimeout(function() { previewEl.style.opacity = '1'; }, 100);
+                    };
                     mediaContainer.appendChild(previewEl);
                 } else if (cleanId) {
                     previewEl = document.createElement('iframe');
                     previewEl.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&vq=hd1080`;
-                    previewEl.className = 'hover-video-preview loaded';
+                    previewEl.className = 'hover-video-preview';
                     previewEl.style.position = 'absolute';
                     previewEl.style.top = '0';
                     previewEl.style.left = '0';
@@ -4244,11 +4256,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     previewEl.style.height = '100%';
                     previewEl.style.border = 'none';
                     previewEl.style.pointerEvents = 'none';
+                    previewEl.style.opacity = '0';
+                    previewEl.style.transition = 'opacity 0.3s ease';
                     previewEl.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture');
                     previewEl.setAttribute('playsinline', '1');
                     previewEl.setAttribute('webkit-playsinline', '1');
-                    previewEl.setAttribute('scrolling', 'no');
-                    previewEl.setAttribute('frameborder', '0');
+                    previewEl.onload = function() {
+                        setTimeout(function() { previewEl.style.opacity = '1'; }, 100);
+                    };
                     mediaContainer.appendChild(previewEl);
                 }
             }
