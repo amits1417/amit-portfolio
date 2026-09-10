@@ -1177,24 +1177,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch(e) {}
             }
 
-             if (hasChanges) {
-                renderProjects();
-                reorderDOMSections();
-                if (typeof renderDynamicSoftware === 'function') {
-                    renderDynamicSoftware();
-                }
-                if (typeof renderDynamicEducation === 'function') {
-                    renderDynamicEducation();
-                }
-                if (typeof renderDynamicTimeline === 'function') {
-                    renderDynamicTimeline();
-                }
-                if (typeof renderDynamicServices === 'function') {
-                    renderDynamicServices();
-                }
-                if (typeof initInlineTextCMS === 'function') {
-                    initInlineTextCMS();
-                }
+             // Always render after cloud sync completes (even if no changes)
+            // to ensure first-time visitors see cloud data instead of defaults.
+            renderProjects();
+            reorderDOMSections();
+            if (typeof renderDynamicSoftware === 'function') {
+                renderDynamicSoftware();
+            }
+            if (typeof renderDynamicEducation === 'function') {
+                renderDynamicEducation();
+            }
+            if (typeof renderDynamicTimeline === 'function') {
+                renderDynamicTimeline();
+            }
+            if (typeof renderDynamicServices === 'function') {
+                renderDynamicServices();
+            }
+            if (typeof initInlineTextCMS === 'function') {
+                initInlineTextCMS();
+            }
+            if (hasChanges) {
                 appendConsoleLog("> Showcase database synchronized with cloud updates.");
             } else {
                 console.log("Local database is up-to-date with cloud.");
@@ -1206,6 +1208,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (err) {
             console.warn(`Cloud sync warning: ${err.message}`);
+            // Fallback: render with local/default data so page isn't blank
+            renderProjects();
+            if (typeof reorderDOMSections === 'function') reorderDOMSections();
         }
     }
 
@@ -3490,7 +3495,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('touchmove', handleDragAutoScroll, { passive: true });
 
     initDatabase();
-    renderProjects();
+    /* renderProjects() removed — deferred to fetchFirebaseCloudData completion
+       to prevent flashing old/default data before cloud data arrives. */
 
     /* ==========================================================================
        PRELOADER & COUNTER
