@@ -4247,7 +4247,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     mediaContainer.appendChild(previewEl);
                 } else if (cleanId) {
                     previewEl = document.createElement('iframe');
-                    previewEl.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&vq=hd1080`;
+                    previewEl.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&enablejsapi=1`;
                     previewEl.className = 'hover-video-preview';
                     previewEl.style.position = 'absolute';
                     previewEl.style.top = '0';
@@ -4430,7 +4430,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 videoContainer.appendChild(iframe);
             } else {
                 const iframe = document.createElement('iframe');
-                iframe.src = `https://www.youtube.com/embed/${cleanYtId || vid}?autoplay=1&controls=1&rel=0&modestbranding=1&vq=hd1080`;
+                iframe.src = `https://www.youtube.com/embed/${cleanYtId || vid}?autoplay=1&controls=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`;
                 iframe.style.position = 'absolute';
                 iframe.style.top = '0';
                 iframe.style.left = '0';
@@ -4470,7 +4470,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             wavePlaying = true;
                         }
                     } else if (cleanYtId) {
-                        videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${cleanYtId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanYtId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+                        videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${cleanYtId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanYtId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&enablejsapi=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
                         const waveformEl = document.getElementById('waveform-canvas');
                         if (waveformEl) waveformEl.style.display = 'none';
                         wavePlaying = true;
@@ -5177,7 +5177,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         appendConsoleLog(`> Lightbox Google Drive active: "${proj.title}"`);
                     } else {
                         const iframe = document.createElement('iframe');
-                        iframe.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&controls=1&rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&vq=hd1080`;
+                        iframe.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&controls=1&rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&enablejsapi=1`;
                         iframe.style.position = 'absolute';
                         iframe.style.top = '0';
                         iframe.style.left = '0';
