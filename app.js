@@ -32,6 +32,32 @@ document.addEventListener('DOMContentLoaded', () => {
         return '';
     }
 
+    // Helper to extract Google Drive file ID
+    function extractGoogleDriveId(link) {
+        if (!link) return '';
+        const clean = link.trim();
+        const m1 = clean.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+        if (m1 && m1[1]) return m1[1];
+        const m2 = clean.match(/id=([a-zA-Z0-9_-]+)/);
+        if (m2 && m2[1]) return m2[1];
+        return '';
+    }
+
+    // Helper to extract Vimeo video ID
+    function extractVimeoId(link) {
+        if (!link) return '';
+        const clean = link.trim();
+        const m = clean.match(/(?:vimeo\.com\/(?:video\/)?|player\.vimeo\.com\/video\/)([0-9]+)/);
+        return m ? m[1] : '';
+    }
+
+    // Helper to detect direct MP4 / WebM / video URLs (e.g. catbox.moe, cdn, aws, cloudflare)
+    function isDirectVideoUrl(link) {
+        if (!link) return false;
+        const clean = link.split('?')[0].toLowerCase();
+        return clean.endsWith('.mp4') || clean.endsWith('.webm') || clean.endsWith('.mov') || clean.endsWith('.m4v') || clean.includes('catbox.moe');
+    }
+
     // Helper to extract Streamable video ID from direct link, embed URL, or iframe embed code
     function extractStreamableId(link) {
         if (!link) return '';
@@ -2977,7 +3003,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = controller ? setTimeout(() => controller.abort(), 1200) : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 5000) : null;
             const res = await fetch(`https://api.streamable.com/videos/${streamableId}`, {
                 signal: controller ? controller.signal : undefined
             });
@@ -4022,7 +4048,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (mediaContainer.querySelector('.hover-video-preview')) return;
 
             let previewEl;
-            if (proj.mediaSource === 'upload') {
+            if (proj.mediaSource === 'upload' || isDirectVideoUrl(proj.mediaLink)) {
                 previewEl = document.createElement('video');
                 previewEl.muted = true;
                 previewEl.defaultMuted = true;
@@ -4045,11 +4071,14 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 const cleanId = extractYouTubeId(proj.mediaLink);
                 const streamableId = extractStreamableId(proj.mediaLink);
+                const driveId = extractGoogleDriveId(proj.mediaLink);
+                const vimeoId = extractVimeoId(proj.mediaLink);
+                
                 if (streamableId) {
                     const createStreamableIframe = () => {
                         if (!mediaContainer || mediaContainer.querySelector('.hover-video-preview')) return;
                         const iframe = document.createElement('iframe');
-                        iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&nocontrols=1`;
+                        iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&loop=1&nocontrols=1`;
                         iframe.className = 'hover-video-preview loaded';
                         iframe.style.position = 'absolute';
                         iframe.style.top = '0';
@@ -4058,42 +4087,43 @@ document.addEventListener('DOMContentLoaded', () => {
                         iframe.style.height = '100%';
                         iframe.style.border = 'none';
                         iframe.style.pointerEvents = 'none';
-                        iframe.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture');
+                        iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope');
                         iframe.setAttribute('allowfullscreen', 'true');
+                        iframe.setAttribute('webkitallowfullscreen', 'true');
+                        iframe.setAttribute('mozallowfullscreen', 'true');
                         iframe.setAttribute('playsinline', '1');
                         iframe.setAttribute('webkit-playsinline', '1');
                         iframe.setAttribute('scrolling', 'no');
                         iframe.setAttribute('frameborder', '0');
                         mediaContainer.appendChild(iframe);
                     };
-
-                    getStreamableDirectUrl(streamableId, 'mobile').then(directUrl => {
-                        if (!mediaContainer || mediaContainer.querySelector('.hover-video-preview')) return;
-                        previewEl = document.createElement('video');
-                        previewEl.muted = true;
-                        previewEl.defaultMuted = true;
-                        previewEl.loop = true;
-                        previewEl.autoplay = true;
-                        previewEl.preload = 'auto';
-                        previewEl.setAttribute('muted', '');
-                        previewEl.setAttribute('playsinline', '');
-                        previewEl.setAttribute('webkit-playsinline', '');
-                        previewEl.playsInline = true;
-                        previewEl.controls = false;
-                        previewEl.className = 'hover-video-preview loaded';
-                        previewEl.onerror = () => {
-                            if (previewEl && previewEl.parentNode) previewEl.remove();
-                            createStreamableIframe();
-                        };
-                        previewEl.src = directUrl;
-                        mediaContainer.appendChild(previewEl);
-                        try {
-                            const p = previewEl.play();
-                            if (p !== undefined) p.catch(() => {});
-                        } catch(e) {}
-                    }).catch(() => {
-                        createStreamableIframe();
-                    });
+                    createStreamableIframe();
+                } else if (vimeoId) {
+                    previewEl = document.createElement('iframe');
+                    previewEl.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=1&loop=1&autopause=0&background=1`;
+                    previewEl.className = 'hover-video-preview loaded';
+                    previewEl.style.position = 'absolute';
+                    previewEl.style.top = '0';
+                    previewEl.style.left = '0';
+                    previewEl.style.width = '100%';
+                    previewEl.style.height = '100%';
+                    previewEl.style.border = 'none';
+                    previewEl.style.pointerEvents = 'none';
+                    previewEl.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+                    mediaContainer.appendChild(previewEl);
+                } else if (driveId) {
+                    previewEl = document.createElement('iframe');
+                    previewEl.src = `https://drive.google.com/file/d/${driveId}/preview`;
+                    previewEl.className = 'hover-video-preview loaded';
+                    previewEl.style.position = 'absolute';
+                    previewEl.style.top = '0';
+                    previewEl.style.left = '0';
+                    previewEl.style.width = '100%';
+                    previewEl.style.height = '100%';
+                    previewEl.style.border = 'none';
+                    previewEl.style.pointerEvents = 'none';
+                    previewEl.setAttribute('allow', 'autoplay');
+                    mediaContainer.appendChild(previewEl);
                 } else if (cleanId) {
                     previewEl = document.createElement('iframe');
                     previewEl.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&vq=hd1080`;
@@ -4897,7 +4927,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 watermarkEl.className = 'video-watermark modal-watermark';
                 watermarkEl.textContent = 'Amit Sharma';
                 
-                if (proj.mediaSource === 'upload') {
+                if (proj.mediaSource === 'upload' || isDirectVideoUrl(proj.mediaLink)) {
                     const videoEl = document.createElement('video');
                     videoEl.id = 'lightbox-plyr-player';
                     videoEl.src = normalizeMediaPath(proj.mediaLink);
@@ -4927,18 +4957,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     const cleanId = extractYouTubeId(proj.mediaLink);
                     const streamableId = extractStreamableId(proj.mediaLink);
+                    const driveId = extractGoogleDriveId(proj.mediaLink);
+                    const vimeoId = extractVimeoId(proj.mediaLink);
+                    
                     if (streamableId) {
                         const createStreamableLightboxIframe = () => {
                             if (wrapper) wrapper.innerHTML = '';
                             const iframe = document.createElement('iframe');
-                            iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1`;
+                            iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&loop=1`;
                             iframe.style.position = 'absolute';
                             iframe.style.top = '0';
                             iframe.style.left = '0';
                             iframe.style.width = '100%';
                             iframe.style.height = '100%';
                             iframe.style.border = 'none';
-                            iframe.setAttribute('allow', 'autoplay *; fullscreen *; picture-in-picture *; encrypted-media *; accelerometer *; gyroscope *; clipboard-write *');
+                            iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope; clipboard-write');
                             iframe.setAttribute('allowfullscreen', 'true');
                             iframe.setAttribute('webkitallowfullscreen', 'true');
                             iframe.setAttribute('mozallowfullscreen', 'true');
@@ -4953,42 +4986,38 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                             appendConsoleLog(`> Lightbox Streamable embed active: "${proj.title}"`);
                         };
-
-                        getStreamableDirectUrl(streamableId, 'hd').then(directUrl => {
-                            if (wrapper) wrapper.innerHTML = '';
-                            const videoEl = document.createElement('video');
-                            videoEl.id = 'lightbox-plyr-player';
-                            videoEl.controls = true;
-                            videoEl.autoplay = true;
-                            videoEl.playsInline = true;
-                            videoEl.preload = 'auto';
-                            videoEl.setAttribute('playsinline', '');
-                            videoEl.setAttribute('webkit-playsinline', '');
-                            videoEl.style.position = 'absolute';
-                            videoEl.style.top = '0';
-                            videoEl.style.left = '0';
-                            videoEl.style.width = '100%';
-                            videoEl.style.height = '100%';
-                            videoEl.style.backgroundColor = '#000';
-                            videoEl.onerror = createStreamableLightboxIframe;
-                            videoEl.src = directUrl;
-                            
-                            if (wrapper) {
-                                wrapper.appendChild(videoEl);
-                                wrapper.appendChild(watermarkEl);
-                            }
-                            
-                            try {
-                                lightboxPlayer = new Plyr('#lightbox-plyr-player', {
-                                    controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
-                                    settings: ['quality'],
-                                    quality: { default: 1080, options: [1080, 720, 480, 360] }
-                                });
-                            } catch(e) {}
-                            appendConsoleLog(`> Lightbox Streamable direct HD player active: "${proj.title}"`);
-                        }).catch(() => {
-                            createStreamableLightboxIframe();
-                        });
+                        createStreamableLightboxIframe();
+                    } else if (vimeoId) {
+                        const iframe = document.createElement('iframe');
+                        iframe.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1`;
+                        iframe.style.position = 'absolute';
+                        iframe.style.top = '0';
+                        iframe.style.left = '0';
+                        iframe.style.width = '100%';
+                        iframe.style.height = '100%';
+                        iframe.style.border = 'none';
+                        iframe.allowFullscreen = true;
+                        iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+                        if (wrapper) {
+                            wrapper.appendChild(iframe);
+                            wrapper.appendChild(watermarkEl);
+                        }
+                        appendConsoleLog(`> Lightbox Vimeo clean native embed active: "${proj.title}"`);
+                    } else if (driveId) {
+                        const iframe = document.createElement('iframe');
+                        iframe.src = `https://drive.google.com/file/d/${driveId}/preview`;
+                        iframe.style.position = 'absolute';
+                        iframe.style.top = '0';
+                        iframe.style.left = '0';
+                        iframe.style.width = '100%';
+                        iframe.style.height = '100%';
+                        iframe.style.border = 'none';
+                        iframe.allowFullscreen = true;
+                        iframe.allow = 'autoplay';
+                        if (wrapper) {
+                            wrapper.appendChild(iframe);
+                        }
+                        appendConsoleLog(`> Lightbox Google Drive active: "${proj.title}"`);
                     } else {
                         const iframe = document.createElement('iframe');
                         iframe.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&controls=1&rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&vq=hd1080`;
