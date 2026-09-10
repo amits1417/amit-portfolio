@@ -4152,59 +4152,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (streamableId) {
                     if (!mediaContainer || mediaContainer.querySelector('.hover-video-preview')) return;
-                    const createStreamableIframe = () => {
-                        if (!mediaContainer || mediaContainer.querySelector('.hover-video-preview')) return;
-                        const iframe = document.createElement('iframe');
-                        iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&loop=1&nocontrols=1`;
-                        iframe.className = 'hover-video-preview';
-                        iframe.style.position = 'absolute';
-                        iframe.style.top = '0';
-                        iframe.style.left = '0';
-                        iframe.style.width = '100%';
-                        iframe.style.height = '100%';
-                        iframe.style.border = 'none';
-                        iframe.style.pointerEvents = 'none';
-                        iframe.style.opacity = '0';
-                        iframe.style.transition = 'opacity 0.3s ease';
-                        iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope');
-                        iframe.setAttribute('allowfullscreen', 'true');
-                        iframe.setAttribute('playsinline', '1');
-                        iframe.setAttribute('webkit-playsinline', '1');
-                        iframe.setAttribute('scrolling', 'no');
-                        iframe.setAttribute('frameborder', '0');
-                        iframe.onload = function() { setTimeout(function() { iframe.style.opacity = '1'; }, 100); };
-                        mediaContainer.appendChild(iframe);
-                    };
-
-                    getStreamableDirectUrl(streamableId, 'mobile').then(directUrl => {
-                        if (!mediaContainer || mediaContainer.querySelector('.hover-video-preview')) return;
-                        const videoEl = document.createElement('video');
-                        videoEl.muted = true;
-                        videoEl.defaultMuted = true;
-                        videoEl.loop = true;
-                        videoEl.autoplay = true;
-                        videoEl.preload = 'auto';
-                        videoEl.setAttribute('muted', '');
-                        videoEl.setAttribute('playsinline', '');
-                        videoEl.setAttribute('webkit-playsinline', '');
-                        videoEl.playsInline = true;
-                        videoEl.controls = false;
-                        videoEl.className = 'hover-video-preview';
-                        videoEl.style.objectFit = 'cover';
-                        videoEl.style.width = '100%';
-                        videoEl.style.height = '100%';
-                        videoEl.style.position = 'absolute';
-                        videoEl.style.top = '0';
-                        videoEl.style.left = '0';
-                        videoEl.style.opacity = '0';
-                        videoEl.style.transition = 'opacity 0.3s ease';
-                        videoEl.src = directUrl;
-                        videoEl.onloadeddata = function() { setTimeout(function() { videoEl.style.opacity = '1'; }, 50); };
-                        mediaContainer.appendChild(videoEl);
-                        try { const p = videoEl.play(); if (p !== undefined) p.catch(() => {}); } catch(e) {}
-                    }).catch(() => {
+                    const isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent);
+                    if (isMobile) {
+                        const thumbUrl = `https://cdn-cf-east.streamable.com/image/${streamableId}.jpg`;
+                        const img = document.createElement('img');
+                        img.src = thumbUrl;
+                        img.className = 'hover-video-preview';
+                        img.style.position = 'absolute';
+                        img.style.top = '0';
+                        img.style.left = '0';
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'cover';
+                        img.style.opacity = '0';
+                        img.style.transition = 'opacity 0.3s ease';
+                        img.onerror = function() { img.style.display = 'none'; };
+                        img.onload = function() { setTimeout(function() { img.style.opacity = '1'; }, 50); };
+                        mediaContainer.appendChild(img);
+                    } else {
+                        const createStreamableIframe = () => {
+                            if (!mediaContainer || mediaContainer.querySelector('.hover-video-preview')) return;
+                            const iframe = document.createElement('iframe');
+                            iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&loop=1&nocontrols=1`;
+                            iframe.className = 'hover-video-preview';
+                            iframe.style.position = 'absolute';
+                            iframe.style.top = '0';
+                            iframe.style.left = '0';
+                            iframe.style.width = '100%';
+                            iframe.style.height = '100%';
+                            iframe.style.border = 'none';
+                            iframe.style.pointerEvents = 'none';
+                            iframe.style.opacity = '0';
+                            iframe.style.transition = 'opacity 0.3s ease';
+                            iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope');
+                            iframe.setAttribute('allowfullscreen', 'true');
+                            iframe.setAttribute('playsinline', '1');
+                            iframe.setAttribute('webkit-playsinline', '1');
+                            iframe.setAttribute('scrolling', 'no');
+                            iframe.setAttribute('frameborder', '0');
+                            iframe.onload = function() { setTimeout(function() { iframe.style.opacity = '1'; }, 100); };
+                            mediaContainer.appendChild(iframe);
+                        };
                         createStreamableIframe();
-                    });
+                    }
                 } else if (wistiaId) {
                     previewEl = document.createElement('iframe');
                     previewEl.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&muted=true&silentAutoPlay=true&playbar=false&smallPlayButton=false&controlsVisibleOnLoad=false&endVideoBehavior=loop`;
@@ -4449,30 +4439,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     iframe.setAttribute('frameborder', '0');
                     videoContainer.appendChild(iframe);
                 };
-
-                getStreamableDirectUrl(streamableId, 'hd').then(directUrl => {
-                    if (!videoContainer) return;
-                    videoContainer.innerHTML = '';
-                    const video = document.createElement('video');
-                    video.controls = true;
-                    video.autoplay = true;
-                    video.playsInline = true;
-                    video.preload = 'auto';
-                    video.setAttribute('playsinline', '');
-                    video.setAttribute('webkit-playsinline', '');
-                    video.style.position = 'absolute';
-                    video.style.top = '0';
-                    video.style.left = '0';
-                    video.style.width = '100%';
-                    video.style.height = '100%';
-                    video.style.border = 'none';
-                    video.onerror = createShowreelIframe;
-                    video.src = directUrl;
-                    videoContainer.appendChild(video);
-                    try { const p = video.play(); if (p !== undefined) p.catch(() => {}); } catch(e) {}
-                }).catch(() => {
-                    createShowreelIframe();
-                });
+                createShowreelIframe();
             } else {
                 const iframe = document.createElement('iframe');
                 iframe.src = `https://www.youtube.com/embed/${cleanYtId || vid}?autoplay=1&controls=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`;
@@ -4516,14 +4483,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 wavePlaying = true;
                             }
                         };
-                        getStreamableDirectUrl(streamableId, 'mobile').then(directUrl => {
-                            if (!isFullPlaying && autoPlayed && videoContainer) {
-                                videoContainer.innerHTML = `<video src="${directUrl}" muted autoplay loop playsinline webkit-playsinline style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;pointer-events:none;"></video>`;
-                                const waveformEl = document.getElementById('waveform-canvas');
-                                if (waveformEl) waveformEl.style.display = 'none';
-                                wavePlaying = true;
-                            }
-                        }).catch(() => { createAutoIframe(); });
+                        createAutoIframe();
                     } else if (cleanYtId) {
                         videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${cleanYtId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanYtId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&enablejsapi=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
                         const waveformEl = document.getElementById('waveform-canvas');
@@ -5154,41 +5114,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             iframe.onload = function() { setTimeout(function() { iframe.style.opacity = '1'; }, 100); };
                             if (wrapper) { wrapper.appendChild(iframe); }
                         };
-
-                        getStreamableDirectUrl(streamableId, 'hd').then(directUrl => {
-                            if (!videoModal || !videoModal.classList.contains('active')) return;
-                            if (wrapper) wrapper.innerHTML = '';
-                            const videoEl = document.createElement('video');
-                            videoEl.id = 'lightbox-plyr-player';
-                            videoEl.src = directUrl;
-                            videoEl.controls = true;
-                            videoEl.autoplay = true;
-                            videoEl.playsInline = true;
-                            videoEl.preload = 'auto';
-                            videoEl.style.position = 'absolute';
-                            videoEl.style.top = '0';
-                            videoEl.style.left = '0';
-                            videoEl.style.width = '100%';
-                            videoEl.style.height = '100%';
-                            videoEl.style.backgroundColor = '#000';
-                            videoEl.style.opacity = '0';
-                            videoEl.style.transition = 'opacity 0.3s ease';
-                            videoEl.onloadeddata = function() { setTimeout(function() { videoEl.style.opacity = '1'; }, 50); };
-                            
-                            if (wrapper) {
-                                wrapper.appendChild(videoEl);
-                                wrapper.appendChild(watermarkEl);
-                            }
-                            
-                            lightboxPlayer = new Plyr('#lightbox-plyr-player', {
-                                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
-                                settings: ['quality'],
-                                quality: { default: 1080, options: [4320, 2160, 1440, 1080, 720, 576, 480, 360, 240] }
-                            });
-                            try { const p = videoEl.play(); if (p !== undefined) p.catch(() => {}); } catch(e) {}
-                        }).catch(() => {
-                            createStreamableLightboxIframe();
-                        });
+                        createStreamableLightboxIframe();
                     } else if (wistiaId) {
                         const iframe = document.createElement('iframe');
                         iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&playsinline=true`;
