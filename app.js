@@ -3569,7 +3569,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('touchmove', handleDragAutoScroll, { passive: true });
 
     initDatabase();
-    renderProjects();
+    /* renderProjects() intentionally NOT called here.
+       fetchFirebaseCloudData() calls renderProjects() after cloud sync.
+       This prevents old/default data flashing before cloud data arrives. */
 
     /* ==========================================================================
        PRELOADER & COUNTER
