@@ -1777,7 +1777,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const fallbackThumb = './assets/showreel_cover_compelling.png';
             let thumbImgSrc = isGraphicsCat ? proj.mediaLink : proj.thumbLink;
             if (!thumbImgSrc || thumbImgSrc.trim() === '') {
-                thumbImgSrc = fallbackThumb;
+                const autoWistiaId = extractWistiaId(proj.mediaLink);
+                const autoYtId = extractYouTubeId(proj.mediaLink);
+                const autoDriveId = extractGoogleDriveId(proj.mediaLink);
+                const autoStreamId = extractStreamableId(proj.mediaLink);
+                if (autoWistiaId) thumbImgSrc = `https://fast.wistia.com/embed/medias/${autoWistiaId}/swatch`;
+                else if (autoYtId) thumbImgSrc = `https://img.youtube.com/vi/${autoYtId}/maxresdefault.jpg`;
+                else if (autoDriveId) thumbImgSrc = `https://drive.google.com/thumbnail?id=${autoDriveId}&sz=w1280`;
+                else if (autoStreamId) thumbImgSrc = `https://cdn-cf-east.streamable.com/image/${autoStreamId}.jpg`;
+                else thumbImgSrc = fallbackThumb;
             }
             const hasDetailsText = (proj.title && proj.title.trim() !== '') || (proj.client && proj.client.trim() !== '') || (proj.role && proj.role.trim() !== '') || (proj.tools && proj.tools.trim() !== '') || (proj.desc && proj.desc.trim() !== '');
             const hideDetails = !hasDetailsText || category === 'shorts' || isGraphicsCat;
