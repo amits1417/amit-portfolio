@@ -4196,26 +4196,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         createStreamableIframe();
                     }
                 } else if (wistiaId) {
-                    previewEl = document.createElement('iframe');
-                    previewEl.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&muted=true&silentAutoPlay=true&playbar=false&smallPlayButton=false&controlsVisibleOnLoad=false&endVideoBehavior=loop`;
-                    previewEl.className = 'hover-video-preview';
-                    previewEl.style.position = 'absolute';
-                    previewEl.style.top = '0';
-                    previewEl.style.left = '0';
-                    previewEl.style.width = '100%';
-                    previewEl.style.height = '100%';
-                    previewEl.style.border = 'none';
-                    previewEl.style.pointerEvents = 'none';
-                    previewEl.style.opacity = '0';
-                    previewEl.style.transition = 'opacity 0.3s ease';
-                    previewEl.setAttribute('allow', 'autoplay; fullscreen');
-                    previewEl.setAttribute('allowfullscreen', 'true');
-                    previewEl.setAttribute('playsinline', '1');
-                    previewEl.setAttribute('webkit-playsinline', '1');
-                    previewEl.onload = function() {
-                        setTimeout(function() { previewEl.style.opacity = '1'; }, 100);
-                    };
-                    mediaContainer.appendChild(previewEl);
+                    const thumbUrl = proj.thumbLink || `https://fast.wistia.com/embed/medias/${wistiaId}/swatch`;
+                    const img = document.createElement('img');
+                    img.src = thumbUrl;
+                    img.className = 'hover-video-preview';
+                    img.style.position = 'absolute';
+                    img.style.top = '0';
+                    img.style.left = '0';
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    img.style.pointerEvents = 'none';
+                    img.style.opacity = '0';
+                    img.style.transition = 'opacity 0.3s ease';
+                    img.onerror = function() { img.style.display = 'none'; };
+                    img.onload = function() { setTimeout(function() { img.style.opacity = '1'; }, 50); };
+                    mediaContainer.appendChild(img);
                 } else if (vimeoId) {
                     previewEl = document.createElement('iframe');
                     previewEl.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=1&loop=1&autopause=0&background=1`;
