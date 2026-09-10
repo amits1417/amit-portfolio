@@ -513,6 +513,19 @@ document.addEventListener('DOMContentLoaded', () => {
             thumbLink: ""
         },
         {
+            id: "proj_streamable_aig5fr",
+            title: "Fxcore Motion Graphics Reel",
+            category: "shorts",
+            client: "Fxcore Exchange",
+            role: "Motion Designer",
+            tools: "After Effects, Illustrator",
+            desc: "Dynamic vertical motion graphics showcase created for mobile reels & stories.",
+            mediaSource: "link",
+            mediaLink: "https://streamable.com/aig5fr",
+            thumbSource: "auto",
+            thumbLink: "https://cdn-cf-east.streamable.com/image/aig5fr.jpg"
+        },
+        {
             id: "shorts-1",
             title: "Amit Sharma AI Avatar Intro",
             category: "shorts",
@@ -670,6 +683,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (storedProjects) {
             try {
                 projects = JSON.parse(storedProjects);
+                if (!projects.some(p => p.mediaLink && p.mediaLink.includes('aig5fr'))) {
+                    const streamableProj = defaultProjects.find(p => p.mediaLink && p.mediaLink.includes('aig5fr'));
+                    if (streamableProj) {
+                        projects.unshift(streamableProj);
+                        localStorage.setItem('amit_portfolio_projects', JSON.stringify(projects));
+                    }
+                }
             } catch(e) {
                 projects = JSON.parse(JSON.stringify(bakedData));
             }
@@ -2929,6 +2949,52 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const streamableVideoCache = {};
+
+    async function getStreamableDirectUrl(streamableId, quality = 'auto') {
+        if (!streamableId) throw new Error('No streamable ID provided');
+        if (streamableVideoCache[streamableId]) {
+            const cached = streamableVideoCache[streamableId];
+            if (quality === 'hd' && cached.hd) return cached.hd;
+            if (quality === 'mobile' && cached.mobile) return cached.mobile;
+            return cached.url || cached.hd || cached.mobile;
+        }
+
+        try {
+            const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 3000) : null;
+            const res = await fetch(`https://api.streamable.com/videos/${streamableId}`, {
+                signal: controller ? controller.signal : undefined
+            });
+            if (timeoutId) clearTimeout(timeoutId);
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.files) {
+                    const hdUrl = data.files.mp4 ? data.files.mp4.url : null;
+                    const mobileUrl = data.files['mp4-mobile'] ? data.files['mp4-mobile'].url : null;
+                    const primaryUrl = (quality === 'mobile' && mobileUrl) ? mobileUrl : (hdUrl || mobileUrl);
+                    
+                    if (primaryUrl) {
+                        const cleanHd = hdUrl && hdUrl.startsWith('//') ? 'https:' + hdUrl : hdUrl;
+                        const cleanMobile = mobileUrl && mobileUrl.startsWith('//') ? 'https:' + mobileUrl : mobileUrl;
+                        const cleanPrimary = primaryUrl.startsWith('//') ? 'https:' + primaryUrl : primaryUrl;
+                        
+                        streamableVideoCache[streamableId] = {
+                            url: cleanPrimary,
+                            hd: cleanHd,
+                            mobile: cleanMobile
+                        };
+                        return (quality === 'hd' && cleanHd) ? cleanHd : ((quality === 'mobile' && cleanMobile) ? cleanMobile : cleanPrimary);
+                    }
+                }
+            }
+        } catch (err) {
+            console.warn('Could not fetch Streamable direct video URL:', err);
+        }
+        throw new Error('Direct Streamable video URL not available');
+    }
+
     let timelineCapturedDataUrl = '';
     let timelineYtPlayer = null;
     let timelineYtReady = false;
@@ -3943,7 +4009,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let previewEl;
             if (proj.mediaSource === 'upload') {
                 previewEl = document.createElement('video');
-                previewEl.src = normalizeMediaPath(proj.mediaLink);
                 previewEl.muted = true;
                 previewEl.defaultMuted = true;
                 previewEl.loop = true;
@@ -3955,6 +4020,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 previewEl.playsInline = true;
                 previewEl.controls = false;
                 previewEl.className = 'hover-video-preview loaded';
+                previewEl.src = normalizeMediaPath(proj.mediaLink);
                 
                 mediaContainer.appendChild(previewEl);
                 try {
@@ -3965,23 +4031,54 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cleanId = extractYouTubeId(proj.mediaLink);
                 const streamableId = extractStreamableId(proj.mediaLink);
                 if (streamableId) {
-                    previewEl = document.createElement('iframe');
-                    previewEl.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&nocontrols=1`;
-                    previewEl.className = 'hover-video-preview loaded';
-                    previewEl.style.position = 'absolute';
-                    previewEl.style.top = '0';
-                    previewEl.style.left = '0';
-                    previewEl.style.width = '100%';
-                    previewEl.style.height = '100%';
-                    previewEl.style.border = 'none';
-                    previewEl.style.pointerEvents = 'none';
-                    previewEl.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture');
-                    previewEl.setAttribute('allowfullscreen', 'true');
-                    previewEl.setAttribute('playsinline', '1');
-                    previewEl.setAttribute('webkit-playsinline', '1');
-                    previewEl.setAttribute('scrolling', 'no');
-                    previewEl.setAttribute('frameborder', '0');
-                    mediaContainer.appendChild(previewEl);
+                    const createStreamableIframe = () => {
+                        if (!mediaContainer || mediaContainer.querySelector('.hover-video-preview')) return;
+                        const iframe = document.createElement('iframe');
+                        iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&nocontrols=1`;
+                        iframe.className = 'hover-video-preview loaded';
+                        iframe.style.position = 'absolute';
+                        iframe.style.top = '0';
+                        iframe.style.left = '0';
+                        iframe.style.width = '100%';
+                        iframe.style.height = '100%';
+                        iframe.style.border = 'none';
+                        iframe.style.pointerEvents = 'none';
+                        iframe.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture');
+                        iframe.setAttribute('allowfullscreen', 'true');
+                        iframe.setAttribute('playsinline', '1');
+                        iframe.setAttribute('webkit-playsinline', '1');
+                        iframe.setAttribute('scrolling', 'no');
+                        iframe.setAttribute('frameborder', '0');
+                        mediaContainer.appendChild(iframe);
+                    };
+
+                    getStreamableDirectUrl(streamableId, 'mobile').then(directUrl => {
+                        if (!mediaContainer || mediaContainer.querySelector('.hover-video-preview')) return;
+                        previewEl = document.createElement('video');
+                        previewEl.muted = true;
+                        previewEl.defaultMuted = true;
+                        previewEl.loop = true;
+                        previewEl.autoplay = true;
+                        previewEl.preload = 'auto';
+                        previewEl.setAttribute('muted', '');
+                        previewEl.setAttribute('playsinline', '');
+                        previewEl.setAttribute('webkit-playsinline', '');
+                        previewEl.playsInline = true;
+                        previewEl.controls = false;
+                        previewEl.className = 'hover-video-preview loaded';
+                        previewEl.onerror = () => {
+                            if (previewEl && previewEl.parentNode) previewEl.remove();
+                            createStreamableIframe();
+                        };
+                        previewEl.src = directUrl;
+                        mediaContainer.appendChild(previewEl);
+                        try {
+                            const p = previewEl.play();
+                            if (p !== undefined) p.catch(() => {});
+                        } catch(e) {}
+                    }).catch(() => {
+                        createStreamableIframe();
+                    });
                 } else if (cleanId) {
                     previewEl = document.createElement('iframe');
                     previewEl.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&vq=hd1080`;
@@ -4145,23 +4242,54 @@ document.addEventListener('DOMContentLoaded', () => {
                 video.style.border = 'none';
                 videoContainer.appendChild(video);
             } else if (isStreamable) {
-                const iframe = document.createElement('iframe');
-                iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1`;
-                iframe.style.position = 'absolute';
-                iframe.style.top = '0';
-                iframe.style.left = '0';
-                iframe.style.width = '100%';
-                iframe.style.height = '100%';
-                iframe.style.border = 'none';
-                iframe.setAttribute('allow', 'autoplay *; fullscreen *; picture-in-picture *; encrypted-media *; accelerometer *; gyroscope *');
-                iframe.setAttribute('allowfullscreen', 'true');
-                iframe.setAttribute('webkitallowfullscreen', 'true');
-                iframe.setAttribute('mozallowfullscreen', 'true');
-                iframe.setAttribute('playsinline', '1');
-                iframe.setAttribute('webkit-playsinline', '1');
-                iframe.setAttribute('scrolling', 'no');
-                iframe.setAttribute('frameborder', '0');
-                videoContainer.appendChild(iframe);
+                const createShowreelIframe = () => {
+                    if (!videoContainer) return;
+                    videoContainer.innerHTML = '';
+                    const iframe = document.createElement('iframe');
+                    iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1`;
+                    iframe.style.position = 'absolute';
+                    iframe.style.top = '0';
+                    iframe.style.left = '0';
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.border = 'none';
+                    iframe.setAttribute('allow', 'autoplay *; fullscreen *; picture-in-picture *; encrypted-media *; accelerometer *; gyroscope *');
+                    iframe.setAttribute('allowfullscreen', 'true');
+                    iframe.setAttribute('webkitallowfullscreen', 'true');
+                    iframe.setAttribute('mozallowfullscreen', 'true');
+                    iframe.setAttribute('playsinline', '1');
+                    iframe.setAttribute('webkit-playsinline', '1');
+                    iframe.setAttribute('scrolling', 'no');
+                    iframe.setAttribute('frameborder', '0');
+                    videoContainer.appendChild(iframe);
+                };
+
+                getStreamableDirectUrl(streamableId, 'hd').then(directUrl => {
+                    if (!videoContainer) return;
+                    videoContainer.innerHTML = '';
+                    const video = document.createElement('video');
+                    video.controls = true;
+                    video.autoplay = true;
+                    video.playsInline = true;
+                    video.preload = 'auto';
+                    video.setAttribute('playsinline', '');
+                    video.setAttribute('webkit-playsinline', '');
+                    video.style.position = 'absolute';
+                    video.style.top = '0';
+                    video.style.left = '0';
+                    video.style.width = '100%';
+                    video.style.height = '100%';
+                    video.style.border = 'none';
+                    video.onerror = createShowreelIframe;
+                    video.src = directUrl;
+                    videoContainer.appendChild(video);
+                    try {
+                        const p = video.play();
+                        if (p !== undefined) p.catch(() => {});
+                    } catch(e) {}
+                }).catch(() => {
+                    createShowreelIframe();
+                });
             } else {
                 const iframe = document.createElement('iframe');
                 iframe.src = `https://www.youtube.com/embed/${cleanYtId || vid}?autoplay=1&controls=1&rel=0&modestbranding=1&vq=hd1080`;
@@ -4785,29 +4913,67 @@ document.addEventListener('DOMContentLoaded', () => {
                     const cleanId = extractYouTubeId(proj.mediaLink);
                     const streamableId = extractStreamableId(proj.mediaLink);
                     if (streamableId) {
-                        const iframe = document.createElement('iframe');
-                        iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1`;
-                        iframe.style.position = 'absolute';
-                        iframe.style.top = '0';
-                        iframe.style.left = '0';
-                        iframe.style.width = '100%';
-                        iframe.style.height = '100%';
-                        iframe.style.border = 'none';
-                        iframe.setAttribute('allow', 'autoplay *; fullscreen *; picture-in-picture *; encrypted-media *; accelerometer *; gyroscope *; clipboard-write *');
-                        iframe.setAttribute('allowfullscreen', 'true');
-                        iframe.setAttribute('webkitallowfullscreen', 'true');
-                        iframe.setAttribute('mozallowfullscreen', 'true');
-                        iframe.setAttribute('playsinline', '1');
-                        iframe.setAttribute('webkit-playsinline', '1');
-                        iframe.setAttribute('scrolling', 'no');
-                        iframe.setAttribute('frameborder', '0');
-                        iframe.setAttribute('title', proj.title || 'Streamable Video');
-                        
-                        if (wrapper) {
-                            wrapper.appendChild(iframe);
-                        }
-                        
-                        appendConsoleLog(`> Lightbox Streamable clean native embed active: "${proj.title}"`);
+                        const createStreamableLightboxIframe = () => {
+                            if (wrapper) wrapper.innerHTML = '';
+                            const iframe = document.createElement('iframe');
+                            iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1`;
+                            iframe.style.position = 'absolute';
+                            iframe.style.top = '0';
+                            iframe.style.left = '0';
+                            iframe.style.width = '100%';
+                            iframe.style.height = '100%';
+                            iframe.style.border = 'none';
+                            iframe.setAttribute('allow', 'autoplay *; fullscreen *; picture-in-picture *; encrypted-media *; accelerometer *; gyroscope *; clipboard-write *');
+                            iframe.setAttribute('allowfullscreen', 'true');
+                            iframe.setAttribute('webkitallowfullscreen', 'true');
+                            iframe.setAttribute('mozallowfullscreen', 'true');
+                            iframe.setAttribute('playsinline', '1');
+                            iframe.setAttribute('webkit-playsinline', '1');
+                            iframe.setAttribute('scrolling', 'no');
+                            iframe.setAttribute('frameborder', '0');
+                            iframe.setAttribute('title', proj.title || 'Streamable Video');
+                            
+                            if (wrapper) {
+                                wrapper.appendChild(iframe);
+                            }
+                            appendConsoleLog(`> Lightbox Streamable embed active: "${proj.title}"`);
+                        };
+
+                        getStreamableDirectUrl(streamableId, 'hd').then(directUrl => {
+                            if (wrapper) wrapper.innerHTML = '';
+                            const videoEl = document.createElement('video');
+                            videoEl.id = 'lightbox-plyr-player';
+                            videoEl.controls = true;
+                            videoEl.autoplay = true;
+                            videoEl.playsInline = true;
+                            videoEl.preload = 'auto';
+                            videoEl.setAttribute('playsinline', '');
+                            videoEl.setAttribute('webkit-playsinline', '');
+                            videoEl.style.position = 'absolute';
+                            videoEl.style.top = '0';
+                            videoEl.style.left = '0';
+                            videoEl.style.width = '100%';
+                            videoEl.style.height = '100%';
+                            videoEl.style.backgroundColor = '#000';
+                            videoEl.onerror = createStreamableLightboxIframe;
+                            videoEl.src = directUrl;
+                            
+                            if (wrapper) {
+                                wrapper.appendChild(videoEl);
+                                wrapper.appendChild(watermarkEl);
+                            }
+                            
+                            try {
+                                lightboxPlayer = new Plyr('#lightbox-plyr-player', {
+                                    controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
+                                    settings: ['quality'],
+                                    quality: { default: 1080, options: [1080, 720, 480, 360] }
+                                });
+                            } catch(e) {}
+                            appendConsoleLog(`> Lightbox Streamable direct HD player active: "${proj.title}"`);
+                        }).catch(() => {
+                            createStreamableLightboxIframe();
+                        });
                     } else {
                         const iframe = document.createElement('iframe');
                         iframe.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&controls=1&rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&vq=hd1080`;
