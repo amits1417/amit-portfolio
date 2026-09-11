@@ -3601,8 +3601,8 @@ function initPortfolioApp() {
     }
     window.hidePreloader = hidePreloader;
 
-    // Emergency Failsafe: Hide preloader quickly if not already done
-    setTimeout(hidePreloader, 300);
+    // Emergency Failsafe: Hide preloader quickly
+    setTimeout(hidePreloader, 100);
 
     // Instant hide if edit mode is active or requested
     if (window._isEditRequested || window.location.href.toLowerCase().includes('edit')) {
@@ -3614,7 +3614,7 @@ function initPortfolioApp() {
 
     let count = 0;
     const counterInterval = setInterval(() => {
-        count += Math.floor(Math.random() * 30) + 35;
+        count += Math.floor(Math.random() * 50) + 50;
         if (count >= 100) {
             count = 100;
             clearInterval(counterInterval);
