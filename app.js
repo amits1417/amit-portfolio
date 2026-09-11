@@ -4,7 +4,9 @@
 // CMS password protection – hard‑coded for this personal portfolio
 const CMS_PASSWORD = "DellN5010";
 
-document.addEventListener('DOMContentLoaded', () => {
+function initPortfolioApp() {
+    if (window._portfolioAppInitialized) return;
+    window._portfolioAppInitialized = true;
     // Note: checkEditURL() is called later after initDatabase() completes (lines 444, 4690)
 
     // Helper to extract YouTube video ID from any link style (including Shorts)
@@ -733,13 +735,25 @@ document.addEventListener('DOMContentLoaded', () => {
     let projects = [];
     let copiedCard = null;
     let isStudioUnlocked = false; // password unlock status
+    let sortableInstances = [];
 
     const gridsContainer = document.getElementById('portfolio-grids-container');
     const portfolioFilters = document.getElementById('portfolio-filters');
 
-    // Cloud sync flag — renderProjects() will NOT render until Firebase data arrives
-    let _cloudReady = false;
-    let _pendingRender = false;
+    // High-Performance Lazy Image Intersection Observer
+    const lazyImageObserver = (typeof IntersectionObserver !== 'undefined') ? new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                const dataSrc = img.getAttribute('data-src');
+                if (dataSrc) {
+                    img.src = dataSrc;
+                    img.removeAttribute('data-src');
+                }
+                observer.unobserve(img);
+            }
+        });
+    }, { rootMargin: '300px 0px' }) : null;
 
     // Load from localStorage or default
     function initDatabase() {
@@ -753,7 +767,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Automatic DB version upgrade migration (forces cache clear for new defaults)
         const DB_VERSION_KEY = 'amit_portfolio_db_version';
-        const CURRENT_DB_VERSION = '22';
+        const CURRENT_DB_VERSION = '24';
         let storedVersion;
         try {
             storedVersion = localStorage.getItem(DB_VERSION_KEY);
@@ -772,12 +786,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.removeItem('amit_portfolio_education');
                 localStorage.removeItem('amit_portfolio_timeline');
                 localStorage.removeItem('amit_portfolio_clients');
-                localStorage.removeItem('amit_portfolio_last_updated');
+                localStorage.setItem('amit_portfolio_last_updated', '1789046380337');
                 localStorage.setItem(DB_VERSION_KEY, CURRENT_DB_VERSION);
                 console.log("Database version upgrade detected. LocalStorage cache cleared.");
             } catch(e) {}
-            location.reload();
-            return;
+            console.log("Migration complete, continuing synchronous init.");
         }
 
         // Load Sections list
@@ -826,11 +839,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             projects = JSON.parse(JSON.stringify(bakedData));
             localStorage.setItem('amit_portfolio_projects', JSON.stringify(projects));
-        }
-
-        // Pull live cloud data so changes made in edit mode appear for all visitors
-        if (firebaseDbUrl) {
-            fetchFirebaseCloudData(firebaseDbUrl);
         }
 
         // Projects loaded. Ready.
@@ -943,7 +951,7 @@ document.addEventListener('DOMContentLoaded', () => {
             services = [...defaultServices];
             localStorage.setItem('amit_portfolio_services', JSON.stringify(services));
         }
-        
+
         // Load clients
         const defaultClients = ["Code Elevator", "MLM World", "Gujarat Career Academy", "Yuva Upnishad Foundation"];
         const storedClients = localStorage.getItem('amit_portfolio_clients');
@@ -954,6 +962,8 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('amit_portfolio_clients', JSON.stringify(clients));
         }
         
+        // Instant Initial Render: Render all showcase videos, graphics, and dynamic sections immediately (0ms delay)
+        renderProjects();
         renderShowreel();
         reorderDOMSections();
         renderDynamicEducation();
@@ -972,10 +982,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (firebaseInput) {
             firebaseInput.value = firebaseDbUrl;
         }
+        // Non-blocking background cloud sync
         if (firebaseDbUrl) {
             fetchFirebaseCloudData(firebaseDbUrl);
         }
     }
+    initDatabase();
 
     async function fetchFirebaseCloudData(url) {
         try {
@@ -984,7 +996,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const localTimestamp = parseInt(localStorage.getItem('amit_portfolio_last_updated') || '0');
             let cloudTimestamp = 0;
             try {
-                const tsRes = await fetch(`${url}/last_updated.json?t=${Date.now()}`, { cache: 'no-store' });
+                const tsController = typeof AbortController !== 'undefined' ? new AbortController() : null;
+                const tsTimeout = tsController ? setTimeout(() => tsController.abort(), 2500) : null;
+                const tsRes = await fetch(`${url}/last_updated.json?t=${Date.now()}`, { 
+                    cache: 'no-store',
+                    signal: tsController ? tsController.signal : undefined
+                });
+                if (tsTimeout) clearTimeout(tsTimeout);
                 if (tsRes.ok) {
                     const parsedTs = await tsRes.json();
                     cloudTimestamp = parsedTs ? parseInt(parsedTs) : 0;
@@ -995,9 +1013,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             console.log(`Sync status: local=${localTimestamp}, cloud=${cloudTimestamp}`);
             
-            // NOTE: Cloud is the single source of truth. We always pull cloud data
-            // on load so every visitor sees the latest edits. Edits are pushed
-            // explicitly via saveDatabase() on user action.
+            // If local data exists and timestamps match, no need to re-download everything
+            if (localTimestamp > 0 && cloudTimestamp > 0 && localTimestamp === cloudTimestamp && localStorage.getItem('amit_portfolio_projects')) {
+                console.log("Local database is already in sync with cloud.");
+                return;
+            }
             
             // Firebase stores arrays as objects {0:val,1:val,...} — convert back
             function firebaseToArray(data) {
@@ -1009,24 +1029,64 @@ document.addEventListener('DOMContentLoaded', () => {
                 return null;
             }
 
-            const projRes = await fetch(`${url}/projects.json?t=${Date.now()}`, { cache: 'no-store' });
-            if (!projRes.ok) return;
-            const cloudProjects = firebaseToArray(await projRes.json());
-            
-            const secRes = await fetch(`${url}/sections.json?t=${Date.now()}`, { cache: 'no-store' });
-            if (!secRes.ok) return;
-            const cloudSections = firebaseToArray(await secRes.json());
+            const fetchNode = async (node) => {
+                try {
+                    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+                    const timeoutId = controller ? setTimeout(() => controller.abort(), 4000) : null;
+                    const res = await fetch(`${url}/${node}.json?t=${Date.now()}`, { 
+                        cache: 'no-store',
+                        signal: controller ? controller.signal : undefined
+                    });
+                    if (timeoutId) clearTimeout(timeoutId);
+                    if (res.ok) return await res.json();
+                } catch(e) {
+                    console.warn(`Error fetching ${node} from cloud:`, e.message);
+                }
+                return null;
+            };
 
-            const layRes = await fetch(`${url}/layout_order.json?t=${Date.now()}`, { cache: 'no-store' });
-            let cloudLayout = null;
-            if (layRes.ok) {
-                cloudLayout = firebaseToArray(await layRes.json());
-            }
-            
+            // Fetch all nodes in parallel for maximum speed
+            const [
+                rawProjects,
+                rawSections,
+                rawLayout,
+                rawTheme,
+                rawSoftware,
+                rawCustomColors,
+                rawClients,
+                rawEdu,
+                rawTimeline,
+                rawServices,
+                rawCmsText
+            ] = await Promise.all([
+                fetchNode('projects'),
+                fetchNode('sections'),
+                fetchNode('layout_order'),
+                fetchNode('theme'),
+                fetchNode('software'),
+                fetchNode('custom_colors'),
+                fetchNode('clients'),
+                fetchNode('education'),
+                fetchNode('timeline'),
+                fetchNode('services'),
+                fetchNode('cms_text')
+            ]);
+
+            const cloudProjects = firebaseToArray(rawProjects);
+            const cloudSections = firebaseToArray(rawSections);
+            const cloudLayout = firebaseToArray(rawLayout);
+            const cloudTheme = rawTheme;
+            const cloudSoftware = firebaseToArray(rawSoftware);
+            const cloudColors = rawCustomColors;
+            const cloudClients = firebaseToArray(rawClients);
+            const cloudEdu = firebaseToArray(rawEdu);
+            const cloudTimeline = firebaseToArray(rawTimeline);
+            const cloudServices = firebaseToArray(rawServices);
+            const cloudCmsText = rawCmsText;
+
             let hasChanges = false;
             
-            if (cloudProjects && Array.isArray(cloudProjects)) {
-                // Filter out any corrupt projects with temporary browser blob URLs
+            if (cloudProjects && Array.isArray(cloudProjects) && cloudProjects.length > 0) {
                 let cleanCloudProjects = cloudProjects.filter(p => {
                     const isCorruptMedia = p.mediaLink && p.mediaLink.startsWith('blob:');
                     const isCorruptThumb = p.thumbLink && p.thumbLink.startsWith('blob:');
@@ -1045,7 +1105,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            if (cloudSections && Array.isArray(cloudSections)) {
+            if (cloudSections && Array.isArray(cloudSections) && cloudSections.length > 0) {
                 if (JSON.stringify(sections) !== JSON.stringify(cloudSections)) {
                     sections = cloudSections;
                     localStorage.setItem('amit_portfolio_sections', JSON.stringify(sections));
@@ -1053,7 +1113,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            if (cloudLayout && Array.isArray(cloudLayout)) {
+            if (cloudLayout && Array.isArray(cloudLayout) && cloudLayout.length > 0) {
                 if (JSON.stringify(layoutOrder) !== JSON.stringify(cloudLayout)) {
                     layoutOrder = cloudLayout;
                     localStorage.setItem('amit_portfolio_layout_order', JSON.stringify(layoutOrder));
@@ -1061,162 +1121,98 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            const themeRes = await fetch(`${url}/theme.json?t=${Date.now()}`, { cache: 'no-store' });
-            if (themeRes.ok) {
-                const cloudTheme = await themeRes.json();
-                if (cloudTheme && typeof cloudTheme === 'string') {
-                    if (localStorage.getItem('amit_portfolio_theme') !== cloudTheme) {
-                        localStorage.setItem('amit_portfolio_theme', cloudTheme);
-                        if (typeof applyTheme === 'function') {
-                            applyTheme(cloudTheme);
-                        }
+            if (cloudTheme && typeof cloudTheme === 'string') {
+                if (localStorage.getItem('amit_portfolio_theme') !== cloudTheme) {
+                    localStorage.setItem('amit_portfolio_theme', cloudTheme);
+                    if (typeof applyTheme === 'function') {
+                        applyTheme(cloudTheme);
                     }
                 }
             }
 
-            const softRes = await fetch(`${url}/software.json?t=${Date.now()}`, { cache: 'no-store' });
-            if (softRes.ok) {
-                const cloudSoftware = firebaseToArray(await softRes.json());
-                if (cloudSoftware && Array.isArray(cloudSoftware)) {
-                    if (JSON.stringify(software) !== JSON.stringify(cloudSoftware)) {
-                        software = cloudSoftware;
-                        localStorage.setItem('amit_portfolio_software', JSON.stringify(software));
-                        hasChanges = true;
-                    }
+            if (cloudSoftware && Array.isArray(cloudSoftware) && cloudSoftware.length > 0) {
+                if (JSON.stringify(software) !== JSON.stringify(cloudSoftware)) {
+                    software = cloudSoftware;
+                    localStorage.setItem('amit_portfolio_software', JSON.stringify(software));
+                    hasChanges = true;
                 }
             }
 
-            const customColorsRes = await fetch(`${url}/custom_colors.json?t=${Date.now()}`, { cache: 'no-store' });
-            if (customColorsRes.ok) {
-                const cloudColors = await customColorsRes.json();
+            if (cloudColors) {
                 const localColorsStr = localStorage.getItem('amit_portfolio_custom_colors');
-                if (cloudColors) {
-                    if (localColorsStr !== JSON.stringify(cloudColors)) {
-                        localStorage.setItem('amit_portfolio_custom_colors', JSON.stringify(cloudColors));
-                        if (typeof applyCustomColors === 'function') {
-                            applyCustomColors(cloudColors);
-                        }
-                    }
-                } else if (localColorsStr) {
-                    localStorage.removeItem('amit_portfolio_custom_colors');
-                    window.location.reload();
-                }
-            }
-
-            const clientsRes = await fetch(`${url}/clients.json?t=${Date.now()}`, { cache: 'no-store' });
-            if (clientsRes.ok) {
-                const cloudClients = await clientsRes.json();
-                if (cloudClients && Array.isArray(cloudClients)) {
-                    if (JSON.stringify(clients) !== JSON.stringify(cloudClients)) {
-                        clients = cloudClients;
-                        localStorage.setItem('amit_portfolio_clients', JSON.stringify(clients));
-                        if (typeof renderClientsStrip === 'function') {
-                            renderClientsStrip();
-                        }
+                if (localColorsStr !== JSON.stringify(cloudColors)) {
+                    localStorage.setItem('amit_portfolio_custom_colors', JSON.stringify(cloudColors));
+                    if (typeof applyCustomColors === 'function') {
+                        applyCustomColors(cloudColors);
                     }
                 }
             }
 
-            // Fetch education from Firebase (null-safe)
-            const eduRes = await fetch(`${url}/education.json?t=${Date.now()}`, { cache: 'no-store' });
-            if (eduRes.ok) {
-                const rawEdu = await eduRes.json();
-                const cloudEdu = firebaseToArray(rawEdu);
-                if (cloudEdu && Array.isArray(cloudEdu) && cloudEdu.length > 0) {
-                    if (JSON.stringify(education) !== JSON.stringify(cloudEdu)) {
-                        education = cloudEdu;
-                        localStorage.setItem('amit_portfolio_education', JSON.stringify(education));
-                        hasChanges = true;
+            if (cloudClients && Array.isArray(cloudClients) && cloudClients.length > 0) {
+                if (JSON.stringify(clients) !== JSON.stringify(cloudClients)) {
+                    clients = cloudClients;
+                    localStorage.setItem('amit_portfolio_clients', JSON.stringify(clients));
+                    if (typeof renderClientsStrip === 'function') {
+                        renderClientsStrip();
                     }
                 }
             }
 
-            // Fetch timeline from Firebase (null-safe)
-            const timelineRes = await fetch(`${url}/timeline.json?t=${Date.now()}`, { cache: 'no-store' });
-            if (timelineRes.ok) {
-                const rawTimeline = await timelineRes.json();
-                const cloudTimeline = firebaseToArray(rawTimeline);
-                if (cloudTimeline && Array.isArray(cloudTimeline) && cloudTimeline.length > 0) {
-                    if (JSON.stringify(timeline) !== JSON.stringify(cloudTimeline)) {
-                        timeline = cloudTimeline;
-                        localStorage.setItem('amit_portfolio_timeline', JSON.stringify(timeline));
-                        hasChanges = true;
-                    }
+            if (cloudEdu && Array.isArray(cloudEdu) && cloudEdu.length > 0) {
+                if (JSON.stringify(education) !== JSON.stringify(cloudEdu)) {
+                    education = cloudEdu;
+                    localStorage.setItem('amit_portfolio_education', JSON.stringify(education));
+                    hasChanges = true;
                 }
             }
 
-            // Fetch services from Firebase (null-safe)
-            const servicesRes = await fetch(`${url}/services.json?t=${Date.now()}`, { cache: 'no-store' });
-            if (servicesRes.ok) {
-                const rawServices = await servicesRes.json();
-                const cloudServices = firebaseToArray(rawServices);
-                if (cloudServices && Array.isArray(cloudServices) && cloudServices.length > 0) {
-                    if (JSON.stringify(services) !== JSON.stringify(cloudServices)) {
-                        services = cloudServices;
-                        localStorage.setItem('amit_portfolio_services', JSON.stringify(services));
-                        hasChanges = true;
-                    }
+            if (cloudTimeline && Array.isArray(cloudTimeline) && cloudTimeline.length > 0) {
+                if (JSON.stringify(timeline) !== JSON.stringify(cloudTimeline)) {
+                    timeline = cloudTimeline;
+                    localStorage.setItem('amit_portfolio_timeline', JSON.stringify(timeline));
+                    hasChanges = true;
                 }
             }
 
-            // Fetch cms_text from Firebase (null-safe)
-            const cmsTextRes = await fetch(`${url}/cms_text.json?t=${Date.now()}`, { cache: 'no-store' });
-            if (cmsTextRes.ok) {
-                const cloudCmsText = await cmsTextRes.json();
-                if (cloudCmsText && typeof cloudCmsText === 'object' && cloudCmsText !== null && Object.keys(cloudCmsText).length > 0) {
-                    const localCmsTextStr = localStorage.getItem('amit_portfolio_cms_text');
-                    if (localCmsTextStr !== JSON.stringify(cloudCmsText)) {
-                        localStorage.setItem('amit_portfolio_cms_text', JSON.stringify(cloudCmsText));
-                        if (typeof initInlineTextCMS === 'function') {
-                            initInlineTextCMS();
-                        }
-                        appendConsoleLog("> Inline text edits synced from cloud.");
-                    }
+            if (cloudServices && Array.isArray(cloudServices) && cloudServices.length > 0) {
+                if (JSON.stringify(services) !== JSON.stringify(cloudServices)) {
+                    services = cloudServices;
+                    localStorage.setItem('amit_portfolio_services', JSON.stringify(services));
+                    hasChanges = true;
                 }
-            } else if (localStorage.getItem('amit_portfolio_cms_text')) {
-                // Cloud has no cms_text but local does — push it up
-                try {
-                    const localCmsText = JSON.parse(localStorage.getItem('amit_portfolio_cms_text'));
-                    pushToCloud('cms_text', localCmsText, true);
-                } catch(e) {}
             }
 
-             // Always render after cloud sync completes (even if no changes)
-             // to ensure first-time visitors see cloud data instead of defaults.
-            _cloudReady = true;
-            renderProjects();
-            reorderDOMSections();
-            if (typeof renderDynamicSoftware === 'function') {
-                renderDynamicSoftware();
+            if (cloudCmsText && typeof cloudCmsText === 'object' && Object.keys(cloudCmsText).length > 0) {
+                const localCmsTextStr = localStorage.getItem('amit_portfolio_cms_text');
+                if (localCmsTextStr !== JSON.stringify(cloudCmsText)) {
+                    localStorage.setItem('amit_portfolio_cms_text', JSON.stringify(cloudCmsText));
+                    if (typeof initInlineTextCMS === 'function') {
+                        initInlineTextCMS();
+                    }
+                    appendConsoleLog("> Inline text edits synced from cloud.");
+                }
             }
-            if (typeof renderDynamicEducation === 'function') {
-                renderDynamicEducation();
-            }
-            if (typeof renderDynamicTimeline === 'function') {
-                renderDynamicTimeline();
-            }
-            if (typeof renderDynamicServices === 'function') {
-                renderDynamicServices();
-            }
-            if (typeof initInlineTextCMS === 'function') {
-                initInlineTextCMS();
-            }
+
+            // If changes were detected from cloud, re-render smoothly
             if (hasChanges) {
+                renderProjects();
+                reorderDOMSections();
+                if (typeof renderDynamicSoftware === 'function') renderDynamicSoftware();
+                if (typeof renderDynamicEducation === 'function') renderDynamicEducation();
+                if (typeof renderDynamicTimeline === 'function') renderDynamicTimeline();
+                if (typeof renderDynamicServices === 'function') renderDynamicServices();
+                if (typeof initInlineTextCMS === 'function') initInlineTextCMS();
                 appendConsoleLog("> Showcase database synchronized with cloud updates.");
             } else {
                 console.log("Local database is up-to-date with cloud.");
             }
             
-            // Save the synchronized cloud timestamp locally
+            // Save synchronized cloud timestamp
             if (cloudTimestamp > 0) {
                 localStorage.setItem('amit_portfolio_last_updated', cloudTimestamp);
             }
         } catch (err) {
             console.warn(`Cloud sync warning: ${err.message}`);
-            // Fallback: render with local/default data so page isn't blank
-            _cloudReady = true;
-            renderProjects();
-            if (typeof reorderDOMSections === 'function') reorderDOMSections();
         }
     }
 
@@ -1716,20 +1712,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return 0;
     }
-    // High-Performance Lazy Image Intersection Observer
-    const lazyImageObserver = (typeof IntersectionObserver !== 'undefined') ? new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                const dataSrc = img.getAttribute('data-src');
-                if (dataSrc) {
-                    img.src = dataSrc;
-                    img.removeAttribute('data-src');
-                }
-                observer.unobserve(img);
-            }
-        });
-    }, { rootMargin: '300px 0px' }) : null;
+
 
     function renderGridCategory(gridEl, category, isEditorActive, aspectRatio) {
         gridEl.innerHTML = '';
@@ -1793,7 +1776,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const autoDriveId = extractGoogleDriveId(proj.mediaLink);
                 const autoStreamId = extractStreamableId(proj.mediaLink);
                 if (autoWistiaId) thumbImgSrc = `https://fast.wistia.com/embed/medias/${autoWistiaId}/swatch`;
-                else if (autoYtId) thumbImgSrc = `https://img.youtube.com/vi/${autoYtId}/maxresdefault.jpg`;
+                else if (autoYtId) thumbImgSrc = `https://img.youtube.com/vi/${autoYtId}/hqdefault.jpg`;
                 else if (autoDriveId) thumbImgSrc = `https://drive.google.com/thumbnail?id=${autoDriveId}&sz=w1280`;
                 else if (autoStreamId) thumbImgSrc = `https://cdn-cf-east.streamable.com/image/${autoStreamId}.jpg`;
                 else thumbImgSrc = fallbackThumb;
@@ -1801,11 +1784,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const hasDetailsText = (proj.title && proj.title.trim() !== '') || (proj.client && proj.client.trim() !== '') || (proj.role && proj.role.trim() !== '') || (proj.tools && proj.tools.trim() !== '') || (proj.desc && proj.desc.trim() !== '');
             const hideDetails = !hasDetailsText || category === 'shorts' || isGraphicsCat;
             
-            const isEager = idx < 6 || isEditorActive;
             const imgSrc = normalizeMediaPath(thumbImgSrc);
-            const imgTagHTML = isEager
-                ? `<img src="${imgSrc}" alt="${proj.title}" loading="lazy" decoding="async" onerror="this.src='./assets/showreel_cover_compelling.png'">`
-                : `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3C/svg%3E" data-src="${imgSrc}" alt="${proj.title}" class="lazy-load-img" loading="lazy" decoding="async" onerror="this.src='./assets/showreel_cover_compelling.png'">`;
+            const imgTagHTML = `<img src="${imgSrc}" alt="${proj.title || 'Work Preview'}" loading="lazy" decoding="async" onerror="this.src='./assets/showreel_cover_compelling.png'">`;
 
             const cmsCheckboxHTML = isEditorActive ? `
                 <div class="cms-checkbox-wrapper" style="pointer-events: auto;">
@@ -2764,12 +2744,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderProjects() {
-        // Block rendering until Firebase cloud data has loaded
-        if (!_cloudReady) {
-            _pendingRender = true;
-            return;
-        }
-        _pendingRender = false;
         const isEditorActive = document.body.classList.contains('editor-active');
         
         // Render Filters Dynamically
@@ -2999,13 +2973,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function normalizeMediaPath(path) {
         if (!path) return '';
-        if (path.startsWith('./assets/uploads/') || path.startsWith('assets/uploads/') || path.startsWith('/assets/uploads/')) {
-            const cleanPath = path.replace(/^\.\//, '/').replace(/^assets\//, '/assets/');
-            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            if (isLocal && window.location.port !== '8000') {
-                return `http://localhost:8000${cleanPath}`;
-            }
-            return cleanPath;
+        if (typeof path !== 'string') return path;
+        if (path.startsWith('data:') || path.startsWith('http:') || path.startsWith('https:')) {
+            return path;
+        }
+        if (path.startsWith('/assets/')) {
+            return '.' + path;
+        }
+        if (path.startsWith('assets/')) {
+            return './' + path;
         }
         return path;
     }
@@ -3446,7 +3422,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Initialize drag-and-drop sortable grids using SortableJS library
-    let sortableInstances = [];
     
     function initDragAndDropSorting() {
         // Destroy existing instances first
@@ -3587,9 +3562,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('touchmove', handleDragAutoScroll, { passive: true });
 
     initDatabase();
-    /* renderProjects() intentionally NOT called here.
-       fetchFirebaseCloudData() calls renderProjects() after cloud sync.
-       This prevents old/default data flashing before cloud data arrives. */
+    renderProjects(); // Instant render from localStorage/cache; Firebase will re-render in background
 
     /* ==========================================================================
        PRELOADER & COUNTER
@@ -3603,9 +3576,10 @@ document.addEventListener('DOMContentLoaded', () => {
         loader._hidden = true;
         if (typeof gsap !== 'undefined' && loader) {
             gsap.to(loader, {
+                opacity: 0,
                 yPercent: -100,
-                duration: 0.5,
-                ease: "power4.inOut",
+                duration: 0.25,
+                ease: "power2.inOut",
                 onComplete: () => {
                     if (loader) loader.style.display = 'none';
                     if (typeof initHeroAnimations === 'function') {
@@ -3614,20 +3588,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         } else if (loader) {
-            loader.style.transition = 'transform 0.5s ease-in-out';
+            loader.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+            loader.style.opacity = '0';
             loader.style.transform = 'translateY(-100%)';
             setTimeout(() => {
                 if (loader) loader.style.display = 'none';
                 if (typeof initHeroAnimations === 'function') {
                     try { initHeroAnimations(); } catch(e) {}
                 }
-            }, 500);
+            }, 250);
         }
     }
     window.hidePreloader = hidePreloader;
 
-    // Emergency Failsafe: Hide preloader max 1.2s after script load
-    setTimeout(hidePreloader, 1200);
+    // Emergency Failsafe: Hide preloader quickly if not already done
+    setTimeout(hidePreloader, 300);
 
     // Instant hide if edit mode is active or requested
     if (window._isEditRequested || window.location.href.toLowerCase().includes('edit')) {
@@ -3639,7 +3614,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let count = 0;
     const counterInterval = setInterval(() => {
-        count += Math.floor(Math.random() * 12) + 8;
+        count += Math.floor(Math.random() * 30) + 35;
         if (count >= 100) {
             count = 100;
             clearInterval(counterInterval);
@@ -3648,7 +3623,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (loaderPercentage) loaderPercentage.textContent = count < 10 ? '0' + count : count;
         if (loaderProgressBar) loaderProgressBar.style.width = count + '%';
-    }, 30);
+    }, 15);
 
 
     /* ==========================================================================
@@ -3913,58 +3888,7 @@ document.addEventListener('DOMContentLoaded', () => {
             onLeaveBack: () => document.getElementById('navbar').classList.remove('nav-scrolled')
         });
         
-        // Portfolio Showcase Title Reveal
-        gsap.from("#portfolio .section-header > *", {
-            scrollTrigger: {
-                trigger: "#portfolio",
-                start: "top 80%"
-            },
-            y: 50,
-            opacity: 0,
-            stagger: 0.15,
-            duration: 0.8,
-            ease: "power3.out"
-        });
-        
-        // Services Section Title & Grid reveals
-        gsap.from("#services .section-header > *", {
-            scrollTrigger: {
-                trigger: "#services",
-                start: "top 80%"
-            },
-            y: 50,
-            opacity: 0,
-            stagger: 0.15,
-            duration: 0.8,
-            ease: "power3.out"
-        });
-        
-        gsap.from(".service-card", {
-            scrollTrigger: {
-                trigger: ".services-grid",
-                start: "top 80%"
-            },
-            y: 60,
-            opacity: 0,
-            stagger: 0.12,
-            duration: 0.8,
-            ease: "power3.out"
-        });
-        
-        // Expertise Skill bars animation trigger
-        gsap.from(".expertise-skills .section-header > *, .expertise-skills .section-desc", {
-            scrollTrigger: {
-                trigger: "#expertise",
-                start: "top 80%"
-            },
-            y: 30,
-            opacity: 0,
-            stagger: 0.1,
-            duration: 0.8,
-            ease: "power3.out"
-        });
-        
-        // Skill Progress bar loading
+        // Skill Progress bar loading on scroll
         ScrollTrigger.create({
             trigger: ".skills-list",
             start: "top 85%",
@@ -3981,79 +3905,6 @@ document.addEventListener('DOMContentLoaded', () => {
             trigger: ".stats-dashboard",
             start: "top 85%",
             onEnter: () => animateStatsCounters()
-        });
-        
-        // Showreel title and viewport reveals
-        gsap.from("#showreel-section .section-header > *", {
-            scrollTrigger: {
-                trigger: "#showreel-section",
-                start: "top 80%"
-            },
-            y: 40,
-            opacity: 0,
-            stagger: 0.15,
-            duration: 0.8,
-            ease: "power3.out"
-        });
-        
-        gsap.from(".showreel-viewport", {
-            scrollTrigger: {
-                trigger: ".showreel-viewport",
-                start: "top 80%"
-            },
-            y: 60,
-            opacity: 0,
-            duration: 1,
-            ease: "power4.out"
-        });
-        
-        // About & Timeline reveals
-        gsap.from(".about-bio > *", {
-            scrollTrigger: {
-                trigger: "#about",
-                start: "top 80%"
-            },
-            y: 30,
-            opacity: 0,
-            stagger: 0.15,
-            duration: 0.8,
-            ease: "power3.out"
-        });
-        
-        gsap.from(".timeline-event", {
-            scrollTrigger: {
-                trigger: ".timeline-container",
-                start: "top 80%"
-            },
-            x: 50,
-            opacity: 0,
-            stagger: 0.2,
-            duration: 0.8,
-            ease: "power3.out"
-        });
-        
-        // Contact details and form reveals
-        gsap.from(".contact-details-box > *", {
-            scrollTrigger: {
-                trigger: "#contact",
-                start: "top 80%"
-            },
-            y: 30,
-            opacity: 0,
-            stagger: 0.15,
-            duration: 0.8,
-            ease: "power3.out"
-        });
-        
-        gsap.from(".contact-form-box", {
-            scrollTrigger: {
-                trigger: ".contact-form-box",
-                start: "top 80%"
-            },
-            scale: 0.95,
-            opacity: 0,
-            duration: 1,
-            ease: "power3.out"
         });
     }
 
@@ -4083,78 +3934,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 const category = btn.getAttribute('data-filter');
                 const allBlocks = gridsContainer.querySelectorAll('.portfolio-category-block');
                 
-                if (typeof gsap !== 'undefined') {
-                    const blocksToHide = [];
-                    const blocksToShow = [];
-                    
-                    allBlocks.forEach(block => {
-                        const secId = block.id.replace('block-', '');
-                        if (category === 'all' || secId === category) {
-                            blocksToShow.push(block);
-                        } else {
-                            blocksToHide.push(block);
-                        }
-                    });
-                    
-                    if (blocksToHide.length > 0) {
-                        gsap.to(blocksToHide, { 
-                            opacity: 0, 
-                            y: 15, 
-                            duration: 0.3, 
-                            onComplete: () => {
-                                blocksToHide.forEach(b => b.style.display = 'none');
-                                blocksToShow.forEach(b => {
-                                    b.style.display = 'block';
-                                });
-                                gsap.to(blocksToShow, { opacity: 1, y: 0, duration: 0.4 });
-                            }
-                        });
+                allBlocks.forEach(block => {
+                    const secId = block.id.replace('block-', '');
+                    if (category === 'all' || secId === category) {
+                        block.style.display = 'block';
+                        block.style.opacity = '1';
+                        block.style.transform = 'none';
                     } else {
-                        blocksToShow.forEach(b => {
-                            b.style.display = 'block';
-                        });
-                        gsap.to(blocksToShow, { opacity: 1, y: 0, duration: 0.4 });
+                        block.style.display = 'none';
+                        block.style.opacity = '0';
                     }
-                } else {
-                    allBlocks.forEach(block => {
-                        const secId = block.id.replace('block-', '');
-                        if (category === 'all' || secId === category) {
-                            block.style.display = 'block';
-                            block.style.opacity = 1;
-                        } else {
-                            block.style.display = 'none';
-                            block.style.opacity = 0;
-                        }
-                    });
-                }
+                });
                 
                 // Toggle individual items inside grids
                 const allItems = document.querySelectorAll('.portfolio-item');
                 allItems.forEach(item => {
                     const itemCat = item.getAttribute('data-category');
-                    
                     if (category === 'all' || itemCat === category) {
                         item.style.display = 'block';
-                        setTimeout(() => {
-                            item.classList.add('show-item');
-                        }, 50);
+                        item.classList.add('show-item');
                     } else {
                         item.classList.remove('show-item');
-                        setTimeout(() => {
-                            item.style.display = 'none';
-                        }, 400);
+                        item.style.display = 'none';
                     }
                 });
                 
                 if (typeof ScrollTrigger !== 'undefined') {
-                    setTimeout(() => {
-                        ScrollTrigger.refresh();
-                    }, 500);
+                    ScrollTrigger.refresh();
                 }
             });
         });
     }
-
 
     /* ==========================================================================
        SERVICES GLOW SPOTLIGHT EFFECT
@@ -4215,28 +4025,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const proj = projects.find(p => p.id === projectId);
             if (!proj) return;
 
-            // If it is static design category, ignore
-            if (proj.mediaSource === 'upload') {
-                const isVideo = (proj.category === 'long' || proj.category === 'shorts');
-                if (!isVideo) return;
-            }
-
-            if (document.body.classList.contains('editor-active')) return;
-            const isAnyPlaying = document.querySelector('.project-card.playing-inline') || 
-                                 (document.getElementById('video-modal') && document.getElementById('video-modal').classList.contains('active'));
-            if (isAnyPlaying) return;
-
-            // Check if a preview is already playing inside this card
-            if (mediaContainer.querySelector('.hover-video-preview')) return;
-
-            let previewEl;
+            // Only allow lightweight video tag preview for direct video uploads on explicit desktop hover
             if (proj.mediaSource === 'upload' || isDirectVideoUrl(proj.mediaLink)) {
-                previewEl = document.createElement('video');
+                if (mediaContainer.querySelector('.hover-video-preview')) return;
+                const previewEl = document.createElement('video');
                 previewEl.muted = true;
                 previewEl.defaultMuted = true;
                 previewEl.loop = true;
                 previewEl.autoplay = true;
-                previewEl.preload = 'auto';
+                previewEl.preload = 'metadata';
                 previewEl.setAttribute('muted', '');
                 previewEl.setAttribute('playsinline', '');
                 previewEl.setAttribute('webkit-playsinline', '');
@@ -4244,172 +4041,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 previewEl.controls = false;
                 previewEl.className = 'hover-video-preview loaded';
                 previewEl.src = normalizeMediaPath(proj.mediaLink);
-                
                 mediaContainer.appendChild(previewEl);
                 try {
                     const p = previewEl.play();
                     if (p !== undefined) p.catch(() => {});
                 } catch(e) {}
-            } else {
-                const cleanId = extractYouTubeId(proj.mediaLink);
-                const streamableId = extractStreamableId(proj.mediaLink);
-                const wistiaId = extractWistiaId(proj.mediaLink);
-                const driveId = extractGoogleDriveId(proj.mediaLink);
-                const vimeoId = extractVimeoId(proj.mediaLink);
-                
-                if (streamableId) {
-                    if (!mediaContainer || mediaContainer.querySelector('.hover-video-preview')) return;
-                    const isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent);
-                    if (isMobile) {
-                        const thumbUrl = `https://cdn-cf-east.streamable.com/image/${streamableId}.jpg`;
-                        const img = document.createElement('img');
-                        img.src = thumbUrl;
-                        img.className = 'hover-video-preview';
-                        img.style.position = 'absolute';
-                        img.style.top = '0';
-                        img.style.left = '0';
-                        img.style.width = '100%';
-                        img.style.height = '100%';
-                        img.style.objectFit = 'cover';
-                        img.style.opacity = '0';
-                        img.style.transition = 'opacity 0.3s ease';
-                        img.onerror = function() { img.style.display = 'none'; };
-                        img.onload = function() { setTimeout(function() { img.style.opacity = '1'; }, 50); };
-                        mediaContainer.appendChild(img);
-                    } else {
-                        const createStreamableIframe = () => {
-                            if (!mediaContainer || mediaContainer.querySelector('.hover-video-preview')) return;
-                            const iframe = document.createElement('iframe');
-                            iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&loop=1&nocontrols=1`;
-                            iframe.className = 'hover-video-preview';
-                            iframe.style.position = 'absolute';
-                            iframe.style.top = '0';
-                            iframe.style.left = '0';
-                            iframe.style.width = '100%';
-                            iframe.style.height = '100%';
-                            iframe.style.border = 'none';
-                            iframe.style.pointerEvents = 'none';
-                            iframe.style.opacity = '0';
-                            iframe.style.transition = 'opacity 0.3s ease';
-                            iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope');
-                            iframe.setAttribute('allowfullscreen', 'true');
-                            iframe.setAttribute('playsinline', '1');
-                            iframe.setAttribute('webkit-playsinline', '1');
-                            iframe.setAttribute('scrolling', 'no');
-                            iframe.setAttribute('frameborder', '0');
-                            iframe.onload = function() { setTimeout(function() { iframe.style.opacity = '1'; }, 100); };
-                            mediaContainer.appendChild(iframe);
-                        };
-                        createStreamableIframe();
-                    }
-                } else if (wistiaId) {
-                    previewEl = document.createElement('iframe');
-                    previewEl.src = `https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=1&mute=1&muted=1&loop=1&controls=0&playsinline=1&silentAutoPlay=true`;
-                    previewEl.className = 'hover-video-preview';
-                    previewEl.style.position = 'absolute';
-                    previewEl.style.top = '0';
-                    previewEl.style.left = '0';
-                    previewEl.style.width = '100%';
-                    previewEl.style.height = '100%';
-                    previewEl.style.border = 'none';
-                    previewEl.style.pointerEvents = 'none';
-                    previewEl.style.opacity = '0';
-                    previewEl.style.transition = 'opacity 0.3s ease';
-                    previewEl.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
-                    previewEl.setAttribute('playsinline', '1');
-                    previewEl.setAttribute('webkit-playsinline', '1');
-                    previewEl.onload = function() { setTimeout(function() { previewEl.style.opacity = '1'; }, 100); };
-                    mediaContainer.appendChild(previewEl);
-                } else if (vimeoId) {
-                    previewEl = document.createElement('iframe');
-                    previewEl.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=1&loop=1&autopause=0&background=1`;
-                    previewEl.className = 'hover-video-preview';
-                    previewEl.style.position = 'absolute';
-                    previewEl.style.top = '0';
-                    previewEl.style.left = '0';
-                    previewEl.style.width = '100%';
-                    previewEl.style.height = '100%';
-                    previewEl.style.border = 'none';
-                    previewEl.style.pointerEvents = 'none';
-                    previewEl.style.opacity = '0';
-                    previewEl.style.transition = 'opacity 0.3s ease';
-                    previewEl.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
-                    previewEl.setAttribute('playsinline', '1');
-                    previewEl.setAttribute('webkit-playsinline', '1');
-                    previewEl.onload = function() {
-                        setTimeout(function() { previewEl.style.opacity = '1'; }, 100);
-                    };
-                    mediaContainer.appendChild(previewEl);
-                } else if (driveId) {
-                    const driveThumbUrl = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1280`;
-                    const img = document.createElement('img');
-                    img.src = driveThumbUrl;
-                    img.className = 'hover-video-preview';
-                    img.style.position = 'absolute';
-                    img.style.top = '0';
-                    img.style.left = '0';
-                    img.style.width = '100%';
-                    img.style.height = '100%';
-                    img.style.objectFit = 'cover';
-                    img.style.pointerEvents = 'none';
-                    img.style.opacity = '0';
-                    img.style.transition = 'opacity 0.3s ease';
-                    img.onerror = function() { img.style.display = 'none'; };
-                    img.onload = function() { setTimeout(function() { img.style.opacity = '1'; }, 50); };
-                    mediaContainer.appendChild(img);
-                } else if (cleanId) {
-                    previewEl = document.createElement('iframe');
-                    previewEl.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&enablejsapi=1`;
-                    previewEl.className = 'hover-video-preview';
-                    previewEl.style.position = 'absolute';
-                    previewEl.style.top = '0';
-                    previewEl.style.left = '0';
-                    previewEl.style.width = '100%';
-                    previewEl.style.height = '100%';
-                    previewEl.style.border = 'none';
-                    previewEl.style.pointerEvents = 'none';
-                    previewEl.style.opacity = '0';
-                    previewEl.style.transition = 'opacity 0.3s ease';
-                    previewEl.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture');
-                    previewEl.setAttribute('playsinline', '1');
-                    previewEl.setAttribute('webkit-playsinline', '1');
-                    previewEl.onload = function() {
-                        setTimeout(function() { previewEl.style.opacity = '1'; }, 100);
-                    };
-                    mediaContainer.appendChild(previewEl);
-                }
             }
         }
 
-        // Load previews as cards scroll into view (works for mobile & desktop), remove when scrolled far away
-        if ('IntersectionObserver' in window) {
-            const observerOptions = {
-                root: null,
-                rootMargin: '100px 0px',
-                threshold: 0.05
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const card = entry.target;
-                    const container = card.querySelector('.project-media');
-                    if (!container) return;
-                    const previews = container.querySelectorAll('.hover-video-preview');
-                    if (entry.isIntersecting) {
-                        previews.forEach(el => { el.style.display = ''; });
-                        if (!container.querySelector('.hover-video-preview')) {
-                            loadCardPreview(card);
-                        }
-                    } else {
-                        previews.forEach(el => { el.style.display = 'none'; });
-                    }
-                });
-            }, observerOptions);
-
-            projectCards.forEach(card => observer.observe(card));
-        }
-
-        // Desktop mouse hover immediate preview
+        // Desktop mouse hover preview for direct local video files only
         projectCards.forEach(card => {
             card.addEventListener('mouseenter', () => {
                 const container = card.querySelector('.project-media');
@@ -4429,7 +4069,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-
 
     /* ==========================================================================
        SHOWREEL SECTION AUDIO WAVEFORM SIMULATOR
@@ -4576,52 +4215,7 @@ document.addEventListener('DOMContentLoaded', () => {
             appendConsoleLog('> Main showreel streaming inline (Full Audio)... Active.');
         }
 
-        const autoObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && !autoPlayed && !isFullPlaying) {
-                    if (document.body.classList.contains('editor-active')) return;
-                    autoPlayed = true;
-                    autoObserver.disconnect();
-                    const playBtn = document.getElementById('play-showreel-btn');
-                    const vid = playBtn ? (playBtn.getAttribute('data-video-id') || 'u6KTFBKMP8M') : 'u6KTFBKMP8M';
-                    const mediaSource = playBtn ? (playBtn.getAttribute('data-media-source') || 'link') : 'link';
-                    const cleanYtId = extractYouTubeId(vid);
-                    const streamableId = extractStreamableId(vid);
-                    const wistiaId = extractWistiaId(vid);
-
-                    if (streamableId) {
-                        const createAutoIframe = () => {
-                            if (!isFullPlaying && autoPlayed && videoContainer) {
-                                videoContainer.innerHTML = `<iframe src="https://streamable.com/e/${streamableId}?autoplay=1&muted=1&loop=1&nocontrols=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;" allow="autoplay; fullscreen" allowfullscreen playsinline webkit-playsinline></iframe>`;
-                                const waveformEl = document.getElementById('waveform-canvas');
-                                if (waveformEl) waveformEl.style.display = 'none';
-                                wavePlaying = true;
-                            }
-                        };
-                        createAutoIframe();
-                    } else if (cleanYtId) {
-                        videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${cleanYtId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanYtId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&enablejsapi=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-                        const waveformEl = document.getElementById('waveform-canvas');
-                        if (waveformEl) waveformEl.style.display = 'none';
-                        wavePlaying = true;
-                        appendConsoleLog('> Showreel auto-preview started (YouTube muted loop).');
-                    } else if (wistiaId) {
-                        videoContainer.innerHTML = `<iframe src="https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&muted=true&mute=1&silentAutoPlay=true&playbar=false&smallPlayButton=false&controlsVisibleOnLoad=false&endVideoBehavior=loop" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
-                        const waveformEl = document.getElementById('waveform-canvas');
-                        if (waveformEl) waveformEl.style.display = 'none';
-                        wavePlaying = true;
-                        appendConsoleLog('> Showreel auto-preview started (Wistia loop).');
-                    } else if (mediaSource === 'upload' || isDirectVideoUrl(vid)) {
-                        videoContainer.innerHTML = `<video src="${normalizeMediaPath(vid)}" muted autoplay loop playsinline webkit-playsinline style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;pointer-events:none;"></video>`;
-                        const waveformEl = document.getElementById('waveform-canvas');
-                        if (waveformEl) waveformEl.style.display = 'none';
-                        wavePlaying = true;
-                        appendConsoleLog('> Showreel auto-preview started (uploaded video loop).');
-                    }
-                }
-            });
-        }, { threshold: 0.4 });
-        autoObserver.observe(viewport);
+        // Showreel plays instantly on click
 
         // Click event handler on showreel viewport / frame / button to play or replay full video anytime
         viewport.addEventListener('click', (e) => {
@@ -4633,7 +4227,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 frame.classList.remove('is-playing');
                 isFullPlaying = false;
                 autoPlayed = false;
-                autoObserver.observe(viewport);
+                // Ready for replay
                 const waveformEl = document.getElementById('waveform-canvas');
                 if (waveformEl) waveformEl.style.display = '';
                 const backdrop = viewport.querySelector('.showreel-glow-backdrop');
@@ -4655,7 +4249,7 @@ document.addEventListener('DOMContentLoaded', () => {
             frame.classList.remove('is-playing');
             isFullPlaying = false;
             autoPlayed = false;
-            autoObserver.observe(viewport);
+            // Ready for replay
             const waveformEl = document.getElementById('waveform-canvas');
             if (waveformEl) waveformEl.style.display = '';
             wavePlaying = false;
@@ -4950,23 +4544,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Hover-to-scroll navigation delegation
-    let hoverScrollTimeout = null;
-    document.addEventListener('mouseover', (e) => {
-        const link = e.target.closest('.spy-link, .nav-link:not(.nav-cta), .nav-menu a:not(.nav-cta)');
-        if (link) {
-            const targetId = link.getAttribute('href');
-            if (targetId && targetId.startsWith('#')) {
-                const targetSec = document.querySelector(targetId);
-                if (targetSec) {
-                    if (hoverScrollTimeout) clearTimeout(hoverScrollTimeout);
-                    hoverScrollTimeout = setTimeout(() => {
-                        targetSec.scrollIntoView({ behavior: 'smooth' });
-                    }, 120);
-                }
-            }
-        }
-    });
+    // Hover-to-scroll removed for smooth user-controlled navigation
     
     // Auto nav active updates on scrolling viewport sections
     const navLinks = document.querySelectorAll('.nav-link:not(.nav-cta)');
@@ -5217,8 +4795,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             iframe.style.width = '100%';
                             iframe.style.height = '100%';
                             iframe.style.border = 'none';
-                            iframe.style.opacity = '0';
-                            iframe.style.transition = 'opacity 0.3s ease';
+                            iframe.style.opacity = '1';
                             iframe.style.backgroundColor = '#000';
                             iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope; clipboard-write');
                             iframe.setAttribute('allowfullscreen', 'true');
@@ -5226,7 +4803,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             iframe.setAttribute('webkit-playsinline', '1');
                             iframe.setAttribute('scrolling', 'no');
                             iframe.setAttribute('frameborder', '0');
-                            iframe.onload = function() { setTimeout(function() { iframe.style.opacity = '1'; }, 100); };
                             if (wrapper) { wrapper.appendChild(iframe); }
                         };
                         createStreamableLightboxIframe();
@@ -5239,8 +4815,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         iframe.style.width = '100%';
                         iframe.style.height = '100%';
                         iframe.style.border = 'none';
-                        iframe.style.opacity = '0';
-                        iframe.style.transition = 'opacity 0.3s ease';
+                        iframe.style.opacity = '1';
                         iframe.style.backgroundColor = '#000';
                         iframe.allowFullscreen = true;
                         iframe.allow = 'autoplay; fullscreen; picture-in-picture';
@@ -5249,9 +4824,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         iframe.setAttribute('mozallowfullscreen', 'true');
                         iframe.setAttribute('playsinline', '1');
                         iframe.setAttribute('webkit-playsinline', '1');
-                        iframe.onload = function() {
-                            setTimeout(function() { iframe.style.opacity = '1'; }, 100);
-                        };
                         if (wrapper) {
                             wrapper.appendChild(iframe);
                             wrapper.appendChild(watermarkEl);
@@ -5311,14 +4883,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         iframe.style.width = '100%';
                         iframe.style.height = '100%';
                         iframe.style.border = 'none';
-                        iframe.style.opacity = '0';
-                        iframe.style.transition = 'opacity 0.3s ease';
+                        iframe.style.opacity = '1';
                         iframe.style.backgroundColor = '#000';
                         iframe.allowFullscreen = true;
                         iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
-                        iframe.onload = function() {
-                            setTimeout(function() { iframe.style.opacity = '1'; }, 100);
-                        };
                         
                         if (wrapper) {
                             wrapper.appendChild(iframe);
@@ -7147,4 +6715,10 @@ document.addEventListener('DOMContentLoaded', () => {
         set: function(val) { projects = val; },
         configurable: true
     });
-});
+}
+
+// Execute immediately (0ms delay) since DOM above this script is already constructed
+initPortfolioApp();
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPortfolioApp);
+}
