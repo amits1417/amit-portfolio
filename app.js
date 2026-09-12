@@ -4257,8 +4257,9 @@ function initPortfolioApp() {
                 try {
                     const wDetails = await getWistiaDetails(vid);
                     if (wDetails && wDetails.id) resolvedWistiaId = wDetails.id;
-                } catch(e) {}
+                } catch(e) { console.warn('Wistia resolve failed:', e); }
             }
+            if (isWistia) console.log('Wistia resolved:', resolvedWistiaId, 'from:', vid);
 
             if (mediaSource === 'upload' && !isYoutube && !isStreamable && !isWistia) {
                 const video = document.createElement('video');
@@ -4338,6 +4339,20 @@ function initPortfolioApp() {
         }
 
         // Showreel plays instantly on click
+
+        // Direct click + touch handler on play button (ensures mobile tap works)
+        const playBtn = document.getElementById('play-showreel-btn');
+        if (playBtn) {
+            playBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!isFullPlaying) playFullShowreel();
+            });
+            playBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (!isFullPlaying) playFullShowreel();
+            });
+        }
 
         // Click event handler on showreel viewport / frame / button to play or replay full video anytime
         viewport.addEventListener('click', (e) => {
