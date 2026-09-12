@@ -22,7 +22,8 @@ function initPortfolioApp() {
         if (cleanId.includes('youtu.be/')) {
             return cleanId.split('youtu.be/')[1].split('?')[0].split('&')[0];
         }
-        if (cleanId.includes('/embed/')) {
+        // Only match /embed/ for YouTube domains — not for Wistia or other providers
+        if ((cleanId.includes('youtube.com') || cleanId.includes('youtu.be')) && cleanId.includes('/embed/')) {
             return cleanId.split('/embed/')[1].split('?')[0].split('&')[0];
         }
         if (cleanId.includes('/live/')) {
@@ -618,7 +619,7 @@ function initPortfolioApp() {
             tools: "After Effects, Premiere Pro",
             desc: "High-energy vertical fintech reel showcasing cryptocurrency wallet features, security animations, and fast mobile UX.",
             mediaSource: "link",
-            mediaLink: "https://fast.wistia.net/embed/iframe/1h12yvgyx9",
+            mediaLink: "https://amits1417.wistia.com/medias/1h12yvgyx9",
             thumbSource: "auto",
             thumbLink: "https://embed-ssl.wistia.com/deliveries/3ceeaf65d79bbddcfe28bbd0e4ff8d171058bf9c.jpg?image_crop_resized=720x1280"
         },
@@ -764,7 +765,7 @@ function initPortfolioApp() {
 
         // Automatic DB version upgrade migration (forces cache clear for new defaults)
         const DB_VERSION_KEY = 'amit_portfolio_db_version';
-        const CURRENT_DB_VERSION = '24';
+        const CURRENT_DB_VERSION = '26';
         let storedVersion;
         try {
             storedVersion = localStorage.getItem(DB_VERSION_KEY);
@@ -1602,7 +1603,7 @@ function initPortfolioApp() {
             let config = {
                 title: "Featured Software Demos & explainers",
                 mediaSource: "link",
-                mediaLink: "https://amits1417.wistia.com/s/b3gm1s9eku3t288",
+                mediaLink: "xpo35n1hy1",
                 thumbLink: "https://fast.wistia.com/embed/medias/xpo35n1hy1/swatch",
                 thumbSource: "auto"
             };
@@ -2032,7 +2033,7 @@ function initPortfolioApp() {
         let config = {
             title: "Featured Software Demos & explainers",
             mediaSource: "link",
-            mediaLink: "https://amits1417.wistia.com/s/b3gm1s9eku3t288",
+            mediaLink: "xpo35n1hy1",
             thumbLink: "https://fast.wistia.com/embed/medias/xpo35n1hy1/swatch",
             thumbSource: "auto"
         };
@@ -4071,17 +4072,8 @@ function initPortfolioApp() {
             }
 
             if (wistiaId) {
-                if (isMobile) {
-                    const img = document.createElement('img');
-                    img.src = proj.thumbLink || `https://fast.wistia.com/embed/medias/${wistiaId}/swatch`;
-                    img.className = 'hover-video-preview';
-                    img.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity 0.3s ease;';
-                    img.onerror = function() { img.style.display = 'none'; };
-                    img.onload = function() { setTimeout(function() { img.style.opacity = '1'; }, 50); };
-                    mediaContainer.appendChild(img);
-                } else {
-                    createIframePreview(`https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=1&mute=1&muted=1&loop=1&controls=0&playsinline=1&quality=high&silentAutoPlay=true`);
-                }
+                // Use iframe on all devices — silentAutoPlay=true handles iOS muted autoplay policy
+                createIframePreview(`https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=1&mute=1&muted=1&loop=1&controls=0&playsinline=1&quality=high&silentAutoPlay=true`);
             } else if (cleanId) {
                 if (isMobile) {
                     const img = document.createElement('img');
@@ -4238,7 +4230,7 @@ function initPortfolioApp() {
         async function playFullShowreel() {
             if (document.body.classList.contains('editor-active')) return;
             const playBtn = document.getElementById('play-showreel-btn');
-            let vid = playBtn ? (playBtn.getAttribute('data-video-id') || 'https://amits1417.wistia.com/s/b3gm1s9eku3t288') : 'https://amits1417.wistia.com/s/b3gm1s9eku3t288';
+            let vid = playBtn ? (playBtn.getAttribute('data-video-id') || 'xpo35n1hy1') : 'xpo35n1hy1';
             const mediaSource = playBtn ? (playBtn.getAttribute('data-media-source') || 'link') : 'link';
             const cleanYtId = extractYouTubeId(vid);
             const isYoutube = !!cleanYtId;
@@ -4296,16 +4288,10 @@ function initPortfolioApp() {
                 };
                 createShowreelIframe();
             } else if (isWistia) {
-                const isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent);
-                if (isMobile) {
-                    // Mobile: show thumbnail + open Wistia in new tab on tap
-                    frame.classList.remove('is-playing');
-                    isFullPlaying = false;
-                    window.open(`https://amits1417.wistia.com/medias/${resolvedWistiaId}`, '_blank');
-                    return;
-                }
                 const iframe = document.createElement('iframe');
-                iframe.src = `https://fast.wistia.net/embed/iframe/${resolvedWistiaId}?autoPlay=true&playsinline=true&volume=1&quality=high&controls=1&fullscreen=true`;
+                // silentAutoPlay=true lets Wistia start muted on iOS/Android (satisfies autoplay policy),
+                // then the user can unmute. autoPlay=1 triggers play on desktop.
+                iframe.src = `https://fast.wistia.net/embed/iframe/${resolvedWistiaId}?autoPlay=1&silentAutoPlay=true&playsinline=true&volume=1&quality=high&controls=1&fullscreen=true`;
                 iframe.style.position = 'absolute';
                 iframe.style.top = '0';
                 iframe.style.left = '0';
@@ -4315,9 +4301,10 @@ function initPortfolioApp() {
                 iframe.style.opacity = '1';
                 iframe.style.backgroundColor = '#000';
                 iframe.allowFullscreen = true;
-                iframe.allow = 'autoplay *; fullscreen *; picture-in-picture *; encrypted-media *';
+                iframe.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media';
                 iframe.setAttribute('allowfullscreen', 'true');
                 iframe.setAttribute('webkitallowfullscreen', 'true');
+                iframe.setAttribute('mozallowfullscreen', 'true');
                 iframe.setAttribute('playsinline', '1');
                 iframe.setAttribute('webkit-playsinline', '1');
                 videoContainer.appendChild(iframe);
@@ -4949,7 +4936,9 @@ function initPortfolioApp() {
                         createStreamableLightboxIframe();
                     } else if (wistiaId) {
                         const iframe = document.createElement('iframe');
-                        iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&playsinline=true&volume=1&quality=high&controls=1&fullscreen=true`;
+                        // autoPlay=1 (not "true") + silentAutoPlay=true starts muted on iOS/Android
+                        // satisfying the browser autoplay policy. User can unmute via Wistia controls.
+                        iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=1&silentAutoPlay=true&playsinline=true&volume=1&quality=high&controls=1&fullscreen=true`;
                         iframe.style.position = 'absolute';
                         iframe.style.top = '0';
                         iframe.style.left = '0';
@@ -4959,7 +4948,7 @@ function initPortfolioApp() {
                         iframe.style.opacity = '1';
                         iframe.style.backgroundColor = '#000';
                         iframe.allowFullscreen = true;
-                        iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+                        iframe.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media';
                         iframe.setAttribute('allowfullscreen', 'true');
                         iframe.setAttribute('webkitallowfullscreen', 'true');
                         iframe.setAttribute('mozallowfullscreen', 'true');
