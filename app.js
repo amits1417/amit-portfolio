@@ -4295,8 +4295,12 @@ function initPortfolioApp() {
                 };
                 createShowreelIframe();
             } else if (isWistia) {
+                const isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent);
                 const iframe = document.createElement('iframe');
-                iframe.src = `https://fast.wistia.net/embed/iframe/${resolvedWistiaId}?autoPlay=true&playsinline=true&volume=1&quality=high&controls=1&fullscreen=true`;
+                const wistiaParams = isMobile
+                    ? `autoPlay=true&playsinline=true&mute=1&muted=1&volume=0&quality=high&controls=1&fullscreen=true`
+                    : `autoPlay=true&playsinline=true&volume=1&quality=high&controls=1&fullscreen=true`;
+                iframe.src = `https://fast.wistia.net/embed/iframe/${resolvedWistiaId}?${wistiaParams}`;
                 iframe.style.position = 'absolute';
                 iframe.style.top = '0';
                 iframe.style.left = '0';
@@ -4306,7 +4310,7 @@ function initPortfolioApp() {
                 iframe.style.opacity = '1';
                 iframe.style.backgroundColor = '#000';
                 iframe.allowFullscreen = true;
-                iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+                iframe.allow = 'autoplay *; fullscreen *; picture-in-picture *; encrypted-media *';
                 iframe.setAttribute('allowfullscreen', 'true');
                 iframe.setAttribute('webkitallowfullscreen', 'true');
                 iframe.setAttribute('playsinline', '1');
