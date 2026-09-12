@@ -5544,7 +5544,13 @@ function initPortfolioApp() {
                     const cleanVimeoId = extractVimeoId(mediaLink);
                     
                     if (cleanWistiaId) {
-                        mediaLink = `https://fast.wistia.net/embed/iframe/${cleanWistiaId}`;
+                        // Resolve share link to real media ID via oembed
+                        let resolvedId = cleanWistiaId;
+                        try {
+                            const wDetails = await getWistiaDetails(mediaLink);
+                            if (wDetails && wDetails.id) resolvedId = wDetails.id;
+                        } catch(e) {}
+                        mediaLink = `https://fast.wistia.net/embed/iframe/${resolvedId}`;
                     } else if (cleanStreamableId) {
                         mediaLink = `https://streamable.com/${cleanStreamableId}`;
                         if (!title) {
