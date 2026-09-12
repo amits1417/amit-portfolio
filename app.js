@@ -4359,10 +4359,11 @@ function initPortfolioApp() {
                 vidEl.loop = true;
                 vidEl.playsInline = true;
                 vidEl.preload = 'auto';
-                vidEl.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;';
+                vidEl.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;';
                 wrap.appendChild(vidEl);
                 videoContainer.appendChild(wrap);
-                vidEl.addEventListener('click', () => {
+                wrap.style.cursor = 'pointer';
+                wrap.addEventListener('click', () => {
                     if (vidEl.muted) {
                         vidEl.muted = false;
                         vidEl.loop = false;
