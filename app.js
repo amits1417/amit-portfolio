@@ -4347,42 +4347,30 @@ function initPortfolioApp() {
             if (isWistia) console.log('Wistia resolved:', resolvedWistiaId, 'from:', vid);
 
             if ((mediaSource === 'upload' || isDirectVideoUrl(vid)) && !isYoutube && !isStreamable && !isWistia) {
+                if (isFullPlaying) {
+                    videoContainer.innerHTML = '';
+                    frame.classList.remove('is-playing');
+                    isFullPlaying = false;
+                    return;
+                }
                 const overlay = document.getElementById('showreel-overlay');
                 if (overlay) overlay.style.display = 'none';
-                const wrap = document.createElement('div');
-                wrap.className = 'glass-video-wrap';
+                videoContainer.innerHTML = '';
                 const vidEl = document.createElement('video');
                 vidEl.src = normalizeMediaPath(vid);
-                vidEl.muted = true;
-                vidEl.defaultMuted = true;
-                vidEl.setAttribute('muted', '');
-                vidEl.autoplay = true;
-                vidEl.loop = true;
+                vidEl.controls = true;
                 vidEl.playsInline = true;
                 vidEl.preload = 'auto';
-                vidEl.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;';
-                wrap.appendChild(vidEl);
-                videoContainer.appendChild(wrap);
-                wrap.style.cursor = 'pointer';
-                vidEl.addEventListener('loadeddata', () => {
-                    vidEl.muted = true;
-                    vidEl.setAttribute('muted', '');
+                vidEl.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;background:#000;';
+                videoContainer.appendChild(vidEl);
+                frame.classList.add('is-playing');
+                isFullPlaying = true;
+                vidEl.addEventListener('ended', () => {
+                    frame.classList.remove('is-playing');
+                    isFullPlaying = false;
+                    videoContainer.innerHTML = '';
                 });
-                wrap.addEventListener('click', () => {
-                    const wasMuted = vidEl.muted;
-                    if (wasMuted) {
-                        vidEl.muted = false;
-                        vidEl.removeAttribute('muted');
-                        vidEl.loop = false;
-                        vidEl.volume = 1;
-                        vidEl.play();
-                    } else if (!vidEl.paused) {
-                        vidEl.pause();
-                    } else {
-                        vidEl.play();
-                    }
-                });
-                try { vidEl.play(); } catch(e) {}
+                vidEl.play();
             } else if (isStreamable) {
                 const createShowreelIframe = () => {
                     if (!videoContainer) return;
@@ -4464,20 +4452,8 @@ function initPortfolioApp() {
         viewport.addEventListener('click', (e) => {
             if (e.target.closest('#btn-edit-showreel') || e.target.closest('.showreel-edit-overlay')) return;
             if (document.body.classList.contains('editor-active')) return;
-            if (isFullPlaying) {
-                // Toggle: stop playing and restore initial state
-                videoContainer.innerHTML = '';
-                frame.classList.remove('is-playing');
-                isFullPlaying = false;
-                autoPlayed = false;
-                // Ready for replay
-                const waveformEl = document.getElementById('waveform-canvas');
-                if (waveformEl) waveformEl.style.display = '';
-                const backdrop = viewport.querySelector('.showreel-glow-backdrop');
-                if (backdrop) backdrop.style.display = '';
-            } else {
-                playFullShowreel();
-            }
+            if (isFullPlaying) return;
+            playFullShowreel();
         });
 
         // Auto-play showreel muted when scrolled into view
