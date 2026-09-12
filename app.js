@@ -4073,7 +4073,7 @@ function initPortfolioApp() {
 
             if (wistiaId) {
                 // Use iframe on all devices — silentAutoPlay=true handles iOS muted autoplay policy
-                createIframePreview(`https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=1&mute=1&muted=1&loop=1&controls=0&playsinline=1&quality=high&silentAutoPlay=true`);
+                    createIframePreview(`https://fast.wistia.net/embed/iframe/${wistiaId}?autoplay=1&mute=1&muted=1&loop=1&controls=0&playsinline=1`);
             } else if (cleanId) {
                 if (isMobile) {
                     const img = document.createElement('img');
@@ -4289,9 +4289,7 @@ function initPortfolioApp() {
                 createShowreelIframe();
             } else if (isWistia) {
                 const iframe = document.createElement('iframe');
-                // silentAutoPlay=true lets Wistia start muted on iOS/Android (satisfies autoplay policy),
-                // then the user can unmute. autoPlay=1 triggers play on desktop.
-                iframe.src = `https://fast.wistia.net/embed/iframe/${resolvedWistiaId}?autoPlay=1&silentAutoPlay=true&playsinline=true&volume=1&quality=high&controls=1&fullscreen=true`;
+                iframe.src = `https://fast.wistia.net/embed/iframe/${resolvedWistiaId}`;
                 iframe.style.position = 'absolute';
                 iframe.style.top = '0';
                 iframe.style.left = '0';
@@ -4936,9 +4934,7 @@ function initPortfolioApp() {
                         createStreamableLightboxIframe();
                     } else if (wistiaId) {
                         const iframe = document.createElement('iframe');
-                        // autoPlay=1 (not "true") + silentAutoPlay=true starts muted on iOS/Android
-                        // satisfying the browser autoplay policy. User can unmute via Wistia controls.
-                        iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=1&silentAutoPlay=true&playsinline=true&volume=1&quality=high&controls=1&fullscreen=true`;
+                        iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}`;
                         iframe.style.position = 'absolute';
                         iframe.style.top = '0';
                         iframe.style.left = '0';
