@@ -4335,8 +4335,40 @@ function initPortfolioApp() {
             if ((mediaSource === 'upload' || isDirectVideoUrl(vid)) && !isYoutube && !isStreamable && !isWistia) {
                 const overlay = document.getElementById('showreel-overlay');
                 if (overlay) overlay.style.display = 'none';
-                console.log('Creating glass player for:', vid);
-                createGlassPlayer(normalizeMediaPath(vid), videoContainer);
+                const wrap = document.createElement('div');
+                wrap.className = 'glass-video-wrap';
+                const vidEl = document.createElement('video');
+                vidEl.src = normalizeMediaPath(vid);
+                vidEl.muted = true;
+                vidEl.defaultMuted = true;
+                vidEl.autoplay = true;
+                vidEl.loop = true;
+                vidEl.playsInline = true;
+                vidEl.preload = 'auto';
+                vidEl.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;';
+                wrap.appendChild(vidEl);
+                videoContainer.appendChild(wrap);
+                vidEl.addEventListener('click', () => {
+                    if (vidEl.muted) {
+                        vidEl.muted = false;
+                        vidEl.loop = false;
+                        vidEl.volume = 1;
+                        if (wrap.requestFullscreen) wrap.requestFullscreen();
+                        else if (wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
+                        vidEl.play();
+                    } else if (!vidEl.paused) {
+                        vidEl.pause();
+                    } else {
+                        vidEl.play();
+                    }
+                });
+                wrap.addEventListener('fullscreenchange', () => {
+                    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                        vidEl.muted = true;
+                        vidEl.loop = true;
+                    }
+                });
+                try { vidEl.play(); } catch(e) {}
             } else if (isStreamable) {
                 const createShowreelIframe = () => {
                     if (!videoContainer) return;
