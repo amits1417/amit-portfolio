@@ -4080,7 +4080,7 @@ function initPortfolioApp() {
                     img.onload = function() { setTimeout(function() { img.style.opacity = '1'; }, 50); };
                     mediaContainer.appendChild(img);
                 } else {
-                    createIframePreview(`https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=1&mute=1&muted=1&loop=1&controls=0&playsinline=1&silentAutoPlay=true`);
+                    createIframePreview(`https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=1&mute=1&muted=1&loop=1&controls=0&playsinline=1&quality=high&silentAutoPlay=true`);
                 }
             } else if (cleanId) {
                 if (isMobile) {
@@ -4137,6 +4137,27 @@ function initPortfolioApp() {
                 }
             });
         });
+
+        // Scroll-based auto-preview: play when card enters viewport, stop when leaving
+        if (typeof IntersectionObserver !== 'undefined') {
+            const previewObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const card = entry.target;
+                    const container = card.querySelector('.project-media');
+                    if (!container) return;
+                    if (entry.isIntersecting) {
+                        const existing = container.querySelectorAll('.hover-video-preview');
+                        existing.forEach(el => { el.style.display = ''; });
+                        if (!container.querySelector('.hover-video-preview')) {
+                            loadCardPreview(card);
+                        }
+                    } else {
+                        container.querySelectorAll('.hover-video-preview').forEach(el => { el.style.display = 'none'; });
+                    }
+                });
+            }, { rootMargin: '100px 0px', threshold: 0.1 });
+            projectCards.forEach(card => previewObserver.observe(card));
+        }
     }
 
     /* ==========================================================================
@@ -4275,7 +4296,7 @@ function initPortfolioApp() {
                 createShowreelIframe();
             } else if (isWistia) {
                 const iframe = document.createElement('iframe');
-                iframe.src = `https://fast.wistia.net/embed/iframe/${resolvedWistiaId}?autoPlay=true&playsinline=true&mute=1&muted=1&silentAutoPlay=true`;
+                iframe.src = `https://fast.wistia.net/embed/iframe/${resolvedWistiaId}?autoPlay=true&playsinline=true&volume=1&quality=high&controls=1&fullscreen=true`;
                 iframe.style.position = 'absolute';
                 iframe.style.top = '0';
                 iframe.style.left = '0';
@@ -4905,7 +4926,7 @@ function initPortfolioApp() {
                         createStreamableLightboxIframe();
                     } else if (wistiaId) {
                         const iframe = document.createElement('iframe');
-                        iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&playsinline=true&mute=1&muted=1&silentAutoPlay=true`;
+                        iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&playsinline=true&volume=1&quality=high&controls=1&fullscreen=true`;
                         iframe.style.position = 'absolute';
                         iframe.style.top = '0';
                         iframe.style.left = '0';
@@ -5567,15 +5588,15 @@ function initPortfolioApp() {
                     const cleanStreamableId = extractStreamableId(mediaLink);
                     const cleanGoogleDriveId = extractGoogleDriveId(mediaLink);
                     const cleanVimeoId = extractVimeoId(mediaLink);
+                    let wistiaResolvedId = cleanWistiaId;
                     
                     if (cleanWistiaId) {
                         // Resolve share link to real media ID via oembed
-                        let resolvedId = cleanWistiaId;
                         try {
                             const wDetails = await getWistiaDetails(mediaLink);
-                            if (wDetails && wDetails.id) resolvedId = wDetails.id;
+                            if (wDetails && wDetails.id) wistiaResolvedId = wDetails.id;
                         } catch(e) {}
-                        mediaLink = `https://fast.wistia.net/embed/iframe/${resolvedId}`;
+                        mediaLink = `https://fast.wistia.net/embed/iframe/${wistiaResolvedId}`;
                     } else if (cleanStreamableId) {
                         mediaLink = `https://streamable.com/${cleanStreamableId}`;
                         if (!title) {
@@ -5636,7 +5657,8 @@ function initPortfolioApp() {
                         if (cleanYtId) {
                             thumbLink = await getBestYoutubeThumbnail(cleanYtId);
                         } else if (cleanWistiaId) {
-                            thumbLink = `https://fast.wistia.com/embed/medias/${cleanWistiaId}/swatch`;
+                            const resolvedWistiaId = wistiaResolvedId || cleanWistiaId;
+                            thumbLink = `https://fast.wistia.com/embed/medias/${resolvedWistiaId}/swatch`;
                         } else if (cleanGoogleDriveId) {
                             thumbLink = `https://drive.google.com/thumbnail?id=${cleanGoogleDriveId}&sz=w1280`;
                         } else if (cleanStreamableId) {
