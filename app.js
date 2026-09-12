@@ -1603,15 +1603,15 @@ function initPortfolioApp() {
             let config = {
                 title: "Featured Software Demos & explainers",
                 mediaSource: "link",
-                mediaLink: "xpo35n1hy1",
+                mediaLink: "https://pub-069db4deb1444820b524ff7460ae854f.r2.dev/Amit%20Sharma%20(AI%20Avtar%20introduction).mp4",
                 thumbLink: "https://fast.wistia.com/embed/medias/xpo35n1hy1/swatch",
                 thumbSource: "auto"
             };
             if (stored) {
                 try {
                     config = JSON.parse(stored);
-                    if (config.mediaLink === 'u6KTFBKMP8M') {
-                        config.mediaLink = 'xpo35n1hy1';
+                    if (config.mediaLink === 'u6KTFBKMP8M' || config.mediaLink === 'xpo35n1hy1') {
+                        config.mediaLink = 'https://pub-069db4deb1444820b524ff7460ae854f.r2.dev/Amit%20Sharma%20(AI%20Avtar%20introduction).mp4';
                         config.thumbLink = 'https://fast.wistia.com/embed/medias/xpo35n1hy1/swatch';
                         localStorage.setItem('amit_portfolio_showreel', JSON.stringify(config));
                     }
@@ -2038,18 +2038,20 @@ function initPortfolioApp() {
         let config = {
             title: "Featured Software Demos & explainers",
             mediaSource: "link",
-            mediaLink: "xpo35n1hy1",
+            mediaLink: "https://pub-069db4deb1444820b524ff7460ae854f.r2.dev/Amit%20Sharma%20(AI%20Avtar%20introduction).mp4",
             thumbLink: "https://fast.wistia.com/embed/medias/xpo35n1hy1/swatch",
             thumbSource: "auto"
         };
         if (stored) {
             try {
                 config = JSON.parse(stored);
-                if (config.mediaLink === 'u6KTFBKMP8M') {
-                    config.mediaLink = 'xpo35n1hy1';
+                if (config.mediaLink === 'u6KTFBKMP8M' || config.mediaLink === 'xpo35n1hy1') {
+                    config.mediaLink = 'https://pub-069db4deb1444820b524ff7460ae854f.r2.dev/Amit%20Sharma%20(AI%20Avtar%20introduction).mp4';
                     config.thumbLink = 'https://fast.wistia.com/embed/medias/xpo35n1hy1/swatch';
                     localStorage.setItem('amit_portfolio_showreel', JSON.stringify(config));
                 }
+            } catch(e) {}
+        }
             } catch(e) {}
         }
         
@@ -4240,7 +4242,7 @@ function initPortfolioApp() {
         async function playFullShowreel() {
             if (document.body.classList.contains('editor-active')) return;
             const playBtn = document.getElementById('play-showreel-btn');
-            let vid = playBtn ? (playBtn.getAttribute('data-video-id') || 'xpo35n1hy1') : 'xpo35n1hy1';
+            let vid = playBtn ? (playBtn.getAttribute('data-video-id') || 'https://pub-069db4deb1444820b524ff7460ae854f.r2.dev/Amit%20Sharma%20(AI%20Avtar%20introduction).mp4') : 'https://pub-069db4deb1444820b524ff7460ae854f.r2.dev/Amit%20Sharma%20(AI%20Avtar%20introduction).mp4';
             const mediaSource = playBtn ? (playBtn.getAttribute('data-media-source') || 'link') : 'link';
             const cleanYtId = extractYouTubeId(vid);
             const isYoutube = !!cleanYtId;
