@@ -1602,8 +1602,8 @@ function initPortfolioApp() {
             let config = {
                 title: "Featured Software Demos & explainers",
                 mediaSource: "link",
-                mediaLink: "u6KTFBKMP8M",
-                thumbLink: "./assets/showreel_cover_compelling.png",
+                mediaLink: "https://amits1417.wistia.com/s/b3gm1s9eku3t288",
+                thumbLink: "https://fast.wistia.com/embed/medias/xpo35n1hy1/swatch",
                 thumbSource: "auto"
             };
             if (stored) {
@@ -2032,8 +2032,8 @@ function initPortfolioApp() {
         let config = {
             title: "Featured Software Demos & explainers",
             mediaSource: "link",
-            mediaLink: "u6KTFBKMP8M",
-            thumbLink: "./assets/showreel_cover_compelling.png",
+            mediaLink: "https://amits1417.wistia.com/s/b3gm1s9eku3t288",
+            thumbLink: "https://fast.wistia.com/embed/medias/xpo35n1hy1/swatch",
             thumbSource: "auto"
         };
         if (stored) {
@@ -4217,7 +4217,7 @@ function initPortfolioApp() {
         function playFullShowreel() {
             if (document.body.classList.contains('editor-active')) return;
             const playBtn = document.getElementById('play-showreel-btn');
-            const vid = playBtn ? (playBtn.getAttribute('data-video-id') || 'u6KTFBKMP8M') : 'u6KTFBKMP8M';
+            const vid = playBtn ? (playBtn.getAttribute('data-video-id') || 'https://amits1417.wistia.com/s/b3gm1s9eku3t288') : 'https://amits1417.wistia.com/s/b3gm1s9eku3t288';
             const mediaSource = playBtn ? (playBtn.getAttribute('data-media-source') || 'link') : 'link';
             const cleanYtId = extractYouTubeId(vid);
             const isYoutube = !!cleanYtId;
