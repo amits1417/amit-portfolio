@@ -264,16 +264,7 @@ select option {
    PRELOADER SCREEN
    ========================================================================== */
 .loader-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--bg-primary);
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: none !important;
 }
 
 .loader-content {
@@ -1395,16 +1386,15 @@ html.light-mode .marquee-dot,
 }
 
 .portfolio-item {
-    display: none;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
+    display: block;
+    opacity: 1;
+    transform: none;
 }
 
 .portfolio-item.show-item {
     display: block;
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
 }
 
 .project-card {
@@ -3083,7 +3073,7 @@ footer {
     align-items: center;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .video-modal-overlay.active {
@@ -3128,6 +3118,7 @@ footer {
     position: relative;
     width: 100%;
     padding-top: 56.25%; /* Default 16:9 */
+    background: #000 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 50 50'%3E%3Cpath fill='%2300f2fe' d='M25,5A20,20,0,1,0,45,25A20,20,0,0,0,25,5ZM25,41A16,16,0,1,1,41,25A16,16,0,0,1,25,41Z' opacity='0.2'/%3E%3Cpath fill='%2300f2fe' d='M25,5A20,20,0,0,1,45,25h-4A16,16,0,0,0,25,9Z'%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 25 25' to='360 25 25' dur='0.8s' repeatCount='indefinite'/%3E%3C/path%3E%3C/svg%3E") center center no-repeat;
 }
 
 .video-modal-iframe-wrapper iframe {
@@ -6489,5 +6480,167 @@ body.light-mode .graphics-view-more-btn:hover {
 body.editor-active .card-edit-overlay {
     display: flex !important;
     opacity: 1 !important;
+}
+
+/* ==========================================================================
+   GLASSMORPHIC VIDEO PLAYER
+   ========================================================================== */
+.glass-video-wrap {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 10;
+    overflow: hidden;
+    border-radius: 16px;
+}
+.glass-video-wrap video {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.glass-controls {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 10px 14px 12px;
+    background: linear-gradient(transparent, rgba(5,7,6,0.75));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(22,139,255,0.15);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 11;
+}
+.glass-video-wrap:hover .glass-controls,
+.glass-controls.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+.glass-seek-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.glass-seek {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.12);
+    outline: none;
+    cursor: pointer;
+}
+.glass-seek::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--accent-cyan);
+    box-shadow: 0 0 8px rgba(22,139,255,0.6);
+    cursor: pointer;
+}
+.glass-seek::-moz-range-thumb {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--accent-cyan);
+    box-shadow: 0 0 8px rgba(22,139,255,0.6);
+    border: none;
+    cursor: pointer;
+}
+.glass-time {
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.7);
+    font-family: 'DM Sans', monospace;
+    white-space: nowrap;
+    min-width: 32px;
+    text-align: center;
+}
+.glass-btn-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+}
+.glass-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.85);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s, transform 0.15s;
+    line-height: 0;
+}
+.glass-btn:hover {
+    color: var(--accent-cyan);
+    transform: scale(1.15);
+}
+.glass-btn svg, .glass-btn i { width: 16px; height: 16px; }
+.glass-vol-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.glass-vol {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 50px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.15);
+    outline: none;
+    cursor: pointer;
+}
+.glass-vol::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+}
+.glass-vol::-moz-range-thumb {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #fff;
+    border: none;
+    cursor: pointer;
+}
+.glass-play-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 12;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+.glass-play-overlay.visible {
+    opacity: 1;
+}
+.glass-play-overlay .gp-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: rgba(22,139,255,0.35);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1.5px solid rgba(22,139,255,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 24px rgba(22,139,255,0.25);
+}
+.glass-play-overlay .gp-icon svg {
+    width: 22px; height: 22px;
+    color: #fff;
+    fill: #fff;
+    margin-left: 2px;
 }
 

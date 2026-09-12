@@ -4226,6 +4226,111 @@ function initPortfolioApp() {
         drawWaveform();
     }
 
+    // Glassmorphic video player creator
+    function createGlassPlayer(src, container) {
+        const wrap = document.createElement('div');
+        wrap.className = 'glass-video-wrap';
+        const vid = document.createElement('video');
+        vid.src = src;
+        vid.muted = true;
+        vid.defaultMuted = true;
+        vid.autoplay = true;
+        vid.loop = true;
+        vid.playsInline = true;
+        vid.preload = 'auto';
+        vid.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;';
+        wrap.appendChild(vid);
+
+        // Play/pause overlay icon
+        const overlay = document.createElement('div');
+        overlay.className = 'glass-play-overlay';
+        overlay.innerHTML = '<div class="gp-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="5,3 19,12 5,21"/></svg></div>';
+        wrap.appendChild(overlay);
+
+        // Controls bar
+        const controls = document.createElement('div');
+        controls.className = 'glass-controls';
+        const svgPlay = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21" fill="currentColor" stroke="none"/></svg>';
+        const svgPause = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" fill="currentColor" stroke="none"/><rect x="14" y="4" width="4" height="16" fill="currentColor" stroke="none"/></svg>';
+        const svgMute = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19" fill="currentColor" stroke="none"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
+        const svgUnmute = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19" fill="currentColor" stroke="none"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
+        const svgFS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
+
+        controls.innerHTML = `
+            <div class="glass-seek-row">
+                <input type="range" class="glass-seek" min="0" max="100" value="0" step="0.1">
+                <span class="glass-time glass-cur">0:00</span>
+                <span class="glass-time">/</span>
+                <span class="glass-time glass-dur">0:00</span>
+            </div>
+            <div class="glass-btn-row">
+                <button class="glass-btn glass-play-btn" type="button">${svgPause}</button>
+                <div class="glass-vol-wrap">
+                    <button class="glass-btn glass-mute-btn" type="button">${svgMute}</button>
+                    <input type="range" class="glass-vol" min="0" max="1" step="0.05" value="0">
+                </div>
+                <button class="glass-btn glass-fs-btn" type="button" style="margin-left:auto">${svgFS}</button>
+            </div>`;
+        wrap.appendChild(controls);
+        container.appendChild(wrap);
+
+        const seek = controls.querySelector('.glass-seek');
+        const curTime = controls.querySelector('.glass-cur');
+        const durTime = controls.querySelector('.glass-dur');
+        const playBtn = controls.querySelector('.glass-play-btn');
+        const muteBtn = controls.querySelector('.glass-mute-btn');
+        const volSlider = controls.querySelector('.glass-vol');
+        const fsBtn = controls.querySelector('.glass-fs-btn');
+
+        function fmt(t) { if (isNaN(t)) return '0:00'; const m = Math.floor(t/60); const s = Math.floor(t%60); return m+':'+(s<10?'0':'')+s; }
+
+        vid.addEventListener('loadedmetadata', () => { durTime.textContent = fmt(vid.duration); });
+        vid.addEventListener('timeupdate', () => {
+            if (!seek.dragging) { seek.value = vid.duration ? (vid.currentTime/vid.duration)*100 : 0; }
+            curTime.textContent = fmt(vid.currentTime);
+        });
+        vid.addEventListener('play', () => { playBtn.innerHTML = svgPause; });
+        vid.addEventListener('pause', () => { playBtn.innerHTML = svgPlay; });
+
+        vid.addEventListener('click', () => {
+            if (vid.muted) { vid.muted = false; vid.loop = false; volSlider.value = vid.volume; muteBtn.innerHTML = svgUnmute; overlay.classList.remove('visible'); return; }
+            if (vid.paused) { vid.play(); overlay.classList.remove('visible'); }
+            else { vid.pause(); overlay.classList.add('visible'); }
+        });
+
+        playBtn.addEventListener('click', (e) => { e.stopPropagation(); if (vid.paused) { vid.play(); overlay.classList.remove('visible'); } else { vid.pause(); overlay.classList.add('visible'); } });
+
+        let wasMuted = true;
+        muteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (vid.muted) { vid.muted = false; vid.loop = false; wasMuted = false; muteBtn.innerHTML = svgUnmute; volSlider.value = vid.volume || 1; }
+            else { vid.muted = true; wasMuted = true; muteBtn.innerHTML = svgMute; volSlider.value = 0; }
+        });
+
+        volSlider.addEventListener('input', (e) => { e.stopPropagation(); vid.volume = parseFloat(volSlider.value); if (vid.volume > 0) { vid.muted = false; vid.loop = false; muteBtn.innerHTML = svgUnmute; } else { vid.muted = true; muteBtn.innerHTML = svgMute; } });
+
+        seek.addEventListener('input', (e) => { e.stopPropagation(); seek.dragging = true; vid.currentTime = (seek.value/100)*vid.duration; });
+        seek.addEventListener('change', () => { seek.dragging = false; });
+        ['mousedown','touchstart'].forEach(ev => seek.addEventListener(ev, (e) => e.stopPropagation()));
+
+        fsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (wrap.requestFullscreen) wrap.requestFullscreen();
+            else if (wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
+        });
+        wrap.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement || document.webkitFullscreenElement) { vid.muted = false; vid.loop = false; vid.play(); muteBtn.innerHTML = svgUnmute; volSlider.value = vid.volume || 1; }
+            else { vid.muted = true; vid.loop = true; muteBtn.innerHTML = svgMute; volSlider.value = 0; }
+        });
+
+        // Show overlay initially, hide on first play
+        overlay.classList.add('visible');
+        vid.addEventListener('playing', () => { overlay.classList.remove('visible'); }, { once: true });
+
+        try { vid.play(); } catch(e) {}
+        return { video: vid, wrap: wrap };
+    }
+
     // Auto-preview showreel muted when section scrolls into view & handle full playback
     (function() {
         const viewport = document.getElementById('showreel-viewport');
@@ -4264,32 +4369,7 @@ function initPortfolioApp() {
             if (isWistia) console.log('Wistia resolved:', resolvedWistiaId, 'from:', vid);
 
             if ((mediaSource === 'upload' || isDirectVideoUrl(vid)) && !isYoutube && !isStreamable && !isWistia) {
-                const video = document.createElement('video');
-                video.src = normalizeMediaPath(vid);
-                video.muted = true;
-                video.defaultMuted = true;
-                video.autoplay = true;
-                video.loop = true;
-                video.playsInline = true;
-                video.preload = 'auto';
-                video.style.position = 'absolute';
-                video.style.top = '0';
-                video.style.left = '0';
-                video.style.width = '100%';
-                video.style.height = '100%';
-                video.style.border = 'none';
-                video.style.cursor = 'pointer';
-                videoContainer.appendChild(video);
-                video.addEventListener('click', () => {
-                    if (video.paused) { video.play(); }
-                    else if (video.muted) { video.muted = false; video.loop = false; }
-                    else { video.requestFullscreen(); }
-                });
-                video.addEventListener('fullscreenchange', () => {
-                    if (document.fullscreenElement) { video.muted = false; video.loop = false; video.play(); }
-                    else { video.muted = true; video.defaultMuted = true; video.loop = true; }
-                });
-                try { video.play(); } catch(e) {}
+                createGlassPlayer(normalizeMediaPath(vid), videoContainer);
             } else if (isStreamable) {
                 const createShowreelIframe = () => {
                     if (!videoContainer) return;
