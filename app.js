@@ -4263,7 +4263,7 @@ function initPortfolioApp() {
             }
             if (isWistia) console.log('Wistia resolved:', resolvedWistiaId, 'from:', vid);
 
-            if (mediaSource === 'upload' && !isYoutube && !isStreamable && !isWistia) {
+            if ((mediaSource === 'upload' || isDirectVideoUrl(vid)) && !isYoutube && !isStreamable && !isWistia) {
                 const video = document.createElement('video');
                 video.src = normalizeMediaPath(vid);
                 video.controls = true;
