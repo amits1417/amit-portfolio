@@ -4266,8 +4266,11 @@ function initPortfolioApp() {
             if ((mediaSource === 'upload' || isDirectVideoUrl(vid)) && !isYoutube && !isStreamable && !isWistia) {
                 const video = document.createElement('video');
                 video.src = normalizeMediaPath(vid);
-                video.controls = true;
+                video.muted = true;
+                video.defaultMuted = true;
                 video.autoplay = true;
+                video.loop = true;
+                video.playsInline = true;
                 video.preload = 'auto';
                 video.style.position = 'absolute';
                 video.style.top = '0';
@@ -4275,7 +4278,18 @@ function initPortfolioApp() {
                 video.style.width = '100%';
                 video.style.height = '100%';
                 video.style.border = 'none';
+                video.style.cursor = 'pointer';
                 videoContainer.appendChild(video);
+                video.addEventListener('click', () => {
+                    if (video.paused) { video.play(); }
+                    else if (video.muted) { video.muted = false; video.loop = false; }
+                    else { video.requestFullscreen(); }
+                });
+                video.addEventListener('fullscreenchange', () => {
+                    if (document.fullscreenElement) { video.muted = false; video.loop = false; video.play(); }
+                    else { video.muted = true; video.defaultMuted = true; video.loop = true; }
+                });
+                try { video.play(); } catch(e) {}
             } else if (isStreamable) {
                 const createShowreelIframe = () => {
                     if (!videoContainer) return;
