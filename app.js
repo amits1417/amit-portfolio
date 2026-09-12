@@ -4228,8 +4228,10 @@ function initPortfolioApp() {
 
             const streamableId = extractStreamableId(vid);
             const isStreamable = !!streamableId;
+            const wistiaId = extractWistiaId(vid);
+            const isWistia = !!wistiaId;
 
-            if (mediaSource === 'upload' && !isYoutube && !isStreamable) {
+            if (mediaSource === 'upload' && !isYoutube && !isStreamable && !isWistia) {
                 const video = document.createElement('video');
                 video.src = normalizeMediaPath(vid);
                 video.controls = true;
@@ -4263,6 +4265,24 @@ function initPortfolioApp() {
                     videoContainer.appendChild(iframe);
                 };
                 createShowreelIframe();
+            } else if (isWistia) {
+                const iframe = document.createElement('iframe');
+                iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&playsinline=true&mute=1&muted=1&silentAutoPlay=true`;
+                iframe.style.position = 'absolute';
+                iframe.style.top = '0';
+                iframe.style.left = '0';
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.border = 'none';
+                iframe.style.opacity = '1';
+                iframe.style.backgroundColor = '#000';
+                iframe.allowFullscreen = true;
+                iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+                iframe.setAttribute('allowfullscreen', 'true');
+                iframe.setAttribute('webkitallowfullscreen', 'true');
+                iframe.setAttribute('playsinline', '1');
+                iframe.setAttribute('webkit-playsinline', '1');
+                videoContainer.appendChild(iframe);
             } else {
                 const iframe = document.createElement('iframe');
                 iframe.src = `https://www.youtube.com/embed/${cleanYtId || vid}?autoplay=1&controls=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`;
