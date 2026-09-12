@@ -822,15 +822,6 @@ function initPortfolioApp() {
         if (storedProjects) {
             try {
                 projects = JSON.parse(storedProjects);
-                ['aig5fr', 'yweov4', '1h12yvgyx9'].forEach(sId => {
-                    if (!projects.some(p => p.mediaLink && p.mediaLink.includes(sId))) {
-                        const defaultProj = defaultProjects.find(p => p.mediaLink && p.mediaLink.includes(sId));
-                        if (defaultProj) {
-                            projects.unshift(defaultProj);
-                            localStorage.setItem('amit_portfolio_projects', JSON.stringify(projects));
-                        }
-                    }
-                });
             } catch(e) {
                 projects = JSON.parse(JSON.stringify(bakedData));
             }
@@ -1097,9 +1088,15 @@ function initPortfolioApp() {
                     pushToCloud('projects', projects, true);
                     hasChanges = true;
                 } else if (JSON.stringify(projects) !== JSON.stringify(cleanCloudProjects)) {
-                    projects = cleanCloudProjects;
-                    localStorage.setItem('amit_portfolio_projects', JSON.stringify(projects));
-                    hasChanges = true;
+                    const localHasFewer = projects.length < cleanCloudProjects.length;
+                    if (localHasFewer) {
+                        pushToCloud('projects', projects, true);
+                        hasChanges = true;
+                    } else {
+                        projects = cleanCloudProjects;
+                        localStorage.setItem('amit_portfolio_projects', JSON.stringify(projects));
+                        hasChanges = true;
+                    }
                 }
             }
             
