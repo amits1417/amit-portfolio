@@ -4297,11 +4297,15 @@ function initPortfolioApp() {
                 createShowreelIframe();
             } else if (isWistia) {
                 const isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent);
+                if (isMobile) {
+                    // Mobile: show thumbnail + open Wistia in new tab on tap
+                    frame.classList.remove('is-playing');
+                    isFullPlaying = false;
+                    window.open(`https://amits1417.wistia.com/medias/${resolvedWistiaId}`, '_blank');
+                    return;
+                }
                 const iframe = document.createElement('iframe');
-                const wistiaParams = isMobile
-                    ? `autoPlay=true&playsinline=true&mute=1&muted=1&volume=0&quality=high&controls=1&fullscreen=true`
-                    : `autoPlay=true&playsinline=true&volume=1&quality=high&controls=1&fullscreen=true`;
-                iframe.src = `https://fast.wistia.net/embed/iframe/${resolvedWistiaId}?${wistiaParams}`;
+                iframe.src = `https://fast.wistia.net/embed/iframe/${resolvedWistiaId}?autoPlay=true&playsinline=true&volume=1&quality=high&controls=1&fullscreen=true`;
                 iframe.style.position = 'absolute';
                 iframe.style.top = '0';
                 iframe.style.left = '0';
