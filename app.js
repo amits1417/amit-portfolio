@@ -4367,19 +4367,11 @@ function initPortfolioApp() {
                         vidEl.muted = false;
                         vidEl.loop = false;
                         vidEl.volume = 1;
-                        if (wrap.requestFullscreen) wrap.requestFullscreen();
-                        else if (wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
                         vidEl.play();
                     } else if (!vidEl.paused) {
                         vidEl.pause();
                     } else {
                         vidEl.play();
-                    }
-                });
-                wrap.addEventListener('fullscreenchange', () => {
-                    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                        vidEl.muted = true;
-                        vidEl.loop = true;
                     }
                 });
                 try { vidEl.play(); } catch(e) {}
