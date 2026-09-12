@@ -765,7 +765,7 @@ function initPortfolioApp() {
 
         // Automatic DB version upgrade migration (forces cache clear for new defaults)
         const DB_VERSION_KEY = 'amit_portfolio_db_version';
-        const CURRENT_DB_VERSION = '26';
+        const CURRENT_DB_VERSION = '27';
         let storedVersion;
         try {
             storedVersion = localStorage.getItem(DB_VERSION_KEY);
@@ -1610,6 +1610,11 @@ function initPortfolioApp() {
             if (stored) {
                 try {
                     config = JSON.parse(stored);
+                    if (config.mediaLink === 'u6KTFBKMP8M') {
+                        config.mediaLink = 'xpo35n1hy1';
+                        config.thumbLink = 'https://fast.wistia.com/embed/medias/xpo35n1hy1/swatch';
+                        localStorage.setItem('amit_portfolio_showreel', JSON.stringify(config));
+                    }
                 } catch(e) {}
             }
             project = {
@@ -2040,6 +2045,11 @@ function initPortfolioApp() {
         if (stored) {
             try {
                 config = JSON.parse(stored);
+                if (config.mediaLink === 'u6KTFBKMP8M') {
+                    config.mediaLink = 'xpo35n1hy1';
+                    config.thumbLink = 'https://fast.wistia.com/embed/medias/xpo35n1hy1/swatch';
+                    localStorage.setItem('amit_portfolio_showreel', JSON.stringify(config));
+                }
             } catch(e) {}
         }
         
