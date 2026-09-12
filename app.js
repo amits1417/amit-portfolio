@@ -4025,9 +4025,15 @@ function initPortfolioApp() {
             const proj = projects.find(p => p.id === projectId);
             if (!proj) return;
 
-            // Only allow lightweight video tag preview for direct video uploads on explicit desktop hover
+            if (document.body.classList.contains('editor-active')) return;
+            const isAnyPlaying = document.querySelector('.project-card.playing-inline') || 
+                                 (document.getElementById('video-modal') && document.getElementById('video-modal').classList.contains('active'));
+            if (isAnyPlaying) return;
+            if (mediaContainer.querySelector('.hover-video-preview')) return;
+
+            const isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent);
+
             if (proj.mediaSource === 'upload' || isDirectVideoUrl(proj.mediaLink)) {
-                if (mediaContainer.querySelector('.hover-video-preview')) return;
                 const previewEl = document.createElement('video');
                 previewEl.muted = true;
                 previewEl.defaultMuted = true;
@@ -4042,10 +4048,76 @@ function initPortfolioApp() {
                 previewEl.className = 'hover-video-preview loaded';
                 previewEl.src = normalizeMediaPath(proj.mediaLink);
                 mediaContainer.appendChild(previewEl);
-                try {
-                    const p = previewEl.play();
-                    if (p !== undefined) p.catch(() => {});
-                } catch(e) {}
+                try { const p = previewEl.play(); if (p !== undefined) p.catch(() => {}); } catch(e) {}
+                return;
+            }
+
+            const wistiaId = extractWistiaId(proj.mediaLink);
+            const cleanId = extractYouTubeId(proj.mediaLink);
+            const streamableId = extractStreamableId(proj.mediaLink);
+            const vimeoId = extractVimeoId(proj.mediaLink);
+            const driveId = extractGoogleDriveId(proj.mediaLink);
+
+            function createIframePreview(src, extraAttrs) {
+                const iframe = document.createElement('iframe');
+                iframe.src = src;
+                iframe.className = 'hover-video-preview';
+                iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:0;transition:opacity 0.3s ease;';
+                iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope');
+                iframe.setAttribute('playsinline', '1');
+                iframe.setAttribute('webkit-playsinline', '1');
+                iframe.setAttribute('scrolling', 'no');
+                iframe.setAttribute('frameborder', '0');
+                if (extraAttrs) Object.entries(extraAttrs).forEach(([k, v]) => iframe.setAttribute(k, v));
+                iframe.onload = function() { setTimeout(function() { iframe.style.opacity = '1'; }, 100); };
+                mediaContainer.appendChild(iframe);
+            }
+
+            if (wistiaId) {
+                if (isMobile) {
+                    const img = document.createElement('img');
+                    img.src = proj.thumbLink || `https://fast.wistia.com/embed/medias/${wistiaId}/swatch`;
+                    img.className = 'hover-video-preview';
+                    img.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity 0.3s ease;';
+                    img.onerror = function() { img.style.display = 'none'; };
+                    img.onload = function() { setTimeout(function() { img.style.opacity = '1'; }, 50); };
+                    mediaContainer.appendChild(img);
+                } else {
+                    createIframePreview(`https://fast.wistia.com/embed/iframe/${wistiaId}?autoplay=1&mute=1&muted=1&loop=1&controls=0&playsinline=1&silentAutoPlay=true`);
+                }
+            } else if (cleanId) {
+                if (isMobile) {
+                    const img = document.createElement('img');
+                    img.src = `https://img.youtube.com/vi/${cleanId}/hqdefault.jpg`;
+                    img.className = 'hover-video-preview';
+                    img.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity 0.3s ease;';
+                    img.onload = function() { setTimeout(function() { img.style.opacity = '1'; }, 50); };
+                    mediaContainer.appendChild(img);
+                } else {
+                    createIframePreview(`https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&enablejsapi=1`);
+                }
+            } else if (streamableId) {
+                if (isMobile) {
+                    const img = document.createElement('img');
+                    img.src = `https://cdn-cf-east.streamable.com/image/${streamableId}.jpg`;
+                    img.className = 'hover-video-preview';
+                    img.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity 0.3s ease;';
+                    img.onerror = function() { img.style.display = 'none'; };
+                    img.onload = function() { setTimeout(function() { img.style.opacity = '1'; }, 50); };
+                    mediaContainer.appendChild(img);
+                } else {
+                    createIframePreview(`https://streamable.com/e/${streamableId}?autoplay=1&muted=1&loop=1&nocontrols=1`);
+                }
+            } else if (vimeoId) {
+                createIframePreview(`https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=1&loop=1&autopause=0&background=1`);
+            } else if (driveId) {
+                const img = document.createElement('img');
+                img.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1280`;
+                img.className = 'hover-video-preview';
+                img.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity 0.3s ease;';
+                img.onerror = function() { img.style.display = 'none'; };
+                img.onload = function() { setTimeout(function() { img.style.opacity = '1'; }, 50); };
+                mediaContainer.appendChild(img);
             }
         }
 
