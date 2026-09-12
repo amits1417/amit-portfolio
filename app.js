@@ -4241,12 +4241,6 @@ function initPortfolioApp() {
         vid.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;';
         wrap.appendChild(vid);
 
-        // Play/pause overlay icon
-        const overlay = document.createElement('div');
-        overlay.className = 'glass-play-overlay';
-        overlay.innerHTML = '<div class="gp-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="5,3 19,12 5,21"/></svg></div>';
-        wrap.appendChild(overlay);
-
         // Controls bar
         const controls = document.createElement('div');
         controls.className = 'glass-controls';
@@ -4293,12 +4287,12 @@ function initPortfolioApp() {
         vid.addEventListener('pause', () => { playBtn.innerHTML = svgPlay; });
 
         vid.addEventListener('click', () => {
-            if (vid.muted) { vid.muted = false; vid.loop = false; volSlider.value = vid.volume; muteBtn.innerHTML = svgUnmute; overlay.classList.remove('visible'); return; }
-            if (vid.paused) { vid.play(); overlay.classList.remove('visible'); }
-            else { vid.pause(); overlay.classList.add('visible'); }
+            if (vid.muted) { vid.muted = false; vid.loop = false; volSlider.value = vid.volume || 1; muteBtn.innerHTML = svgUnmute; return; }
+            if (vid.paused) vid.play();
+            else vid.pause();
         });
 
-        playBtn.addEventListener('click', (e) => { e.stopPropagation(); if (vid.paused) { vid.play(); overlay.classList.remove('visible'); } else { vid.pause(); overlay.classList.add('visible'); } });
+        playBtn.addEventListener('click', (e) => { e.stopPropagation(); if (vid.paused) vid.play(); else vid.pause(); });
 
         let wasMuted = true;
         muteBtn.addEventListener('click', (e) => {
@@ -4322,10 +4316,6 @@ function initPortfolioApp() {
             if (document.fullscreenElement || document.webkitFullscreenElement) { vid.muted = false; vid.loop = false; vid.play(); muteBtn.innerHTML = svgUnmute; volSlider.value = vid.volume || 1; }
             else { vid.muted = true; vid.loop = true; muteBtn.innerHTML = svgMute; volSlider.value = 0; }
         });
-
-        // Show overlay initially, hide on first play
-        overlay.classList.add('visible');
-        vid.addEventListener('playing', () => { overlay.classList.remove('visible'); }, { once: true });
 
         try { vid.play(); } catch(e) {}
         return { video: vid, wrap: wrap };
@@ -4369,6 +4359,9 @@ function initPortfolioApp() {
             if (isWistia) console.log('Wistia resolved:', resolvedWistiaId, 'from:', vid);
 
             if ((mediaSource === 'upload' || isDirectVideoUrl(vid)) && !isYoutube && !isStreamable && !isWistia) {
+                const overlay = document.getElementById('showreel-overlay');
+                if (overlay) overlay.style.display = 'none';
+                console.log('Creating glass player for:', vid);
                 createGlassPlayer(normalizeMediaPath(vid), videoContainer);
             } else if (isStreamable) {
                 const createShowreelIframe = () => {

@@ -6381,6 +6381,11 @@ body.light-mode .graphics-view-more-btn:hover {
 .showreel-video-container:not(:empty) ~ .showreel-overlay {
     display: none !important;
 }
+.showreel-frame.is-playing .showreel-video-container {
+    display: block !important;
+    z-index: 10 !important;
+    pointer-events: auto !important;
+}
 /* Hide showreel overlay when full video is playing */
 .showreel-frame.is-playing .showreel-overlay,
 .showreel-frame.is-playing .showreel-img,
