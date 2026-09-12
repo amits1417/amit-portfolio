@@ -1851,11 +1851,26 @@ function initPortfolioApp() {
             if (cardEl) {
                 cardEl.addEventListener('click', function(ev) {
                     if (ev.target.closest('.card-hud-btn') || ev.target.closest('.cms-checkbox-wrapper') || ev.target.classList.contains('cms-delete-checkbox') || ev.target.closest('.cms-media-delete-btn')) return;
-                    if (document.body.classList.contains('editor-active')) {
-                        return;
-                    }
+                    if (document.body.classList.contains('editor-active')) return;
+                    if (ev.target.closest('.hover-video-preview')) return;
                     const pid = this.getAttribute('data-project-id');
                     const pj = projects.find(p => p.id === pid);
+                    if (!pj) return;
+                    const wId = extractWistiaId(pj.mediaLink);
+                    if (wId) {
+                        const media = this.querySelector('.project-media');
+                        if (media && !media.querySelector('.wistia-inline-play')) {
+                            media.querySelectorAll('.hover-video-preview').forEach(e => e.remove());
+                            const iframe = document.createElement('iframe');
+                            iframe.className = 'wistia-inline-play';
+                            iframe.src = `https://fast.wistia.net/embed/iframe/${wId}?autoplay=1&volume=1&loop=0&controls=0&playsinline=1`;
+                            iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;z-index:5;';
+                            iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+                            iframe.setAttribute('playsinline', '1');
+                            media.appendChild(iframe);
+                        }
+                        return;
+                    }
                     if (pj) openLightbox(pj);
                 });
             }
@@ -4082,8 +4097,7 @@ function initPortfolioApp() {
             }
 
             if (wistiaId) {
-                // Use iframe on all devices — silentAutoPlay=true handles iOS muted autoplay policy
-                    createIframePreview(`https://fast.wistia.net/embed/iframe/${wistiaId}?autoplay=1&mute=1&muted=1&loop=1&controls=0&playsinline=1`);
+                    createIframePreview(`https://fast.wistia.net/embed/iframe/${wistiaId}?autoplay=1&volume=0&loop=1&controls=0&playsinline=1`);
             } else if (cleanId) {
                 if (isMobile) {
                     const img = document.createElement('img');
