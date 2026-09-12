@@ -5196,7 +5196,8 @@ function initPortfolioApp() {
         
         if (!isEditURL) return;
 
-        // Require password authentication for ?edit URL access
+        // URL-based edit access ALWAYS requires fresh password — bypass stored auth
+        try { localStorage.removeItem('cms_authenticated'); } catch(e) {}
         triggerCMSUnlock();
     }
     window.checkEditURL = checkEditURL;
