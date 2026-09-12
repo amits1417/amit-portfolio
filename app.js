@@ -4238,74 +4238,48 @@ function initPortfolioApp() {
         vid.loop = true;
         vid.playsInline = true;
         vid.preload = 'auto';
+        vid.volume = 1;
         vid.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;';
         wrap.appendChild(vid);
 
-        // Controls bar
-        const controls = document.createElement('div');
-        controls.className = 'glass-controls';
-        const svgPlay = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21" fill="currentColor" stroke="none"/></svg>';
-        const svgPause = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" fill="currentColor" stroke="none"/><rect x="14" y="4" width="4" height="16" fill="currentColor" stroke="none"/></svg>';
+        const svgPlay = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6,3 20,12 6,21"/></svg>';
+        const svgPause = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>';
         const svgMute = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19" fill="currentColor" stroke="none"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
         const svgUnmute = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19" fill="currentColor" stroke="none"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
         const svgFS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
 
+        const controls = document.createElement('div');
+        controls.className = 'glass-controls';
+        controls.style.opacity = '1';
+        controls.style.transform = 'none';
         controls.innerHTML = `
-            <div class="glass-seek-row">
-                <input type="range" class="glass-seek" min="0" max="100" value="0" step="0.1">
-                <span class="glass-time glass-cur">0:00</span>
-                <span class="glass-time">/</span>
-                <span class="glass-time glass-dur">0:00</span>
-            </div>
             <div class="glass-btn-row">
                 <button class="glass-btn glass-play-btn" type="button">${svgPause}</button>
-                <div class="glass-vol-wrap">
-                    <button class="glass-btn glass-mute-btn" type="button">${svgMute}</button>
-                    <input type="range" class="glass-vol" min="0" max="1" step="0.05" value="0">
-                </div>
+                <button class="glass-btn glass-mute-btn" type="button">${svgMute}</button>
                 <button class="glass-btn glass-fs-btn" type="button" style="margin-left:auto">${svgFS}</button>
             </div>`;
         wrap.appendChild(controls);
         container.appendChild(wrap);
 
-        const seek = controls.querySelector('.glass-seek');
-        const curTime = controls.querySelector('.glass-cur');
-        const durTime = controls.querySelector('.glass-dur');
         const playBtn = controls.querySelector('.glass-play-btn');
         const muteBtn = controls.querySelector('.glass-mute-btn');
-        const volSlider = controls.querySelector('.glass-vol');
         const fsBtn = controls.querySelector('.glass-fs-btn');
 
-        function fmt(t) { if (isNaN(t)) return '0:00'; const m = Math.floor(t/60); const s = Math.floor(t%60); return m+':'+(s<10?'0':'')+s; }
-
-        vid.addEventListener('loadedmetadata', () => { durTime.textContent = fmt(vid.duration); });
-        vid.addEventListener('timeupdate', () => {
-            if (!seek.dragging) { seek.value = vid.duration ? (vid.currentTime/vid.duration)*100 : 0; }
-            curTime.textContent = fmt(vid.currentTime);
-        });
         vid.addEventListener('play', () => { playBtn.innerHTML = svgPause; });
         vid.addEventListener('pause', () => { playBtn.innerHTML = svgPlay; });
 
         vid.addEventListener('click', () => {
-            if (vid.muted) { vid.muted = false; vid.loop = false; volSlider.value = vid.volume || 1; muteBtn.innerHTML = svgUnmute; return; }
-            if (vid.paused) vid.play();
-            else vid.pause();
+            if (vid.muted) { vid.muted = false; vid.loop = false; muteBtn.innerHTML = svgUnmute; return; }
+            if (vid.paused) vid.play(); else vid.pause();
         });
 
         playBtn.addEventListener('click', (e) => { e.stopPropagation(); if (vid.paused) vid.play(); else vid.pause(); });
 
-        let wasMuted = true;
         muteBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (vid.muted) { vid.muted = false; vid.loop = false; wasMuted = false; muteBtn.innerHTML = svgUnmute; volSlider.value = vid.volume || 1; }
-            else { vid.muted = true; wasMuted = true; muteBtn.innerHTML = svgMute; volSlider.value = 0; }
+            if (vid.muted) { vid.muted = false; vid.loop = false; muteBtn.innerHTML = svgUnmute; }
+            else { vid.muted = true; muteBtn.innerHTML = svgMute; }
         });
-
-        volSlider.addEventListener('input', (e) => { e.stopPropagation(); vid.volume = parseFloat(volSlider.value); if (vid.volume > 0) { vid.muted = false; vid.loop = false; muteBtn.innerHTML = svgUnmute; } else { vid.muted = true; muteBtn.innerHTML = svgMute; } });
-
-        seek.addEventListener('input', (e) => { e.stopPropagation(); seek.dragging = true; vid.currentTime = (seek.value/100)*vid.duration; });
-        seek.addEventListener('change', () => { seek.dragging = false; });
-        ['mousedown','touchstart'].forEach(ev => seek.addEventListener(ev, (e) => e.stopPropagation()));
 
         fsBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -4313,8 +4287,8 @@ function initPortfolioApp() {
             else if (wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
         });
         wrap.addEventListener('fullscreenchange', () => {
-            if (document.fullscreenElement || document.webkitFullscreenElement) { vid.muted = false; vid.loop = false; vid.play(); muteBtn.innerHTML = svgUnmute; volSlider.value = vid.volume || 1; }
-            else { vid.muted = true; vid.loop = true; muteBtn.innerHTML = svgMute; volSlider.value = 0; }
+            if (document.fullscreenElement || document.webkitFullscreenElement) { vid.muted = false; vid.loop = false; vid.play(); muteBtn.innerHTML = svgUnmute; }
+            else { vid.muted = true; vid.loop = true; muteBtn.innerHTML = svgMute; }
         });
 
         try { vid.play(); } catch(e) {}

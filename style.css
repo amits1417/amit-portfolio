@@ -6514,60 +6514,12 @@ body.editor-active .card-edit-overlay {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-top: 1px solid rgba(22,139,255,0.15);
-    opacity: 0;
-    transform: translateY(6px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
     z-index: 11;
-}
-.glass-video-wrap:hover .glass-controls,
-.glass-controls.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-.glass-seek-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.glass-seek {
-    -webkit-appearance: none;
-    appearance: none;
-    flex: 1;
-    height: 4px;
-    border-radius: 2px;
-    background: rgba(255,255,255,0.12);
-    outline: none;
-    cursor: pointer;
-}
-.glass-seek::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: var(--accent-cyan);
-    box-shadow: 0 0 8px rgba(22,139,255,0.6);
-    cursor: pointer;
-}
-.glass-seek::-moz-range-thumb {
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: var(--accent-cyan);
-    box-shadow: 0 0 8px rgba(22,139,255,0.6);
-    border: none;
-    cursor: pointer;
-}
-.glass-time {
-    font-size: 0.65rem;
-    color: rgba(255,255,255,0.7);
-    font-family: 'DM Sans', monospace;
-    white-space: nowrap;
-    min-width: 32px;
-    text-align: center;
 }
 .glass-btn-row {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-top: 4px;
 }
 .glass-btn {
     background: none;
@@ -6586,35 +6538,6 @@ body.editor-active .card-edit-overlay {
     transform: scale(1.15);
 }
 .glass-btn svg, .glass-btn i { width: 16px; height: 16px; }
-.glass-vol-wrap {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-.glass-vol {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 50px;
-    height: 3px;
-    border-radius: 2px;
-    background: rgba(255,255,255,0.15);
-    outline: none;
-    cursor: pointer;
-}
-.glass-vol::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: #fff;
-    cursor: pointer;
-}
-.glass-vol::-moz-range-thumb {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: #fff;
-    border: none;
-    cursor: pointer;
-}
 .glass-play-overlay {
     position: absolute;
     top: 0; left: 0;
