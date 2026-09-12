@@ -4214,10 +4214,10 @@ function initPortfolioApp() {
         let autoPlayed = false;
         let isFullPlaying = false;
 
-        function playFullShowreel() {
+        async function playFullShowreel() {
             if (document.body.classList.contains('editor-active')) return;
             const playBtn = document.getElementById('play-showreel-btn');
-            const vid = playBtn ? (playBtn.getAttribute('data-video-id') || 'https://amits1417.wistia.com/s/b3gm1s9eku3t288') : 'https://amits1417.wistia.com/s/b3gm1s9eku3t288';
+            let vid = playBtn ? (playBtn.getAttribute('data-video-id') || 'https://amits1417.wistia.com/s/b3gm1s9eku3t288') : 'https://amits1417.wistia.com/s/b3gm1s9eku3t288';
             const mediaSource = playBtn ? (playBtn.getAttribute('data-media-source') || 'link') : 'link';
             const cleanYtId = extractYouTubeId(vid);
             const isYoutube = !!cleanYtId;
@@ -4230,6 +4230,14 @@ function initPortfolioApp() {
             const isStreamable = !!streamableId;
             const wistiaId = extractWistiaId(vid);
             const isWistia = !!wistiaId;
+
+            let resolvedWistiaId = wistiaId;
+            if (isWistia && wistiaId.length <= 12 && vid.includes('/s/')) {
+                try {
+                    const wDetails = await getWistiaDetails(vid);
+                    if (wDetails && wDetails.id) resolvedWistiaId = wDetails.id;
+                } catch(e) {}
+            }
 
             if (mediaSource === 'upload' && !isYoutube && !isStreamable && !isWistia) {
                 const video = document.createElement('video');
@@ -4267,7 +4275,7 @@ function initPortfolioApp() {
                 createShowreelIframe();
             } else if (isWistia) {
                 const iframe = document.createElement('iframe');
-                iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&playsinline=true&mute=1&muted=1&silentAutoPlay=true`;
+                iframe.src = `https://fast.wistia.net/embed/iframe/${resolvedWistiaId}?autoPlay=true&playsinline=true&mute=1&muted=1&silentAutoPlay=true`;
                 iframe.style.position = 'absolute';
                 iframe.style.top = '0';
                 iframe.style.left = '0';
