@@ -2052,8 +2052,6 @@ function initPortfolioApp() {
                 }
             } catch(e) {}
         }
-            } catch(e) {}
-        }
         
         const showreelImg = document.querySelector('.showreel-img');
         if (showreelImg) {
