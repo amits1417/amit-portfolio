@@ -4434,6 +4434,19 @@ function initPortfolioApp() {
             }
         });
 
+        // Auto-play showreel muted when scrolled into view
+        if (typeof IntersectionObserver !== 'undefined') {
+            const showreelObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !isFullPlaying && !autoPlayed) {
+                        autoPlayed = true;
+                        playFullShowreel();
+                    }
+                });
+            }, { threshold: 0.4 });
+            showreelObserver.observe(viewport);
+        }
+
         // Stop all video previews (used when entering CMS mode)
         window.stopAllPreviews = function() {
             document.querySelectorAll('.hover-video-preview').forEach(el => { el.style.display = 'none'; });
