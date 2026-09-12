@@ -4097,7 +4097,7 @@ function initPortfolioApp() {
             }
 
             if (wistiaId) {
-                    createIframePreview(`https://fast.wistia.net/embed/iframe/${wistiaId}?autoplay=1&volume=0&loop=1&controls=0&playsinline=1`);
+                    createIframePreview(`https://fast.wistia.net/embed/iframe/${wistiaId}?autoplay=1&m=1&volume=0&loop=1&controls=0&playsinline=1`);
             } else if (cleanId) {
                 if (isMobile) {
                     const img = document.createElement('img');
@@ -4355,6 +4355,7 @@ function initPortfolioApp() {
                 vidEl.src = normalizeMediaPath(vid);
                 vidEl.muted = true;
                 vidEl.defaultMuted = true;
+                vidEl.setAttribute('muted', '');
                 vidEl.autoplay = true;
                 vidEl.loop = true;
                 vidEl.playsInline = true;
@@ -4363,9 +4364,15 @@ function initPortfolioApp() {
                 wrap.appendChild(vidEl);
                 videoContainer.appendChild(wrap);
                 wrap.style.cursor = 'pointer';
+                vidEl.addEventListener('loadeddata', () => {
+                    vidEl.muted = true;
+                    vidEl.setAttribute('muted', '');
+                });
                 wrap.addEventListener('click', () => {
-                    if (vidEl.muted) {
+                    const wasMuted = vidEl.muted;
+                    if (wasMuted) {
                         vidEl.muted = false;
+                        vidEl.removeAttribute('muted');
                         vidEl.loop = false;
                         vidEl.volume = 1;
                         vidEl.play();
