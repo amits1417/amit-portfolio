@@ -92,18 +92,15 @@ function initPortfolioApp() {
         
         try {
             const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = controller ? setTimeout(() => controller.abort(), 2500) : null;
-            const res = await fetch(`https://fast.wistia.net/oembed.json?url=${encodeURIComponent(targetUrl)}`, {
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 5000) : null;
+            const proxyUrl = `/api/wistia?url=${encodeURIComponent(targetUrl)}`;
+            const res = await fetch(proxyUrl, {
                 signal: controller ? controller.signal : undefined
             });
             if (timeoutId) clearTimeout(timeoutId);
             if (res.ok) {
                 const data = await res.json();
-                let realId = '';
-                if (data.html) {
-                    const m = data.html.match(/\/embed\/iframe\/([a-zA-Z0-9_-]+)/);
-                    if (m && m[1]) realId = m[1];
-                }
+                const realId = data.id || '';
                 const result = {
                     id: realId || clean,
                     title: data.title || '',
@@ -116,7 +113,7 @@ function initPortfolioApp() {
                 return result;
             }
         } catch (err) {
-            console.warn('Could not fetch Wistia oembed:', err);
+            console.warn('Could not fetch Wistia oembed via proxy:', err);
         }
         return {
             id: clean,

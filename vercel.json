@@ -3,6 +3,9 @@
   "functions": {
     "api/streamable.js": {
       "maxDuration": 10
+    },
+    "api/wistia.js": {
+      "maxDuration": 10
     }
   },
   "rewrites": [
