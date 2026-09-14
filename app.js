@@ -1724,6 +1724,151 @@ function initPortfolioApp() {
     }
 
 
+    function getCardProject(card) {
+        if (!card) return null;
+        const projectId = card.getAttribute('data-project-id');
+        return (projects || []).find(p => p.id === projectId) || (window.projects || []).find(p => p.id === projectId);
+    }
+
+    function playCardPreview(card) {
+        if (!card) return;
+        if (document.body.classList.contains('editor-active')) return;
+        const isModalActive = document.getElementById('video-modal') && document.getElementById('video-modal').classList.contains('active');
+        if (isModalActive) return;
+
+        const mediaContainer = card.querySelector('.project-media');
+        if (!mediaContainer) return;
+
+        const proj = getCardProject(card);
+        if (!proj) return;
+
+        // Stop preview on all other cards first
+        document.querySelectorAll('.project-card').forEach(otherCard => {
+            if (otherCard !== card) {
+                stopCardPreview(otherCard);
+            }
+        });
+
+        // Direct MP4 / WebM / Cloudflare R2 / Uploaded Video
+        if (proj.mediaSource === 'upload' || isDirectVideoUrl(proj.mediaLink)) {
+            let videoEl = mediaContainer.querySelector('video.hover-video-preview');
+            if (!videoEl) {
+                videoEl = document.createElement('video');
+                videoEl.className = 'hover-video-preview';
+                videoEl.muted = true;
+                videoEl.defaultMuted = true;
+                videoEl.volume = 0;
+                videoEl.loop = true;
+                videoEl.playsInline = true;
+                videoEl.controls = false;
+                videoEl.setAttribute('muted', '');
+                videoEl.setAttribute('playsinline', '');
+                videoEl.setAttribute('webkit-playsinline', '');
+                videoEl.setAttribute('autoplay', '');
+                videoEl.setAttribute('loop', '');
+                videoEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:1;display:block;z-index:5;';
+                videoEl.src = normalizeMediaPath(proj.mediaLink);
+
+                const shield = mediaContainer.querySelector('.project-media-click-shield');
+                if (shield) {
+                    mediaContainer.insertBefore(videoEl, shield);
+                } else {
+                    mediaContainer.appendChild(videoEl);
+                }
+            } else {
+                videoEl.style.display = 'block';
+                videoEl.style.opacity = '1';
+            }
+            try {
+                const p = videoEl.play();
+                if (p !== undefined) p.catch(() => {});
+            } catch (e) {}
+            return;
+        }
+
+        // YouTube Video (controls=0, muted, loop, no visible native controls)
+        const cleanId = extractYouTubeId(proj.mediaLink);
+        if (cleanId) {
+            if (mediaContainer.querySelector('.hover-video-preview')) return;
+            const iframe = document.createElement('iframe');
+            iframe.className = 'hover-video-preview';
+            iframe.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&fs=0&enablejsapi=1`;
+            iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:1;z-index:5;background:#000;';
+            iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+            iframe.setAttribute('allowfullscreen', 'true');
+            iframe.setAttribute('playsinline', '1');
+            iframe.setAttribute('webkit-playsinline', '1');
+
+            const shield = mediaContainer.querySelector('.project-media-click-shield');
+            if (shield) {
+                mediaContainer.insertBefore(iframe, shield);
+            } else {
+                mediaContainer.appendChild(iframe);
+            }
+            return;
+        }
+
+        // Wistia Video
+        const wistiaId = extractWistiaId(proj.mediaLink);
+        if (wistiaId) {
+            if (mediaContainer.querySelector('.hover-video-preview')) return;
+            const iframe = document.createElement('iframe');
+            iframe.className = 'hover-video-preview';
+            iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoplay=1&m=1&volume=0&loop=1&controls=0&playsinline=1`;
+            iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:1;z-index:5;';
+            iframe.setAttribute('allow', 'autoplay; fullscreen');
+            iframe.setAttribute('playsinline', '1');
+            const shield = mediaContainer.querySelector('.project-media-click-shield');
+            if (shield) mediaContainer.insertBefore(iframe, shield);
+            else mediaContainer.appendChild(iframe);
+            return;
+        }
+
+        // Streamable Video
+        const streamableId = extractStreamableId(proj.mediaLink);
+        if (streamableId) {
+            if (mediaContainer.querySelector('.hover-video-preview')) return;
+            const iframe = document.createElement('iframe');
+            iframe.className = 'hover-video-preview';
+            iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&loop=1&nocontrols=1`;
+            iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:1;z-index:5;';
+            iframe.setAttribute('allow', 'autoplay');
+            iframe.setAttribute('playsinline', '1');
+            const shield = mediaContainer.querySelector('.project-media-click-shield');
+            if (shield) mediaContainer.insertBefore(iframe, shield);
+            else mediaContainer.appendChild(iframe);
+            return;
+        }
+    }
+
+    function stopCardPreview(card) {
+        if (!card) return;
+        const mediaContainer = card.querySelector('.project-media');
+        if (!mediaContainer) return;
+
+        // Stop and hide self-hosted video
+        const videoEl = mediaContainer.querySelector('video.hover-video-preview');
+        if (videoEl) {
+            try {
+                videoEl.pause();
+                videoEl.currentTime = 0;
+            } catch (e) {}
+            videoEl.style.opacity = '0';
+            videoEl.style.display = 'none';
+        }
+
+        // Remove iframe previews (YouTube, Wistia, Streamable) to immediately stop playback and free resources
+        const iframe = mediaContainer.querySelector('iframe.hover-video-preview');
+        if (iframe) {
+            iframe.src = 'about:blank';
+            iframe.remove();
+        }
+    }
+
+    window.getCardProject = getCardProject;
+    window.playCardPreview = playCardPreview;
+    window.stopCardPreview = stopCardPreview;
+
     function renderGridCategory(gridEl, category, isEditorActive, aspectRatio) {
         gridEl.innerHTML = '';
         const catProjects = projects.filter(p => p.category === category);
@@ -1852,6 +1997,18 @@ function initPortfolioApp() {
             // Direct click listener on card (more reliable than delegation/onclick)
             const cardEl = itemEl.firstElementChild;
             if (cardEl) {
+                cardEl.onmouseenter = function() {
+                    playCardPreview(this);
+                };
+                cardEl.onmouseleave = function() {
+                    stopCardPreview(this);
+                };
+                cardEl.addEventListener('mouseenter', function() {
+                    playCardPreview(this);
+                });
+                cardEl.addEventListener('mouseleave', function() {
+                    stopCardPreview(this);
+                });
                 cardEl.addEventListener('click', function(ev) {
                     if (ev.target.closest('.card-hud-btn') || ev.target.closest('.cms-checkbox-wrapper') || ev.target.classList.contains('cms-delete-checkbox') || ev.target.closest('.cms-media-delete-btn')) return;
                     if (document.body.classList.contains('editor-active')) return;
@@ -4068,208 +4225,19 @@ function initPortfolioApp() {
        ========================================================================== */
     function initPreviewCanvases() {
         const projectCards = document.querySelectorAll('.project-card');
-        const gridsContainer = document.getElementById('portfolio-grids-container');
-        if (!projectCards.length && !gridsContainer) return;
+        if (!projectCards.length) return;
 
         const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent);
 
-        function getCardProject(card) {
-            const projectId = card.getAttribute('data-project-id');
-            return projects.find(p => p.id === projectId);
-        }
-
-        function playCardPreview(card) {
-            if (!card) return;
-            if (document.body.classList.contains('editor-active')) return;
-            const isModalActive = document.getElementById('video-modal') && document.getElementById('video-modal').classList.contains('active');
-            if (isModalActive) return;
-
-            const mediaContainer = card.querySelector('.project-media');
-            if (!mediaContainer) return;
-
-            const proj = getCardProject(card);
-            if (!proj) return;
-
-            // Direct MP4 / WebM / Cloudflare R2 / Uploaded Video
-            if (proj.mediaSource === 'upload' || isDirectVideoUrl(proj.mediaLink)) {
-                let videoEl = mediaContainer.querySelector('video.hover-video-preview');
-                if (!videoEl) {
-                    videoEl = document.createElement('video');
-                    videoEl.className = 'hover-video-preview';
-                    videoEl.muted = true;
-                    videoEl.defaultMuted = true;
-                    videoEl.volume = 0;
-                    videoEl.loop = true;
-                    videoEl.playsInline = true;
-                    videoEl.controls = false;
-                    videoEl.setAttribute('muted', '');
-                    videoEl.setAttribute('playsinline', '');
-                    videoEl.setAttribute('webkit-playsinline', '');
-                    videoEl.setAttribute('autoplay', '');
-                    videoEl.setAttribute('loop', '');
-                    videoEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity 0.35s ease;z-index:5;';
-                    videoEl.src = normalizeMediaPath(proj.mediaLink);
-
-                    const shield = mediaContainer.querySelector('.project-media-click-shield');
-                    if (shield) {
-                        mediaContainer.insertBefore(videoEl, shield);
-                    } else {
-                        mediaContainer.appendChild(videoEl);
-                    }
-                }
-                videoEl.style.display = 'block';
-                const reveal = () => {
-                    if (videoEl.style.display !== 'none') {
-                        videoEl.style.opacity = '1';
-                    }
-                };
-                if (videoEl.readyState >= 2) {
-                    reveal();
-                } else {
-                    videoEl.addEventListener('playing', reveal, { once: true });
-                    videoEl.addEventListener('canplay', reveal, { once: true });
-                }
-                try {
-                    const p = videoEl.play();
-                    if (p !== undefined) p.catch(() => {});
-                } catch (e) {}
-                return;
-            }
-
-            // YouTube Video (controls=0, muted, loop, no visible native controls)
-            const cleanId = extractYouTubeId(proj.mediaLink);
-            if (cleanId) {
-                if (mediaContainer.querySelector('.hover-video-preview')) return;
-                const iframe = document.createElement('iframe');
-                iframe.className = 'hover-video-preview';
-                iframe.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&fs=0&enablejsapi=1`;
-                iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:0;transition:opacity 0.35s ease;z-index:5;background:#000;';
-                iframe.setAttribute('allow', 'autoplay; encrypted-media');
-                iframe.setAttribute('playsinline', '1');
-                iframe.setAttribute('webkit-playsinline', '1');
-
-                let revealed = false;
-                const reveal = () => {
-                    if (revealed) return;
-                    revealed = true;
-                    iframe.style.opacity = '1';
-                };
-
-                const onMsg = (ev) => {
-                    try {
-                        const data = typeof ev.data === 'string' ? JSON.parse(ev.data) : ev.data;
-                        if (data && (data.event === 'onStateChange' || data.info === 1)) {
-                            if (data.info === 1) {
-                                reveal();
-                                window.removeEventListener('message', onMsg);
-                            }
-                        }
-                    } catch (e) {}
-                };
-                window.addEventListener('message', onMsg);
-                iframe._onMsg = onMsg;
-
-                iframe.onload = () => {
-                    setTimeout(() => {
-                        reveal();
-                        window.removeEventListener('message', onMsg);
-                    }, 800);
-                };
-
-                const shield = mediaContainer.querySelector('.project-media-click-shield');
-                if (shield) {
-                    mediaContainer.insertBefore(iframe, shield);
-                } else {
-                    mediaContainer.appendChild(iframe);
-                }
-                return;
-            }
-
-            // Wistia Video
-            const wistiaId = extractWistiaId(proj.mediaLink);
-            if (wistiaId) {
-                if (mediaContainer.querySelector('.hover-video-preview')) return;
-                const iframe = document.createElement('iframe');
-                iframe.className = 'hover-video-preview';
-                iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoplay=1&m=1&volume=0&loop=1&controls=0&playsinline=1`;
-                iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:0;transition:opacity 0.35s ease;z-index:5;';
-                iframe.setAttribute('allow', 'autoplay; fullscreen');
-                iframe.setAttribute('playsinline', '1');
-                iframe.onload = () => { iframe.style.opacity = '1'; };
-                const shield = mediaContainer.querySelector('.project-media-click-shield');
-                if (shield) mediaContainer.insertBefore(iframe, shield);
-                else mediaContainer.appendChild(iframe);
-                return;
-            }
-
-            // Streamable Video
-            const streamableId = extractStreamableId(proj.mediaLink);
-            if (streamableId) {
-                if (mediaContainer.querySelector('.hover-video-preview')) return;
-                const iframe = document.createElement('iframe');
-                iframe.className = 'hover-video-preview';
-                iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&loop=1&nocontrols=1`;
-                iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:0;transition:opacity 0.35s ease;z-index:5;';
-                iframe.setAttribute('allow', 'autoplay');
-                iframe.setAttribute('playsinline', '1');
-                iframe.onload = () => { iframe.style.opacity = '1'; };
-                const shield = mediaContainer.querySelector('.project-media-click-shield');
-                if (shield) mediaContainer.insertBefore(iframe, shield);
-                else mediaContainer.appendChild(iframe);
-                return;
-            }
-        }
-
-        function stopCardPreview(card) {
-            if (!card) return;
-            const mediaContainer = card.querySelector('.project-media');
-            if (!mediaContainer) return;
-
-            // Stop and hide self-hosted video
-            const videoEl = mediaContainer.querySelector('video.hover-video-preview');
-            if (videoEl) {
-                try {
-                    videoEl.pause();
-                    videoEl.currentTime = 0;
-                } catch (e) {}
-                videoEl.style.opacity = '0';
-                videoEl.style.display = 'none';
-            }
-
-            // Remove iframe previews (YouTube, Wistia, Streamable) to immediately stop playback and free resources
-            const iframe = mediaContainer.querySelector('iframe.hover-video-preview');
-            if (iframe) {
-                if (iframe._onMsg) {
-                    window.removeEventListener('message', iframe._onMsg);
-                }
-                iframe.remove();
-            }
-        }
-
-        // Attach direct mouseenter/mouseleave listeners to all current cards
+        // Attach direct mouseenter/mouseleave listeners to all project cards
         projectCards.forEach(card => {
-            if (card._hoverPreviewInitialized) return;
-            card._hoverPreviewInitialized = true;
-            card.addEventListener('mouseenter', () => playCardPreview(card));
-            card.addEventListener('mouseleave', () => stopCardPreview(card));
+            card.onmouseenter = function() {
+                playCardPreview(this);
+            };
+            card.onmouseleave = function() {
+                stopCardPreview(this);
+            };
         });
-
-        // Event delegation on grids container (ensures preview works on dynamically rendered or filtered cards)
-        if (gridsContainer && !gridsContainer._hoverDelegationInitialized) {
-            gridsContainer._hoverDelegationInitialized = true;
-            gridsContainer.addEventListener('mouseover', (e) => {
-                const card = e.target.closest('.project-card');
-                if (!card) return;
-                if (card.contains(e.relatedTarget)) return;
-                playCardPreview(card);
-            });
-            gridsContainer.addEventListener('mouseout', (e) => {
-                const card = e.target.closest('.project-card');
-                if (!card) return;
-                if (card.contains(e.relatedTarget)) return;
-                stopCardPreview(card);
-            });
-        }
 
         // Mobile / Touch scroll-based autoplay into view & pause when scrolling away
         if (typeof IntersectionObserver !== 'undefined') {
@@ -4291,7 +4259,7 @@ function initPortfolioApp() {
             // Viewport safety observer: pause and hide when completely scrolled out of view
             const viewportSafetyObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    if (!entry.isIntersecting) {
+                    if (!entry.isIntersecting && !entry.target.matches(':hover')) {
                         stopCardPreview(entry.target);
                     }
                 });

@@ -1466,6 +1466,7 @@ html.light-mode .marquee-dot,
     transform: none !important;
     z-index: 5;
     background: #000;
+    opacity: 1 !important;
 }
 
 /* Transparent click shield layer ensures 100% reliable tap/click detection over active preview iframes */
