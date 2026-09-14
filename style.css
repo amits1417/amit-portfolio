@@ -1451,7 +1451,8 @@ html.light-mode .marquee-dot,
     opacity: 1;
 }
 
-.project-media video.hover-video-preview {
+.project-media video.hover-video-preview,
+.project-media iframe.hover-video-preview {
     pointer-events: none !important;
     user-select: none !important;
     touch-action: manipulation;
@@ -1463,6 +1464,8 @@ html.light-mode .marquee-dot,
     object-fit: cover !important;
     border: none !important;
     transform: none !important;
+    z-index: 5;
+    background: #000;
 }
 
 /* Transparent click shield layer ensures 100% reliable tap/click detection over active preview iframes */

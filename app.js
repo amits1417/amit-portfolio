@@ -3852,85 +3852,112 @@ function initPortfolioApp() {
         if (typeof gsap === 'undefined') return;
         
         // Navbar reveal
-        gsap.from("#navbar", {
-            y: -100,
-            opacity: 0,
-            duration: 1,
-            ease: "power3.out"
-        });
+        if (document.getElementById('navbar')) {
+            gsap.from("#navbar", {
+                y: -100,
+                opacity: 0,
+                duration: 1,
+                ease: "power3.out"
+            });
+        }
         
         // Hero Content Elements
         const heroTimeline = gsap.timeline();
         
-        heroTimeline.from(".hero-badge", {
-            y: 30,
-            opacity: 0,
-            duration: 0.8,
-            ease: "power3.out"
-        })
-        .from("#hero-headline", {
-            y: 40,
-            opacity: 0,
-            duration: 1,
-            ease: "power4.out"
-        }, "-=0.6")
-        .from(".hero-subheading", {
-            y: 20,
-            opacity: 0,
-            duration: 0.8,
-            ease: "power3.out"
-        }, "-=0.6")
-        .from(".hero-actions", {
-            y: 20,
-            opacity: 0,
-            duration: 0.8,
-            ease: "power3.out"
-        }, "-=0.6")
-        .from(".hud-frame", {
-            scale: 0.9,
-            opacity: 0,
-            duration: 1.2,
-            ease: "power4.out"
-        }, "-=1")
-        .from(".hud-tag", {
-            opacity: 0,
-            x: (i, target) => target.classList.contains('tag-top') ? 30 : -30,
-            duration: 0.8,
-            ease: "back.out(1.7)"
-        }, "-=0.4")
-        .from(".scroll-indicator", {
-            y: -20,
-            opacity: 0,
-            duration: 0.6,
-            ease: "power2.out"
-        }, "-=0.2");
+        if (document.querySelector('.hero-badge')) {
+            heroTimeline.from(".hero-badge", {
+                y: 30,
+                opacity: 0,
+                duration: 0.8,
+                ease: "power3.out"
+            });
+        }
+        if (document.querySelector('#hero-headline')) {
+            heroTimeline.from("#hero-headline", {
+                y: 40,
+                opacity: 0,
+                duration: 1,
+                ease: "power4.out"
+            }, "-=0.6");
+        }
+        if (document.querySelector('.hero-subheading')) {
+            heroTimeline.from(".hero-subheading", {
+                y: 20,
+                opacity: 0,
+                duration: 0.8,
+                ease: "power3.out"
+            }, "-=0.6");
+        }
+        const heroActionsEl = document.querySelector('.hero-actions') || document.querySelector('.hero-right');
+        if (heroActionsEl) {
+            heroTimeline.from(heroActionsEl, {
+                y: 20,
+                opacity: 0,
+                duration: 0.8,
+                ease: "power3.out"
+            }, "-=0.6");
+        }
+        if (document.querySelector('.hud-frame')) {
+            heroTimeline.from(".hud-frame", {
+                scale: 0.9,
+                opacity: 0,
+                duration: 1.2,
+                ease: "power4.out"
+            }, "-=1");
+        }
+        if (document.querySelector('.hud-tag')) {
+            heroTimeline.from(".hud-tag", {
+                opacity: 0,
+                x: (i, target) => target.classList.contains('tag-top') ? 30 : -30,
+                duration: 0.8,
+                ease: "back.out(1.7)"
+            }, "-=0.4");
+        }
+        if (document.querySelector('.scroll-indicator')) {
+            heroTimeline.from(".scroll-indicator", {
+                y: -20,
+                opacity: 0,
+                duration: 0.6,
+                ease: "power2.out"
+            }, "-=0.2");
+        }
         
         // Navbar Scrolled State Trigger
-        ScrollTrigger.create({
-            trigger: "#hero",
-            start: "100px top",
-            onEnter: () => document.getElementById('navbar').classList.add('nav-scrolled'),
-            onLeaveBack: () => document.getElementById('navbar').classList.remove('nav-scrolled')
-        });
-        
-        // Skill Progress bar loading on scroll
-        ScrollTrigger.create({
-            trigger: ".skills-list",
-            start: "top 85%",
-            onEnter: () => {
-                document.querySelectorAll('.skill-bar-progress').forEach(bar => {
-                    const targetPercent = bar.getAttribute('data-progress');
-                    bar.style.width = targetPercent;
+        if (typeof ScrollTrigger !== 'undefined') {
+            if (document.getElementById('hero') && document.getElementById('navbar')) {
+                ScrollTrigger.create({
+                    trigger: "#hero",
+                    start: "100px top",
+                    onEnter: () => document.getElementById('navbar').classList.add('nav-scrolled'),
+                    onLeaveBack: () => document.getElementById('navbar').classList.remove('nav-scrolled')
                 });
             }
-        });
-        
-        // Numerical statistics counter trigger
-        ScrollTrigger.create({
-            trigger: ".stats-dashboard",
-            start: "top 85%",
-            onEnter: () => animateStatsCounters()
-        });
+            
+            // Skill Progress bar loading on scroll
+            const skillsTriggerEl = document.querySelector(".skills-list") || document.querySelector("#skills-marquee-section") || document.querySelector(".expertise-skills");
+            if (skillsTriggerEl) {
+                ScrollTrigger.create({
+                    trigger: skillsTriggerEl,
+                    start: "top 85%",
+                    onEnter: () => {
+                        document.querySelectorAll('.skill-bar-progress').forEach(bar => {
+                            const targetPercent = bar.getAttribute('data-progress');
+                            bar.style.width = targetPercent;
+                        });
+                    }
+                });
+            }
+            
+            // Numerical statistics counter trigger
+            const statsTriggerEl = document.querySelector(".stats-dashboard") || document.querySelector("#stats-strip") || document.querySelector(".stats-row");
+            if (statsTriggerEl) {
+                ScrollTrigger.create({
+                    trigger: statsTriggerEl,
+                    start: "top 85%",
+                    onEnter: () => animateStatsCounters()
+                });
+            }
+        }
     }
 
     // Backup triggers if GSAP doesn't load properly
@@ -4037,11 +4064,12 @@ function initPortfolioApp() {
 
 
     /* ==========================================================================
-       PORTFOLIO HOVER RENDERING PREVIEW (SELF-HOSTED MP4 / DIRECT VIDEO ONLY)
+       PORTFOLIO HOVER RENDERING PREVIEW (SELF-HOSTED MP4 & YOUTUBE CONTROLS=0)
        ========================================================================== */
     function initPreviewCanvases() {
         const projectCards = document.querySelectorAll('.project-card');
-        if (!projectCards.length) return;
+        const gridsContainer = document.getElementById('portfolio-grids-container');
+        if (!projectCards.length && !gridsContainer) return;
 
         const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent);
 
@@ -4050,126 +4078,198 @@ function initPortfolioApp() {
             return projects.find(p => p.id === projectId);
         }
 
-        function isCardDirectVideo(proj) {
-            if (!proj) return false;
-            return proj.mediaSource === 'upload' || isDirectVideoUrl(proj.mediaLink);
-        }
-
-        function getOrCreateVideo(card, proj) {
-            const mediaContainer = card.querySelector('.project-media');
-            if (!mediaContainer) return null;
-
-            let videoEl = mediaContainer.querySelector('video.hover-video-preview');
-            if (!videoEl) {
-                videoEl = document.createElement('video');
-                videoEl.className = 'hover-video-preview';
-                videoEl.muted = true;
-                videoEl.defaultMuted = true;
-                videoEl.volume = 0;
-                videoEl.loop = true;
-                videoEl.playsInline = true;
-                videoEl.controls = false;
-                videoEl.setAttribute('muted', '');
-                videoEl.setAttribute('playsinline', '');
-                videoEl.setAttribute('webkit-playsinline', '');
-                videoEl.setAttribute('autoplay', '');
-                videoEl.setAttribute('loop', '');
-                videoEl.setAttribute('preload', 'none');
-                videoEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;display:none;transition:opacity 0.35s ease;z-index:2;';
-
-                const shield = mediaContainer.querySelector('.project-media-click-shield');
-                if (shield) {
-                    mediaContainer.insertBefore(videoEl, shield);
-                } else {
-                    mediaContainer.appendChild(videoEl);
-                }
-            }
-
-            if (!videoEl.src && proj && proj.mediaLink) {
-                videoEl.src = normalizeMediaPath(proj.mediaLink);
-            }
-
-            return videoEl;
-        }
-
         function playCardPreview(card) {
+            if (!card) return;
             if (document.body.classList.contains('editor-active')) return;
             const isModalActive = document.getElementById('video-modal') && document.getElementById('video-modal').classList.contains('active');
             if (isModalActive) return;
 
+            const mediaContainer = card.querySelector('.project-media');
+            if (!mediaContainer) return;
+
             const proj = getCardProject(card);
-            // Strictly only use self-hosted / direct video for hover-preview
-            // YouTube-only projects fallback to showing only the thumbnail image poster
-            if (!isCardDirectVideo(proj)) return;
+            if (!proj) return;
 
-            const videoEl = getOrCreateVideo(card, proj);
-            if (!videoEl) return;
+            // Direct MP4 / WebM / Cloudflare R2 / Uploaded Video
+            if (proj.mediaSource === 'upload' || isDirectVideoUrl(proj.mediaLink)) {
+                let videoEl = mediaContainer.querySelector('video.hover-video-preview');
+                if (!videoEl) {
+                    videoEl = document.createElement('video');
+                    videoEl.className = 'hover-video-preview';
+                    videoEl.muted = true;
+                    videoEl.defaultMuted = true;
+                    videoEl.volume = 0;
+                    videoEl.loop = true;
+                    videoEl.playsInline = true;
+                    videoEl.controls = false;
+                    videoEl.setAttribute('muted', '');
+                    videoEl.setAttribute('playsinline', '');
+                    videoEl.setAttribute('webkit-playsinline', '');
+                    videoEl.setAttribute('autoplay', '');
+                    videoEl.setAttribute('loop', '');
+                    videoEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity 0.35s ease;z-index:5;';
+                    videoEl.src = normalizeMediaPath(proj.mediaLink);
 
-            videoEl.style.display = 'block';
-
-            const revealVideo = () => {
-                if (videoEl.style.display !== 'none') {
-                    videoEl.style.opacity = '1';
+                    const shield = mediaContainer.querySelector('.project-media-click-shield');
+                    if (shield) {
+                        mediaContainer.insertBefore(videoEl, shield);
+                    } else {
+                        mediaContainer.appendChild(videoEl);
+                    }
                 }
-            };
-
-            if (videoEl.readyState >= 2) {
-                revealVideo();
-            } else {
-                videoEl.addEventListener('playing', revealVideo, { once: true });
-                videoEl.addEventListener('canplay', revealVideo, { once: true });
+                videoEl.style.display = 'block';
+                const reveal = () => {
+                    if (videoEl.style.display !== 'none') {
+                        videoEl.style.opacity = '1';
+                    }
+                };
+                if (videoEl.readyState >= 2) {
+                    reveal();
+                } else {
+                    videoEl.addEventListener('playing', reveal, { once: true });
+                    videoEl.addEventListener('canplay', reveal, { once: true });
+                }
+                try {
+                    const p = videoEl.play();
+                    if (p !== undefined) p.catch(() => {});
+                } catch (e) {}
+                return;
             }
 
-            try {
-                const playPromise = videoEl.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        revealVideo();
-                    }).catch(() => {});
+            // YouTube Video (controls=0, muted, loop, no visible native controls)
+            const cleanId = extractYouTubeId(proj.mediaLink);
+            if (cleanId) {
+                if (mediaContainer.querySelector('.hover-video-preview')) return;
+                const iframe = document.createElement('iframe');
+                iframe.className = 'hover-video-preview';
+                iframe.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&fs=0&enablejsapi=1`;
+                iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:0;transition:opacity 0.35s ease;z-index:5;background:#000;';
+                iframe.setAttribute('allow', 'autoplay; encrypted-media');
+                iframe.setAttribute('playsinline', '1');
+                iframe.setAttribute('webkit-playsinline', '1');
+
+                let revealed = false;
+                const reveal = () => {
+                    if (revealed) return;
+                    revealed = true;
+                    iframe.style.opacity = '1';
+                };
+
+                const onMsg = (ev) => {
+                    try {
+                        const data = typeof ev.data === 'string' ? JSON.parse(ev.data) : ev.data;
+                        if (data && (data.event === 'onStateChange' || data.info === 1)) {
+                            if (data.info === 1) {
+                                reveal();
+                                window.removeEventListener('message', onMsg);
+                            }
+                        }
+                    } catch (e) {}
+                };
+                window.addEventListener('message', onMsg);
+                iframe._onMsg = onMsg;
+
+                iframe.onload = () => {
+                    setTimeout(() => {
+                        reveal();
+                        window.removeEventListener('message', onMsg);
+                    }, 800);
+                };
+
+                const shield = mediaContainer.querySelector('.project-media-click-shield');
+                if (shield) {
+                    mediaContainer.insertBefore(iframe, shield);
+                } else {
+                    mediaContainer.appendChild(iframe);
                 }
-            } catch (err) {}
+                return;
+            }
+
+            // Wistia Video
+            const wistiaId = extractWistiaId(proj.mediaLink);
+            if (wistiaId) {
+                if (mediaContainer.querySelector('.hover-video-preview')) return;
+                const iframe = document.createElement('iframe');
+                iframe.className = 'hover-video-preview';
+                iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoplay=1&m=1&volume=0&loop=1&controls=0&playsinline=1`;
+                iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:0;transition:opacity 0.35s ease;z-index:5;';
+                iframe.setAttribute('allow', 'autoplay; fullscreen');
+                iframe.setAttribute('playsinline', '1');
+                iframe.onload = () => { iframe.style.opacity = '1'; };
+                const shield = mediaContainer.querySelector('.project-media-click-shield');
+                if (shield) mediaContainer.insertBefore(iframe, shield);
+                else mediaContainer.appendChild(iframe);
+                return;
+            }
+
+            // Streamable Video
+            const streamableId = extractStreamableId(proj.mediaLink);
+            if (streamableId) {
+                if (mediaContainer.querySelector('.hover-video-preview')) return;
+                const iframe = document.createElement('iframe');
+                iframe.className = 'hover-video-preview';
+                iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=1&loop=1&nocontrols=1`;
+                iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:0;transition:opacity 0.35s ease;z-index:5;';
+                iframe.setAttribute('allow', 'autoplay');
+                iframe.setAttribute('playsinline', '1');
+                iframe.onload = () => { iframe.style.opacity = '1'; };
+                const shield = mediaContainer.querySelector('.project-media-click-shield');
+                if (shield) mediaContainer.insertBefore(iframe, shield);
+                else mediaContainer.appendChild(iframe);
+                return;
+            }
         }
 
         function stopCardPreview(card) {
+            if (!card) return;
             const mediaContainer = card.querySelector('.project-media');
             if (!mediaContainer) return;
+
+            // Stop and hide self-hosted video
             const videoEl = mediaContainer.querySelector('video.hover-video-preview');
             if (videoEl) {
                 try {
                     videoEl.pause();
+                    videoEl.currentTime = 0;
                 } catch (e) {}
                 videoEl.style.opacity = '0';
                 videoEl.style.display = 'none';
             }
+
+            // Remove iframe previews (YouTube, Wistia, Streamable) to immediately stop playback and free resources
+            const iframe = mediaContainer.querySelector('iframe.hover-video-preview');
+            if (iframe) {
+                if (iframe._onMsg) {
+                    window.removeEventListener('message', iframe._onMsg);
+                }
+                iframe.remove();
+            }
         }
 
-        // Lazy-loading: attach video source when card is near the viewport
-        if (typeof IntersectionObserver !== 'undefined') {
-            const lazyLoadObserver = new IntersectionObserver((entries, obs) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const card = entry.target;
-                        const proj = getCardProject(card);
-                        if (isCardDirectVideo(proj)) {
-                            getOrCreateVideo(card, proj);
-                        }
-                        obs.unobserve(card);
-                    }
-                });
-            }, { rootMargin: '300px 0px' });
-
-            projectCards.forEach(card => lazyLoadObserver.observe(card));
-        }
-
-        // Desktop mouse hover / leave listeners
+        // Attach direct mouseenter/mouseleave listeners to all current cards
         projectCards.forEach(card => {
-            card.addEventListener('mouseenter', () => {
+            if (card._hoverPreviewInitialized) return;
+            card._hoverPreviewInitialized = true;
+            card.addEventListener('mouseenter', () => playCardPreview(card));
+            card.addEventListener('mouseleave', () => stopCardPreview(card));
+        });
+
+        // Event delegation on grids container (ensures preview works on dynamically rendered or filtered cards)
+        if (gridsContainer && !gridsContainer._hoverDelegationInitialized) {
+            gridsContainer._hoverDelegationInitialized = true;
+            gridsContainer.addEventListener('mouseover', (e) => {
+                const card = e.target.closest('.project-card');
+                if (!card) return;
+                if (card.contains(e.relatedTarget)) return;
                 playCardPreview(card);
             });
-            card.addEventListener('mouseleave', () => {
+            gridsContainer.addEventListener('mouseout', (e) => {
+                const card = e.target.closest('.project-card');
+                if (!card) return;
+                if (card.contains(e.relatedTarget)) return;
                 stopCardPreview(card);
             });
-        });
+        }
 
         // Mobile / Touch scroll-based autoplay into view & pause when scrolling away
         if (typeof IntersectionObserver !== 'undefined') {
