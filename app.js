@@ -4117,7 +4117,7 @@ function initPortfolioApp() {
                     img.onload = function() { setTimeout(function() { img.style.opacity = '1'; }, 50); };
                     mediaContainer.appendChild(img);
                 } else {
-                    createIframePreview(`https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&fs=0`);
+                    createIframePreview(`https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&fs=0&cc_load_policy=0`);
                 }
             } else if (streamableId) {
                 if (isMobile) {
@@ -4533,7 +4533,7 @@ function initPortfolioApp() {
                 videoContainer.appendChild(iframe);
             } else {
                 const iframe = document.createElement('iframe');
-                iframe.src = `https://www.youtube.com/embed/${cleanYtId || vid}?autoplay=1&mute=0&start=0&controls=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`;
+                iframe.src = `https://www.youtube.com/embed/${cleanYtId || vid}?autoplay=1&mute=0&start=0&controls=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&cc_load_policy=0`;
                 iframe.style.position = 'absolute';
                 iframe.style.top = '0';
                 iframe.style.left = '0';
@@ -5150,6 +5150,7 @@ function initPortfolioApp() {
                         autoplay: true,
                         muted: false,
                         volume: 1,
+                        captions: { active: false, update: false },
                         controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
                         settings: ['quality'],
                         quality: { default: 1080, options: [4320, 2160, 1440, 1080, 720, 576, 480, 360, 240] }
@@ -5263,7 +5264,7 @@ function initPortfolioApp() {
                         appendConsoleLog(`> Lightbox Google Drive active: "${proj.title}"`);
                     } else {
                         const iframe = document.createElement('iframe');
-                        iframe.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=0&start=0&controls=1&rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&enablejsapi=1`;
+                        iframe.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=0&start=0&controls=1&rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&enablejsapi=1&cc_load_policy=0`;
                         iframe.style.position = 'absolute';
                         iframe.style.top = '0';
                         iframe.style.left = '0';
@@ -5280,7 +5281,7 @@ function initPortfolioApp() {
                         iframe.setAttribute('playsinline', '1');
                         iframe.setAttribute('webkit-playsinline', '1');
                         
-                        // Ensure audio is unmuted on load without seeking back
+                        // Ensure audio is unmuted on load without seeking back, and disable captions by default
                         iframe.addEventListener('load', () => {
                             const sendCmd = (func, args = []) => {
                                 try {
@@ -5294,6 +5295,8 @@ function initPortfolioApp() {
                             setTimeout(() => {
                                 sendCmd('unMute');
                                 sendCmd('setVolume', [100]);
+                                sendCmd('unloadModule', ['captions']);
+                                sendCmd('setOption', ['captions', 'track', {}]);
                                 sendCmd('playVideo');
                             }, 100);
                         });
