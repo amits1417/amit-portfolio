@@ -2337,7 +2337,7 @@ window.CLOUD_DEFAULT_PROJECTS = [
         "client": "Crypto Fintech",
         "desc": "High-energy vertical fintech reel showcasing cryptocurrency wallet features, security animations, and fast mobile UX.",
         "id": "proj_wistia_1h12yvgyx9",
-        "mediaLink": "https://amits1417.wistia.com/medias/1h12yvgyx9",
+        "mediaLink": "https://amits1417.wistia.com/s/aolfgnqehaqcj6t",
         "mediaSource": "link",
         "role": "Motion Designer & Editor",
         "thumbLink": "https://embed-ssl.wistia.com/deliveries/3ceeaf65d79bbddcfe28bbd0e4ff8d171058bf9c.jpg?image_crop_resized=720x1280",

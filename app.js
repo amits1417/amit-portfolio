@@ -55,34 +55,50 @@ function initPortfolioApp() {
     }
 
     const wistiaDetailsCache = {
-        'aolfgnqehaqcj6t': { id: '1h12yvgyx9', title: 'Block chain wallet', thumb: 'https://embed-ssl.wistia.com/deliveries/3ceeaf65d79bbddcfe28bbd0e4ff8d171058bf9c.jpg?image_crop_resized=720x1280' }
+        'aolfgnqehaqcj6t': { id: '1h12yvgyx9', title: 'Block chain wallet', thumb: 'https://embed-ssl.wistia.com/deliveries/3ceeaf65d79bbddcfe28bbd0e4ff8d171058bf9c.jpg?image_crop_resized=720x1280' },
+        '1h12yvgyx9': { id: '1h12yvgyx9', title: 'Block chain wallet', thumb: 'https://embed-ssl.wistia.com/deliveries/3ceeaf65d79bbddcfe28bbd0e4ff8d171058bf9c.jpg?image_crop_resized=720x1280' }
     };
 
     // Helper to extract Wistia video ID from link, embed code, or player snippet
     function extractWistiaId(link) {
         if (!link) return '';
         const clean = link.trim();
+        let rawId = '';
         const mediaIdMatch = clean.match(/media-id=["']([a-zA-Z0-9_-]+)["']/i);
-        if (mediaIdMatch && mediaIdMatch[1]) return mediaIdMatch[1];
-        const asyncMatch = clean.match(/wistia_async_([a-zA-Z0-9_-]+)/i);
-        if (asyncMatch && asyncMatch[1]) return asyncMatch[1];
-        const scriptMatch = clean.match(/\/embed\/(?:medias\/)?([a-zA-Z0-9_-]+)(?:\.js|\.json)?/i);
-        if (scriptMatch && scriptMatch[1] && scriptMatch[1] !== 'player' && scriptMatch[1] !== 'iframe') return scriptMatch[1];
-        const urlMatch = clean.match(/(?:wistia\.(?:com|net)\/(?:medias|embed\/iframe)\/)([a-zA-Z0-9_-]+)/i);
-        if (urlMatch && urlMatch[1]) return urlMatch[1];
-        const shareMatch = clean.match(/(?:wistia\.(?:com|net)\/s\/)([a-zA-Z0-9_-]+)/i);
-        if (shareMatch && shareMatch[1]) {
-            if (wistiaDetailsCache[shareMatch[1]]) {
-                return wistiaDetailsCache[shareMatch[1]].id;
-            }
-            return shareMatch[1];
+        if (mediaIdMatch && mediaIdMatch[1]) rawId = mediaIdMatch[1];
+        if (!rawId) {
+            const asyncMatch = clean.match(/wistia_async_([a-zA-Z0-9_-]+)/i);
+            if (asyncMatch && asyncMatch[1]) rawId = asyncMatch[1];
         }
-        const wvideoMatch = clean.match(/[?&]wvideo=([a-zA-Z0-9_-]+)/i);
-        if (wvideoMatch && wvideoMatch[1]) return wvideoMatch[1];
-        const wistiaColonMatch = clean.match(/^wistia:([a-zA-Z0-9_-]+)/i);
-        if (wistiaColonMatch && wistiaColonMatch[1]) return wistiaColonMatch[1];
-        if (/^[a-zA-Z0-9]{8,12}$/.test(clean) && !clean.includes('http') && !clean.includes('/') && !clean.includes('.')) {
-            return clean;
+        if (!rawId) {
+            const scriptMatch = clean.match(/\/embed\/(?:medias\/)?([a-zA-Z0-9_-]+)(?:\.js|\.json)?/i);
+            if (scriptMatch && scriptMatch[1] && scriptMatch[1] !== 'player' && scriptMatch[1] !== 'iframe') rawId = scriptMatch[1];
+        }
+        if (!rawId) {
+            const urlMatch = clean.match(/(?:wistia\.(?:com|net)\/(?:medias|embed\/iframe)\/)([a-zA-Z0-9_-]+)/i);
+            if (urlMatch && urlMatch[1]) rawId = urlMatch[1];
+        }
+        if (!rawId) {
+            const shareMatch = clean.match(/(?:wistia\.(?:com|net)\/s\/)([a-zA-Z0-9_-]+)/i);
+            if (shareMatch && shareMatch[1]) rawId = shareMatch[1];
+        }
+        if (!rawId) {
+            const wvideoMatch = clean.match(/[?&]wvideo=([a-zA-Z0-9_-]+)/i);
+            if (wvideoMatch && wvideoMatch[1]) rawId = wvideoMatch[1];
+        }
+        if (!rawId) {
+            const wistiaColonMatch = clean.match(/^wistia:([a-zA-Z0-9_-]+)/i);
+            if (wistiaColonMatch && wistiaColonMatch[1]) rawId = wistiaColonMatch[1];
+        }
+        if (!rawId && /^[a-zA-Z0-9]{8,12}$/.test(clean) && !clean.includes('http') && !clean.includes('/') && !clean.includes('.')) {
+            rawId = clean;
+        }
+
+        if (rawId) {
+            if (wistiaDetailsCache[rawId] && wistiaDetailsCache[rawId].id) {
+                return wistiaDetailsCache[rawId].id;
+            }
+            return rawId;
         }
         return '';
     }
@@ -1825,9 +1841,10 @@ function initPortfolioApp() {
             if (mediaContainer.querySelector('.hover-video-preview')) return;
             const iframe = document.createElement('iframe');
             iframe.className = 'hover-video-preview';
-            iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoplay=1&silentAutoPlay=true&controlsVisibleOnLoad=false&playbar=false&playButton=false&smallPlayButton=false&volumeControl=false&fullscreenButton=false&endVideoBehavior=loop&playsinline=1`;
+            iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&silentAutoPlay=allow&muted=true&controlsVisibleOnLoad=false&playbar=false&playButton=false&smallPlayButton=false&volumeControl=false&fullscreenButton=false&endVideoBehavior=loop&playsinline=1`;
             iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:1;z-index:5;background:#000;';
             iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+            iframe.setAttribute('allowfullscreen', 'true');
             iframe.setAttribute('playsinline', '1');
             iframe.setAttribute('webkit-playsinline', '1');
             const shield = mediaContainer.querySelector('.project-media-click-shield');
@@ -5287,7 +5304,7 @@ function initPortfolioApp() {
                         createStreamableLightboxIframe();
                     } else if (wistiaId) {
                         const iframe = document.createElement('iframe');
-                        iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoplay=1&volume=1&muted=0&time=0`;
+                        iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoPlay=true&volume=1&muted=false&time=0`;
                         iframe.style.position = 'absolute';
                         iframe.style.top = '0';
                         iframe.style.left = '0';
