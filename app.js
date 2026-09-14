@@ -4113,7 +4113,7 @@ function initPortfolioApp() {
                     img.onload = function() { setTimeout(function() { img.style.opacity = '1'; }, 50); };
                     mediaContainer.appendChild(img);
                 } else {
-                    createIframePreview(`https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&fs=0&enablejsapi=1`);
+                    createIframePreview(`https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=1&loop=1&playlist=${cleanId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&fs=0&enablejsapi=1`);
                 }
             } else if (streamableId) {
                 if (isMobile) {
