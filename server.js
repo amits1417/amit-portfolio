@@ -57,6 +57,44 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (parsedUrl.pathname === '/api/wistia') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    if (req.method === 'OPTIONS') { res.writeHead(200); res.end(); return; }
+    const targetUrl = parsedUrl.searchParams.get('url');
+    if (!targetUrl) { res.writeHead(400, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'Missing url' })); return; }
+    const oembedUrl = `https://fast.wistia.net/oembed.json?url=${encodeURIComponent(targetUrl)}`;
+    https.get(oembedUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (apiRes) => {
+      let body = '';
+      apiRes.on('data', chunk => body += chunk);
+      apiRes.on('end', () => {
+        try {
+          const data = JSON.parse(body);
+          let realId = '';
+          if (data.html) {
+            const m = data.html.match(/\/embed\/iframe\/([a-zA-Z0-9_-]+)/);
+            if (m && m[1]) realId = m[1];
+          }
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({
+            id: realId || '',
+            title: data.title || '',
+            thumbnail_url: data.thumbnail_url || '',
+            width: data.width,
+            height: data.height
+          }));
+        } catch(e) {
+          res.writeHead(502, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Failed to parse oembed' }));
+        }
+      });
+    }).on('error', () => {
+      res.writeHead(502, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Failed' }));
+    });
+    return;
+  }
+
   if (parsedUrl.pathname === '/api/streamable-proxy') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     if (req.method === 'OPTIONS') { res.writeHead(200); res.end(); return; }

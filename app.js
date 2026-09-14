@@ -64,6 +64,8 @@ function initPortfolioApp() {
         const clean = link.trim();
         const mediaIdMatch = clean.match(/media-id=["']([a-zA-Z0-9_-]+)["']/i);
         if (mediaIdMatch && mediaIdMatch[1]) return mediaIdMatch[1];
+        const asyncMatch = clean.match(/wistia_async_([a-zA-Z0-9_-]+)/i);
+        if (asyncMatch && asyncMatch[1]) return asyncMatch[1];
         const scriptMatch = clean.match(/\/embed\/(?:medias\/)?([a-zA-Z0-9_-]+)(?:\.js|\.json)?/i);
         if (scriptMatch && scriptMatch[1] && scriptMatch[1] !== 'player' && scriptMatch[1] !== 'iframe') return scriptMatch[1];
         const urlMatch = clean.match(/(?:wistia\.(?:com|net)\/(?:medias|embed\/iframe)\/)([a-zA-Z0-9_-]+)/i);
@@ -75,7 +77,11 @@ function initPortfolioApp() {
             }
             return shareMatch[1];
         }
-        if (/^[a-zA-Z0-9]{10}$/.test(clean)) {
+        const wvideoMatch = clean.match(/[?&]wvideo=([a-zA-Z0-9_-]+)/i);
+        if (wvideoMatch && wvideoMatch[1]) return wvideoMatch[1];
+        const wistiaColonMatch = clean.match(/^wistia:([a-zA-Z0-9_-]+)/i);
+        if (wistiaColonMatch && wistiaColonMatch[1]) return wistiaColonMatch[1];
+        if (/^[a-zA-Z0-9]{8,12}$/.test(clean) && !clean.includes('http') && !clean.includes('/') && !clean.includes('.')) {
             return clean;
         }
         return '';
@@ -1808,16 +1814,17 @@ function initPortfolioApp() {
             return;
         }
 
-        // Wistia Video
+        // Wistia Video (muted, loop, no visible player controls, matches YouTube)
         const wistiaId = extractWistiaId(proj.mediaLink);
         if (wistiaId) {
             if (mediaContainer.querySelector('.hover-video-preview')) return;
             const iframe = document.createElement('iframe');
             iframe.className = 'hover-video-preview';
-            iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoplay=1&m=1&volume=0&loop=1&controls=0&playsinline=1`;
-            iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:1;z-index:5;';
-            iframe.setAttribute('allow', 'autoplay; fullscreen');
+            iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoplay=1&silentAutoPlay=true&controlsVisibleOnLoad=false&playbar=false&playButton=false&smallPlayButton=false&volumeControl=false&fullscreenButton=false&endVideoBehavior=loop&playsinline=1`;
+            iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:1;z-index:5;background:#000;';
+            iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
             iframe.setAttribute('playsinline', '1');
+            iframe.setAttribute('webkit-playsinline', '1');
             const shield = mediaContainer.querySelector('.project-media-click-shield');
             if (shield) mediaContainer.insertBefore(iframe, shield);
             else mediaContainer.appendChild(iframe);
@@ -2015,22 +2022,7 @@ function initPortfolioApp() {
                     const pid = this.getAttribute('data-project-id');
                     const pj = projects.find(p => p.id === pid);
                     if (!pj) return;
-                    const wId = extractWistiaId(pj.mediaLink);
-                    if (wId) {
-                        const media = this.querySelector('.project-media');
-                        if (media && !media.querySelector('.wistia-inline-play')) {
-                            media.querySelectorAll('.hover-video-preview').forEach(e => e.remove());
-                            const iframe = document.createElement('iframe');
-                            iframe.className = 'wistia-inline-play';
-                            iframe.src = `https://fast.wistia.net/embed/iframe/${wId}?autoplay=1&volume=1&muted=0&time=0&controls=0&playsinline=1`;
-                            iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;z-index:5;';
-                            iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
-                            iframe.setAttribute('playsinline', '1');
-                            media.appendChild(iframe);
-                        }
-                        return;
-                    }
-                    if (pj) openLightbox(pj);
+                    openLightbox(pj);
                 });
             }
         });
@@ -7176,17 +7168,39 @@ function initPortfolioApp() {
 
     // Text editing is always active in CMS mode (handled by applyContentEditable)
 
-    // Real-time auto-fetch on typing/pasting Streamable link or embed snippet
+    // Real-time auto-fetch on typing/pasting YouTube, Wistia, or Streamable link or embed snippet
     const mediaLinkInputEl = document.getElementById('modal-media-link');
     if (mediaLinkInputEl) {
         const handleMediaInput = async () => {
             const rawVal = mediaLinkInputEl.value.trim();
             const sId = extractStreamableId(rawVal);
+            const wId = extractWistiaId(rawVal);
+            const ytId = extractYouTubeId(rawVal);
             const titleInput = document.getElementById('modal-project-title');
             const thumbInput = document.getElementById('modal-thumb-link');
             const thumbSrcSel = document.getElementById('modal-thumb-source');
 
-            if (sId) {
+            if (wId) {
+                if (rawVal.includes('<iframe') || rawVal.includes('<script')) {
+                    mediaLinkInputEl.value = `https://fast.wistia.net/embed/iframe/${wId}`;
+                }
+                if (thumbInput && (!thumbInput.value.trim() || (thumbSrcSel && thumbSrcSel.value === 'auto'))) {
+                    thumbInput.value = `https://fast.wistia.com/embed/medias/${wId}/swatch`;
+                }
+                const details = await getWistiaDetails(wId);
+                if (details) {
+                    if (titleInput && !titleInput.value.trim() && details.title) {
+                        titleInput.value = details.title;
+                    }
+                    if (thumbInput && thumbSrcSel && thumbSrcSel.value === 'auto' && details.thumbnail) {
+                        thumbInput.value = details.thumbnail;
+                    }
+                }
+            } else if (ytId) {
+                if (thumbInput && (!thumbInput.value.trim() || (thumbSrcSel && thumbSrcSel.value === 'auto'))) {
+                    thumbInput.value = `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`;
+                }
+            } else if (sId) {
                 if (rawVal.includes('<iframe') || rawVal.includes('/e/')) {
                     mediaLinkInputEl.value = `https://streamable.com/${sId}`;
                 }
@@ -7208,6 +7222,8 @@ function initPortfolioApp() {
 
     // Expose to window so inline script can access them
     window.extractYouTubeId = extractYouTubeId;
+    window.extractWistiaId = extractWistiaId;
+    window.getWistiaDetails = getWistiaDetails;
     window.extractStreamableId = extractStreamableId;
     window.getStreamableDetails = getStreamableDetails;
     window.getBestStreamableThumbnail = getBestStreamableThumbnail;
