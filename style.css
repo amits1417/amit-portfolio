@@ -1451,15 +1451,10 @@ html.light-mode .marquee-dot,
     opacity: 1;
 }
 
-.project-media iframe.hover-video-preview,
 .project-media video.hover-video-preview {
     pointer-events: none !important;
     user-select: none !important;
     touch-action: manipulation;
-}
-
-.project-media iframe.hover-video-preview,
-.project-media video.hover-video-preview {
     position: absolute !important;
     top: 0 !important;
     left: 0 !important;
@@ -1467,28 +1462,6 @@ html.light-mode .marquee-dot,
     height: 100% !important;
     object-fit: cover !important;
     border: none !important;
-    pointer-events: none !important;
-    transform: none !important;
-}
-
-.project-media.aspect-9-16 iframe.hover-video-preview {
-    position: absolute !important;
-    top: 0 !important;
-    left: -108% !important;
-    width: 316% !important;
-    height: 100% !important;
-    border: none !important;
-    pointer-events: none !important;
-    transform: none !important;
-}
-
-.project-media.aspect-9-16 video.hover-video-preview {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
     transform: none !important;
 }
 
