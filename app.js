@@ -4092,12 +4092,37 @@ function initPortfolioApp() {
                 iframe.setAttribute('scrolling', 'no');
                 iframe.setAttribute('frameborder', '0');
                 if (extraAttrs) Object.entries(extraAttrs).forEach(([k, v]) => iframe.setAttribute(k, v));
-                iframe.onload = function() {
-                    setTimeout(function() {
-                        iframe.classList.add('loaded');
-                        iframe.style.opacity = '1';
-                    }, 400);
+                
+                let revealed = false;
+                const reveal = () => {
+                    if (revealed) return;
+                    revealed = true;
+                    iframe.classList.add('loaded');
+                    iframe.style.opacity = '1';
                 };
+
+                // Listen for YouTube playback start (onStateChange === 1) so it only reveals once controls have auto-hidden
+                const onMsg = (ev) => {
+                    try {
+                        const data = typeof ev.data === 'string' ? JSON.parse(ev.data) : ev.data;
+                        if (data && (data.event === 'onStateChange' || data.info === 1)) {
+                            if (data.info === 1) {
+                                reveal();
+                                window.removeEventListener('message', onMsg);
+                            }
+                        }
+                    } catch(e) {}
+                };
+                window.addEventListener('message', onMsg);
+
+                // Fallback timer: reveal at 1300ms once initial YouTube controls have auto-hidden
+                iframe.onload = function() {
+                    setTimeout(() => {
+                        reveal();
+                        window.removeEventListener('message', onMsg);
+                    }, 1300);
+                };
+
                 const shield = mediaContainer.querySelector('.project-media-click-shield');
                 if (shield) {
                     mediaContainer.insertBefore(iframe, shield);
@@ -4117,7 +4142,7 @@ function initPortfolioApp() {
                     img.onload = function() { setTimeout(function() { img.style.opacity = '1'; }, 50); };
                     mediaContainer.appendChild(img);
                 } else {
-                    createIframePreview(`https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&fs=0&cc_load_policy=0`);
+                    createIframePreview(`https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&fs=0&enablejsapi=1&cc_load_policy=0`);
                 }
             } else if (streamableId) {
                 if (isMobile) {
