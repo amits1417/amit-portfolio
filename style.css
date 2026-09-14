@@ -1458,26 +1458,38 @@ html.light-mode .marquee-dot,
     touch-action: manipulation;
 }
 
-.project-media iframe.hover-video-preview {
+.project-media iframe.hover-video-preview,
+.project-media video.hover-video-preview {
     position: absolute !important;
-    width: 180% !important;
-    height: 180% !important;
-    top: -40% !important;
-    left: -40% !important;
-    transform: none !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
     border: none !important;
     pointer-events: none !important;
+    transform: none !important;
 }
 
 .project-media.aspect-9-16 iframe.hover-video-preview {
     position: absolute !important;
-    width: 180% !important;
-    height: 170% !important;
-    top: -35% !important;
-    left: -40% !important;
-    transform: none !important;
+    top: 0 !important;
+    left: -108% !important;
+    width: 316% !important;
+    height: 100% !important;
     border: none !important;
     pointer-events: none !important;
+    transform: none !important;
+}
+
+.project-media.aspect-9-16 video.hover-video-preview {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    transform: none !important;
 }
 
 /* Transparent click shield layer ensures 100% reliable tap/click detection over active preview iframes */

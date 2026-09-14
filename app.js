@@ -4092,14 +4092,18 @@ function initPortfolioApp() {
                 iframe.setAttribute('scrolling', 'no');
                 iframe.setAttribute('frameborder', '0');
                 if (extraAttrs) Object.entries(extraAttrs).forEach(([k, v]) => iframe.setAttribute(k, v));
-                // Give player 650ms to start silent playback before revealing so controls never flash
                 iframe.onload = function() {
                     setTimeout(function() {
                         iframe.classList.add('loaded');
                         iframe.style.opacity = '1';
-                    }, 650);
+                    }, 400);
                 };
-                mediaContainer.appendChild(iframe);
+                const shield = mediaContainer.querySelector('.project-media-click-shield');
+                if (shield) {
+                    mediaContainer.insertBefore(iframe, shield);
+                } else {
+                    mediaContainer.appendChild(iframe);
+                }
             }
 
             if (wistiaId) {
@@ -4113,7 +4117,7 @@ function initPortfolioApp() {
                     img.onload = function() { setTimeout(function() { img.style.opacity = '1'; }, 50); };
                     mediaContainer.appendChild(img);
                 } else {
-                    createIframePreview(`https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=1&loop=1&playlist=${cleanId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&fs=0&enablejsapi=1`);
+                    createIframePreview(`https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&fs=0`);
                 }
             } else if (streamableId) {
                 if (isMobile) {
@@ -5276,7 +5280,7 @@ function initPortfolioApp() {
                         iframe.setAttribute('playsinline', '1');
                         iframe.setAttribute('webkit-playsinline', '1');
                         
-                        // Send postMessage commands to ensure video starts from 0 with sound
+                        // Ensure audio is unmuted on load without seeking back
                         iframe.addEventListener('load', () => {
                             const sendCmd = (func, args = []) => {
                                 try {
@@ -5288,16 +5292,10 @@ function initPortfolioApp() {
                                 } catch (err) {}
                             };
                             setTimeout(() => {
-                                sendCmd('seekTo', [0, true]);
                                 sendCmd('unMute');
                                 sendCmd('setVolume', [100]);
                                 sendCmd('playVideo');
-                            }, 150);
-                            setTimeout(() => {
-                                sendCmd('seekTo', [0, true]);
-                                sendCmd('unMute');
-                                sendCmd('playVideo');
-                            }, 500);
+                            }, 100);
                         });
                         
                         if (wrapper) {
