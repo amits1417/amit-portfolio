@@ -1748,6 +1748,11 @@ function initPortfolioApp() {
         const proj = getCardProject(card);
         if (!proj) return;
 
+        // Skip graphics cards completely — hover preview is only for video projects
+        const isGraphics = (proj.category && proj.category.toLowerCase().includes('graphic')) ||
+                           (card.closest('.portfolio-item') && card.closest('.portfolio-item').getAttribute('data-category') === 'graphics');
+        if (isGraphics) return;
+
         // Stop preview on all other cards first
         document.querySelectorAll('.project-card').forEach(otherCard => {
             if (otherCard !== card) {
@@ -1976,9 +1981,9 @@ function initPortfolioApp() {
                     ${cmsMediaDeleteBtnHTML}
                     <div class="project-media ${aspectClass}">
                         ${imgTagHTML}
-                        <canvas class="preview-canvas"></canvas>
+                        ${!isGraphicsCat ? '<canvas class="preview-canvas"></canvas>' : ''}
                         <div class="video-watermark">Amit Sharma</div>
-                        <div class="project-overlay-glow"></div>
+                        ${!isGraphicsCat ? '<div class="project-overlay-glow"></div>' : ''}
                         <div class="project-media-click-shield"></div>
                     </div>
                     <div class="project-details" ${hideDetails ? 'style="display: none !important;"' : ''}>
@@ -2004,18 +2009,20 @@ function initPortfolioApp() {
             // Direct click listener on card (more reliable than delegation/onclick)
             const cardEl = itemEl.firstElementChild;
             if (cardEl) {
-                cardEl.onmouseenter = function() {
-                    playCardPreview(this);
-                };
-                cardEl.onmouseleave = function() {
-                    stopCardPreview(this);
-                };
-                cardEl.addEventListener('mouseenter', function() {
-                    playCardPreview(this);
-                });
-                cardEl.addEventListener('mouseleave', function() {
-                    stopCardPreview(this);
-                });
+                if (!isGraphicsCat) {
+                    cardEl.onmouseenter = function() {
+                        playCardPreview(this);
+                    };
+                    cardEl.onmouseleave = function() {
+                        stopCardPreview(this);
+                    };
+                    cardEl.addEventListener('mouseenter', function() {
+                        playCardPreview(this);
+                    });
+                    cardEl.addEventListener('mouseleave', function() {
+                        stopCardPreview(this);
+                    });
+                }
                 cardEl.addEventListener('click', function(ev) {
                     if (ev.target.closest('.card-hud-btn') || ev.target.closest('.cms-checkbox-wrapper') || ev.target.classList.contains('cms-delete-checkbox') || ev.target.closest('.cms-media-delete-btn')) return;
                     if (document.body.classList.contains('editor-active')) return;
@@ -4221,8 +4228,17 @@ function initPortfolioApp() {
 
         const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent);
 
-        // Attach direct mouseenter/mouseleave listeners to all project cards
-        projectCards.forEach(card => {
+        const videoCards = Array.from(projectCards).filter(card => {
+            const pItem = card.closest('.portfolio-item');
+            const cat = pItem ? pItem.getAttribute('data-category') : '';
+            if (cat && cat.toLowerCase().includes('graphic')) return false;
+            const proj = getCardProject(card);
+            if (proj && proj.category && proj.category.toLowerCase().includes('graphic')) return false;
+            return true;
+        });
+
+        // Attach direct mouseenter/mouseleave listeners only to video cards (skip graphics)
+        videoCards.forEach(card => {
             card.onmouseenter = function() {
                 playCardPreview(this);
             };
@@ -4245,7 +4261,7 @@ function initPortfolioApp() {
                     });
                 }, { threshold: 0.5 });
 
-                projectCards.forEach(card => mobileScrollObserver.observe(card));
+                videoCards.forEach(card => mobileScrollObserver.observe(card));
             }
 
             // Viewport safety observer: pause and hide when completely scrolled out of view
@@ -4257,7 +4273,7 @@ function initPortfolioApp() {
                 });
             }, { threshold: 0 });
 
-            projectCards.forEach(card => viewportSafetyObserver.observe(card));
+            videoCards.forEach(card => viewportSafetyObserver.observe(card));
         }
     }
 

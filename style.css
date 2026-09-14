@@ -1536,6 +1536,24 @@ body.light-mode .grid-graphics .project-media {
 .portfolio-item[data-category="graphics"] .project-card:hover .project-media img {
     transform: none !important;
 }
+
+.portfolio-item[data-category="graphics"] .preview-canvas,
+.grid-graphics .preview-canvas,
+.portfolio-item[data-category="graphics"] .project-overlay-glow,
+.grid-graphics .project-overlay-glow,
+.portfolio-item[data-category="graphics"] .hover-video-preview,
+.grid-graphics .hover-video-preview {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+.portfolio-item[data-category="graphics"] .project-card:hover,
+.grid-graphics .project-card:hover {
+    transform: none !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+}
 /* Bigger graphics grid columns */
 .grid-graphics {
     grid-template-columns: repeat(4, 1fr) !important;
