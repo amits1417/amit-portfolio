@@ -1845,7 +1845,6 @@ function initPortfolioApp() {
                 cardEl.addEventListener('click', function(ev) {
                     if (ev.target.closest('.card-hud-btn') || ev.target.closest('.cms-checkbox-wrapper') || ev.target.classList.contains('cms-delete-checkbox') || ev.target.closest('.cms-media-delete-btn')) return;
                     if (document.body.classList.contains('editor-active')) return;
-                    if (ev.target.closest('.hover-video-preview')) return;
                     const pid = this.getAttribute('data-project-id');
                     const pj = projects.find(p => p.id === pid);
                     if (!pj) return;
@@ -1856,7 +1855,7 @@ function initPortfolioApp() {
                             media.querySelectorAll('.hover-video-preview').forEach(e => e.remove());
                             const iframe = document.createElement('iframe');
                             iframe.className = 'wistia-inline-play';
-                            iframe.src = `https://fast.wistia.net/embed/iframe/${wId}?autoplay=1&volume=1&loop=0&controls=0&playsinline=1`;
+                            iframe.src = `https://fast.wistia.net/embed/iframe/${wId}?autoplay=1&volume=1&muted=0&time=0&controls=0&playsinline=1`;
                             iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;z-index:5;';
                             iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
                             iframe.setAttribute('playsinline', '1');
@@ -4086,7 +4085,7 @@ function initPortfolioApp() {
                 const iframe = document.createElement('iframe');
                 iframe.src = src;
                 iframe.className = 'hover-video-preview';
-                iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:0;transition:opacity 0.4s ease;';
+                iframe.style.cssText = 'position:absolute;border:none;pointer-events:none;opacity:0;transition:opacity 0.4s ease;';
                 iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope');
                 iframe.setAttribute('playsinline', '1');
                 iframe.setAttribute('webkit-playsinline', '1');
@@ -4114,7 +4113,7 @@ function initPortfolioApp() {
                     img.onload = function() { setTimeout(function() { img.style.opacity = '1'; }, 50); };
                     mediaContainer.appendChild(img);
                 } else {
-                    createIframePreview(`https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&enablejsapi=1`);
+                    createIframePreview(`https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&fs=0&enablejsapi=1`);
                 }
             } else if (streamableId) {
                 if (isMobile) {
@@ -4409,6 +4408,7 @@ function initPortfolioApp() {
 
             const activeVid = document.getElementById('hero-showcase-video') || mutedPreviewEl;
             if (activeVid) {
+                activeVid.currentTime = 0;
                 activeVid.muted = false;
                 activeVid.volume = 1;
                 activeVid.loop = false;
@@ -4529,7 +4529,7 @@ function initPortfolioApp() {
                 videoContainer.appendChild(iframe);
             } else {
                 const iframe = document.createElement('iframe');
-                iframe.src = `https://www.youtube.com/embed/${cleanYtId || vid}?autoplay=1&controls=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`;
+                iframe.src = `https://www.youtube.com/embed/${cleanYtId || vid}?autoplay=1&mute=0&start=0&controls=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`;
                 iframe.style.position = 'absolute';
                 iframe.style.top = '0';
                 iframe.style.left = '0';
@@ -5127,6 +5127,9 @@ function initPortfolioApp() {
                     videoEl.autoplay = true;
                     videoEl.playsInline = true;
                     videoEl.preload = 'auto';
+                    videoEl.muted = false;
+                    videoEl.volume = 1;
+                    videoEl.currentTime = 0;
                     videoEl.style.position = 'absolute';
                     videoEl.style.top = '0';
                     videoEl.style.left = '0';
@@ -5140,9 +5143,20 @@ function initPortfolioApp() {
                     }
                     
                     lightboxPlayer = new Plyr('#lightbox-plyr-player', {
+                        autoplay: true,
+                        muted: false,
+                        volume: 1,
                         controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
                         settings: ['quality'],
                         quality: { default: 1080, options: [4320, 2160, 1440, 1080, 720, 576, 480, 360, 240] }
+                    });
+                    lightboxPlayer.on('ready', () => {
+                        try {
+                            lightboxPlayer.currentTime = 0;
+                            lightboxPlayer.muted = false;
+                            lightboxPlayer.volume = 1;
+                            lightboxPlayer.play();
+                        } catch(e) {}
                     });
                     
                     appendConsoleLog(`> Lightbox video active: "${proj.title}"`);
@@ -5157,7 +5171,7 @@ function initPortfolioApp() {
                         const createStreamableLightboxIframe = () => {
                             if (wrapper) wrapper.innerHTML = '';
                             const iframe = document.createElement('iframe');
-                            iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=0&loop=1`;
+                            iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1&muted=0&start=0&loop=1`;
                             iframe.style.position = 'absolute';
                             iframe.style.top = '0';
                             iframe.style.left = '0';
@@ -5177,7 +5191,7 @@ function initPortfolioApp() {
                         createStreamableLightboxIframe();
                     } else if (wistiaId) {
                         const iframe = document.createElement('iframe');
-                        iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}`;
+                        iframe.src = `https://fast.wistia.net/embed/iframe/${wistiaId}?autoplay=1&volume=1&muted=0&time=0`;
                         iframe.style.position = 'absolute';
                         iframe.style.top = '0';
                         iframe.style.left = '0';
@@ -5200,7 +5214,7 @@ function initPortfolioApp() {
                         appendConsoleLog(`> Lightbox Wistia clean embed active: "${proj.title}"`);
                     } else if (vimeoId) {
                         const iframe = document.createElement('iframe');
-                        iframe.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1`;
+                        iframe.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=0#t=0s`;
                         iframe.style.position = 'absolute';
                         iframe.style.top = '0';
                         iframe.style.left = '0';
@@ -5245,7 +5259,7 @@ function initPortfolioApp() {
                         appendConsoleLog(`> Lightbox Google Drive active: "${proj.title}"`);
                     } else {
                         const iframe = document.createElement('iframe');
-                        iframe.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&controls=1&rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&enablejsapi=1`;
+                        iframe.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=0&start=0&controls=1&rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&enablejsapi=1`;
                         iframe.style.position = 'absolute';
                         iframe.style.top = '0';
                         iframe.style.left = '0';
@@ -5255,7 +5269,36 @@ function initPortfolioApp() {
                         iframe.style.opacity = '1';
                         iframe.style.backgroundColor = '#000';
                         iframe.allowFullscreen = true;
-                        iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+                        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+                        iframe.setAttribute('allowfullscreen', 'true');
+                        iframe.setAttribute('webkitallowfullscreen', 'true');
+                        iframe.setAttribute('mozallowfullscreen', 'true');
+                        iframe.setAttribute('playsinline', '1');
+                        iframe.setAttribute('webkit-playsinline', '1');
+                        
+                        // Send postMessage commands to ensure video starts from 0 with sound
+                        iframe.addEventListener('load', () => {
+                            const sendCmd = (func, args = []) => {
+                                try {
+                                    iframe.contentWindow.postMessage(JSON.stringify({
+                                        event: 'command',
+                                        func: func,
+                                        args: args
+                                    }), '*');
+                                } catch (err) {}
+                            };
+                            setTimeout(() => {
+                                sendCmd('seekTo', [0, true]);
+                                sendCmd('unMute');
+                                sendCmd('setVolume', [100]);
+                                sendCmd('playVideo');
+                            }, 150);
+                            setTimeout(() => {
+                                sendCmd('seekTo', [0, true]);
+                                sendCmd('unMute');
+                                sendCmd('playVideo');
+                            }, 500);
+                        });
                         
                         if (wrapper) {
                             wrapper.appendChild(iframe);

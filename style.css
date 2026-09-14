@@ -1459,11 +1459,25 @@ html.light-mode .marquee-dot,
 }
 
 .project-media iframe.hover-video-preview {
-    transform: scale(1.35); /* Hide YouTube logo & parameters on landscape */
+    position: absolute !important;
+    width: 170% !important;
+    height: 170% !important;
+    top: -35% !important;
+    left: -35% !important;
+    transform: none !important;
+    border: none !important;
+    pointer-events: none !important;
 }
 
 .project-media.aspect-9-16 iframe.hover-video-preview {
-    transform: scale(1.05) !important; /* Fit 9:16 vertical shorts cleanly */
+    position: absolute !important;
+    width: 160% !important;
+    height: 150% !important;
+    top: -25% !important;
+    left: -30% !important;
+    transform: none !important;
+    border: none !important;
+    pointer-events: none !important;
 }
 
 /* Transparent click shield layer ensures 100% reliable tap/click detection over active preview iframes */
