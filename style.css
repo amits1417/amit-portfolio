@@ -6376,18 +6376,48 @@ body.light-mode .graphics-view-more-btn:hover {
     pointer-events: none !important;
 }
 
-/* Full playing state for Showreel frame */
-/* Hide showreel overlay (blue play button) when preview video is loaded */
-.showreel-video-container:not(:empty) ~ .showreel-overlay {
+/* Strictly hide all native browser/webkit video controls on preview videos */
+.project-media video,
+.hover-video-preview,
+#showreel-video-container video:not([controls]) {
+    -webkit-appearance: none !important;
+}
+.project-media video::-webkit-media-controls,
+.project-media video::-webkit-media-controls-enclosure,
+.project-media video::-webkit-media-controls-panel,
+.project-media video::-webkit-media-controls-play-button,
+.project-media video::-webkit-media-controls-start-playback-button,
+.project-media video::-webkit-media-controls-overlay-play-button,
+.project-media video::-webkit-media-controls-timeline,
+.project-media video::-webkit-media-controls-current-time-display,
+.project-media video::-webkit-media-controls-time-remaining-display,
+.project-media video::-webkit-media-controls-mute-button,
+.project-media video::-webkit-media-controls-volume-slider,
+.hover-video-preview::-webkit-media-controls,
+.hover-video-preview::-webkit-media-controls-enclosure,
+.hover-video-preview::-webkit-media-controls-panel,
+.hover-video-preview::-webkit-media-controls-play-button,
+.hover-video-preview::-webkit-media-controls-start-playback-button,
+.hover-video-preview::-webkit-media-controls-overlay-play-button,
+#showreel-video-container video:not([controls])::-webkit-media-controls,
+#showreel-video-container video:not([controls])::-webkit-media-controls-play-button,
+#showreel-video-container video:not([controls])::-webkit-media-controls-start-playback-button,
+#showreel-video-container video:not([controls])::-webkit-media-controls-overlay-play-button {
     display: none !important;
+    -webkit-appearance: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
 }
-.showreel-frame.is-playing .showreel-video-container {
+
+/* Showreel states */
+.showreel-frame .showreel-video-container {
     display: block !important;
-    z-index: 10 !important;
-    pointer-events: auto !important;
+    z-index: 2;
+    pointer-events: auto;
 }
-/* Hide showreel overlay when full video is playing */
-.showreel-frame.is-playing .showreel-overlay,
+
+/* When preview video is active and playing */
 .showreel-frame.is-playing .showreel-img,
 .showreel-frame.is-playing .waveform-canvas {
     opacity: 0 !important;
@@ -6395,14 +6425,60 @@ body.light-mode .graphics-view-more-btn:hover {
     display: none !important;
 }
 
-.showreel-frame.is-playing .showreel-video-container {
-    z-index: 10 !important;
-    pointer-events: auto !important;
+/* Hide play overlay during muted preview (unmute hint shows instead) or during full play */
+.showreel-frame.is-playing .showreel-overlay,
+.showreel-frame.is-full-playing .showreel-overlay {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    display: none !important;
 }
 
-.showreel-frame.is-playing .showreel-video-container iframe,
-.showreel-frame.is-playing .showreel-video-container video {
-    pointer-events: auto !important;
+/* Muted auto-preview: show pulsing CLICK TO UNMUTE hint */
+.showreel-frame.is-playing:not(.is-full-playing) .showreel-unmute-hint {
+    display: flex !important;
+    opacity: 1 !important;
+}
+.showreel-frame.is-full-playing .showreel-unmute-hint {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+.showreel-unmute-hint {
+    display: none;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 20px;
+    background: rgba(10, 14, 26, 0.82);
+    border: 1.5px solid rgba(0, 240, 255, 0.55);
+    border-radius: 30px;
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 12px rgba(0,240,255,0.25);
+    pointer-events: auto;
+    animation: unmuteHintPulse 2.4s ease-in-out infinite;
+    white-space: nowrap;
+}
+.showreel-unmute-hint svg {
+    width: 16px; height: 16px;
+    flex-shrink: 0;
+}
+@keyframes unmuteHintPulse {
+    0%, 100% { box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 12px rgba(0,240,255,0.25); }
+    50% { box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 22px rgba(0,240,255,0.55); }
+}
+/* Hide unmute hint once video is fully playing (user clicked) */
+.showreel-frame.is-full-playing .showreel-unmute-hint {
+    display: none !important;
 }
 
 /* ==========================================================================
@@ -6497,47 +6573,187 @@ body.editor-active .card-edit-overlay {
     z-index: 10;
     overflow: hidden;
     border-radius: 16px;
+    background: #000;
 }
 .glass-video-wrap video {
     width: 100%; height: 100%;
     object-fit: cover;
     display: block;
+    background: #000;
 }
+.glass-unmute-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(10, 14, 26, 0.88);
+    border: 1.5px solid rgba(0, 240, 255, 0.6);
+    border-radius: 30px;
+    color: #ffffff;
+    font-family: var(--font-mono, monospace);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 240, 255, 0.35);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+}
+.glass-unmute-badge:hover {
+    background: rgba(0, 240, 255, 0.25);
+    border-color: var(--accent-cyan, #00f0ff);
+    transform: scale(1.06);
+    box-shadow: 0 6px 25px rgba(0, 240, 255, 0.5);
+}
+.glass-unmute-badge.is-unmuted {
+    border-color: rgba(156, 85, 235, 0.8);
+    box-shadow: 0 4px 20px rgba(156, 85, 235, 0.4);
+}
+.glass-unmute-badge .unmute-badge-icon svg {
+    width: 16px;
+    height: 16px;
+    color: var(--accent-cyan, #00f0ff);
+    display: block;
+}
+.pulse-sound-icon {
+    animation: soundWavePulse 1.4s ease-in-out infinite alternate;
+}
+@keyframes soundWavePulse {
+    0% { transform: scale(0.92); opacity: 0.75; }
+    100% { transform: scale(1.15); opacity: 1; }
+}
+
 .glass-controls {
     position: absolute;
     bottom: 0; left: 0; right: 0;
     display: flex;
     flex-direction: column;
-    gap: 0;
-    padding: 10px 14px 12px;
-    background: linear-gradient(transparent, rgba(5,7,6,0.75));
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-top: 1px solid rgba(22,139,255,0.15);
-    z-index: 11;
+    gap: 4px;
+    padding: 12px 16px 14px;
+    background: linear-gradient(transparent, rgba(5, 7, 12, 0.88) 35%, rgba(5, 7, 12, 0.96));
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(0, 240, 255, 0.2);
+    z-index: 14;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+}
+.glass-video-wrap:hover .glass-controls {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+.glass-progress-wrap {
+    width: 100%;
+    padding: 6px 0 4px;
+    cursor: pointer;
+}
+.glass-progress-bar {
+    position: relative;
+    width: 100%;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: visible;
+    transition: height 0.15s ease;
+}
+.glass-progress-wrap:hover .glass-progress-bar {
+    height: 7px;
+}
+.glass-progress-buffered {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    width: 0%;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    transition: width 0.2s ease;
+}
+.glass-progress-filled {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent-cyan, #00f0ff), var(--accent-purple, #9c55eb));
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+}
+.glass-progress-handle {
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 8px rgba(0, 240, 255, 0.9);
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.15s ease;
+}
+.glass-progress-wrap:hover .glass-progress-handle {
+    transform: translate(-50%, -50%) scale(1);
 }
 .glass-btn-row {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
 }
 .glass-btn {
     background: none;
     border: none;
-    color: rgba(255,255,255,0.85);
+    color: rgba(255, 255, 255, 0.85);
     cursor: pointer;
-    padding: 4px;
+    padding: 6px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.2s, transform 0.15s;
+    transition: all 0.2s ease;
     line-height: 0;
 }
 .glass-btn:hover {
-    color: var(--accent-cyan);
-    transform: scale(1.15);
+    color: var(--accent-cyan, #00f0ff);
+    background: rgba(0, 240, 255, 0.12);
+    transform: scale(1.12);
 }
-.glass-btn svg, .glass-btn i { width: 16px; height: 16px; }
+.glass-btn.active {
+    color: var(--accent-cyan, #00f0ff);
+}
+.glass-btn svg, .glass-btn i { width: 18px; height: 18px; }
+.glass-time-display {
+    font-family: var(--font-mono, monospace);
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+}
+.glass-volume-slider {
+    -webkit-appearance: none;
+    width: 60px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+.glass-volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent-cyan, #00f0ff);
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(0, 240, 255, 0.8);
+}
 .glass-play-overlay {
     position: absolute;
     top: 0; left: 0;
@@ -6554,21 +6770,21 @@ body.editor-active .card-edit-overlay {
     opacity: 1;
 }
 .glass-play-overlay .gp-icon {
-    width: 56px; height: 56px;
+    width: 64px; height: 64px;
     border-radius: 50%;
-    background: rgba(22,139,255,0.35);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1.5px solid rgba(22,139,255,0.4);
+    background: rgba(10, 14, 26, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 2px solid var(--accent-cyan, #00f0ff);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 24px rgba(22,139,255,0.25);
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
 }
 .glass-play-overlay .gp-icon svg {
-    width: 22px; height: 22px;
+    width: 26px; height: 26px;
     color: #fff;
     fill: #fff;
-    margin-left: 2px;
+    margin-left: 3px;
 }
 

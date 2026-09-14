@@ -1817,10 +1817,6 @@ function initPortfolioApp() {
                         <canvas class="preview-canvas"></canvas>
                         <div class="video-watermark">Amit Sharma</div>
                         <div class="project-overlay-glow"></div>
-                        <div class="project-view-badge">
-                            <i data-lucide="${iconName}" class="play-icon"></i>
-                            <span>${viewLabel}</span>
-                        </div>
                         <div class="project-media-click-shield"></div>
                     </div>
                     <div class="project-details" ${hideDetails ? 'style="display: none !important;"' : ''}>
@@ -4057,17 +4053,25 @@ function initPortfolioApp() {
                 const previewEl = document.createElement('video');
                 previewEl.muted = true;
                 previewEl.defaultMuted = true;
-                previewEl.loop = true;
-                previewEl.autoplay = true;
-                previewEl.preload = 'metadata';
+                previewEl.volume = 0;
                 previewEl.setAttribute('muted', '');
                 previewEl.setAttribute('playsinline', '');
                 previewEl.setAttribute('webkit-playsinline', '');
+                previewEl.setAttribute('autoplay', '');
+                previewEl.setAttribute('loop', '');
                 previewEl.playsInline = true;
+                previewEl.loop = true;
+                previewEl.autoplay = true;
                 previewEl.controls = false;
-                previewEl.className = 'hover-video-preview loaded';
+                previewEl.preload = 'auto';
+                previewEl.className = 'hover-video-preview';
+                previewEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity 0.35s ease;';
                 previewEl.src = normalizeMediaPath(proj.mediaLink);
                 mediaContainer.appendChild(previewEl);
+                previewEl.addEventListener('playing', () => {
+                    previewEl.classList.add('loaded');
+                    previewEl.style.opacity = '1';
+                }, { once: true });
                 try { const p = previewEl.play(); if (p !== undefined) p.catch(() => {}); } catch(e) {}
                 return;
             }
@@ -4082,14 +4086,20 @@ function initPortfolioApp() {
                 const iframe = document.createElement('iframe');
                 iframe.src = src;
                 iframe.className = 'hover-video-preview';
-                iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:0;transition:opacity 0.3s ease;';
+                iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:0;transition:opacity 0.4s ease;';
                 iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope');
                 iframe.setAttribute('playsinline', '1');
                 iframe.setAttribute('webkit-playsinline', '1');
                 iframe.setAttribute('scrolling', 'no');
                 iframe.setAttribute('frameborder', '0');
                 if (extraAttrs) Object.entries(extraAttrs).forEach(([k, v]) => iframe.setAttribute(k, v));
-                iframe.onload = function() { setTimeout(function() { iframe.style.opacity = '1'; }, 100); };
+                // Give player 650ms to start silent playback before revealing so controls never flash
+                iframe.onload = function() {
+                    setTimeout(function() {
+                        iframe.classList.add('loaded');
+                        iframe.style.opacity = '1';
+                    }, 650);
+                };
                 mediaContainer.appendChild(iframe);
             }
 
@@ -4261,8 +4271,8 @@ function initPortfolioApp() {
 
         const controls = document.createElement('div');
         controls.className = 'glass-controls';
-        controls.style.opacity = '1';
-        controls.style.transform = 'none';
+        controls.style.opacity = '0';
+        controls.style.transform = 'translateY(4px)';
         controls.innerHTML = `
             <div class="glass-btn-row">
                 <button class="glass-btn glass-play-btn" type="button">${svgPause}</button>
@@ -4316,16 +4326,133 @@ function initPortfolioApp() {
 
         let autoPlayed = false;
         let isFullPlaying = false;
+        let mutedPreviewEl = null; // tracks the auto-muted preview video element
 
+        const heroVid = document.getElementById('hero-showcase-video');
+        if (heroVid) {
+            mutedPreviewEl = heroVid;
+            const markPlaying = () => {
+                frame.classList.add('is-playing');
+            };
+            heroVid.addEventListener('playing', markPlaying);
+            heroVid.addEventListener('timeupdate', () => {
+                if (heroVid.currentTime > 0) markPlaying();
+            }, { once: true });
+            if (!heroVid.paused) markPlaying();
+
+            // Attempt native muted playback immediately
+            const p = heroVid.play();
+            if (p !== undefined) {
+                p.catch(() => {
+                    // Fallback on first user gesture
+                    const onFirstGesture = () => {
+                        if (heroVid && heroVid.paused && !isFullPlaying) {
+                            heroVid.play().catch(() => {});
+                        }
+                    };
+                    ['scroll', 'touchstart', 'pointerdown', 'mousemove', 'keydown', 'wheel'].forEach(evt => {
+                        window.addEventListener(evt, onFirstGesture, { capture: true, once: true, passive: true });
+                    });
+                });
+            }
+        }
+
+        // Phase 1: Auto muted preview (for fallback or dynamic changes)
+        function startMutedPreview() {
+            if (document.body.classList.contains('editor-active')) return;
+            const existingVid = document.getElementById('hero-showcase-video');
+            if (existingVid) {
+                if (existingVid.paused && !isFullPlaying) {
+                    existingVid.play().catch(() => {});
+                }
+                return;
+            }
+            if (isFullPlaying || mutedPreviewEl) return;
+            const playBtn = document.getElementById('play-showreel-btn');
+            const vid = playBtn ? (playBtn.getAttribute('data-video-id') || '') : '';
+            if (!vid) return;
+
+            const isDirectMp4 = isDirectVideoUrl(vid);
+            if (!isDirectMp4) return;
+
+            videoContainer.innerHTML = '';
+            const previewVid = document.createElement('video');
+            previewVid.id = 'hero-showcase-video';
+            previewVid.muted = true;
+            previewVid.defaultMuted = true;
+            previewVid.volume = 0;
+            previewVid.setAttribute('muted', '');
+            previewVid.setAttribute('playsinline', '');
+            previewVid.setAttribute('webkit-playsinline', '');
+            previewVid.setAttribute('autoplay', '');
+            previewVid.setAttribute('loop', '');
+            previewVid.playsInline = true;
+            previewVid.loop = true;
+            previewVid.autoplay = true;
+            previewVid.controls = false;
+            previewVid.preload = 'auto';
+            previewVid.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;background:#000;';
+            previewVid.src = normalizeMediaPath(vid);
+            videoContainer.appendChild(previewVid);
+            mutedPreviewEl = previewVid;
+
+            previewVid.addEventListener('playing', () => {
+                frame.classList.add('is-playing');
+            }, { once: true });
+
+            previewVid.play().catch(() => {});
+        }
+
+        // Phase 2: Full unmuted playback (with controls, triggered on click)
         async function playFullShowreel() {
             if (document.body.classList.contains('editor-active')) return;
+
+            const activeVid = document.getElementById('hero-showcase-video') || mutedPreviewEl;
+            if (activeVid) {
+                activeVid.muted = false;
+                activeVid.volume = 1;
+                activeVid.loop = false;
+                activeVid.controls = true;
+                isFullPlaying = true;
+                frame.classList.add('is-playing');
+                frame.classList.add('is-full-playing');
+                const overlay = document.getElementById('showreel-overlay');
+                if (overlay) overlay.style.display = 'none';
+                activeVid.play().catch(() => {});
+                return;
+            }
+
             const playBtn = document.getElementById('play-showreel-btn');
             let vid = playBtn ? (playBtn.getAttribute('data-video-id') || 'https://pub-069db4deb1444820b524ff7460ae854f.r2.dev/Amit%20Sharma%20(AI%20Avtar%20introduction).mp4') : 'https://pub-069db4deb1444820b524ff7460ae854f.r2.dev/Amit%20Sharma%20(AI%20Avtar%20introduction).mp4';
             const mediaSource = playBtn ? (playBtn.getAttribute('data-media-source') || 'link') : 'link';
             const cleanYtId = extractYouTubeId(vid);
             const isYoutube = !!cleanYtId;
 
+            // Direct MP4
+            if ((mediaSource === 'upload' || isDirectVideoUrl(vid)) && !isYoutube) {
+                videoContainer.innerHTML = '';
+                const vidEl = document.createElement('video');
+                vidEl.id = 'hero-showcase-video';
+                vidEl.src = normalizeMediaPath(vid);
+                vidEl.controls = true;
+                vidEl.playsInline = true;
+                vidEl.autoplay = true;
+                vidEl.preload = 'auto';
+                vidEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;background:#000;';
+                videoContainer.appendChild(vidEl);
+                frame.classList.add('is-playing');
+                frame.classList.add('is-full-playing');
+                isFullPlaying = true;
+                mutedPreviewEl = vidEl;
+                const overlay = document.getElementById('showreel-overlay');
+                if (overlay) overlay.style.display = 'none';
+                vidEl.play().catch(() => {});
+                return;
+            }
+
+            // No preview running yet — load fresh with full controls
             videoContainer.innerHTML = '';
+            mutedPreviewEl = null;
             frame.classList.add('is-playing');
             isFullPlaying = true;
 
@@ -4341,33 +4468,25 @@ function initPortfolioApp() {
                     if (wDetails && wDetails.id) resolvedWistiaId = wDetails.id;
                 } catch(e) { console.warn('Wistia resolve failed:', e); }
             }
-            if (isWistia) console.log('Wistia resolved:', resolvedWistiaId, 'from:', vid);
 
             if ((mediaSource === 'upload' || isDirectVideoUrl(vid)) && !isYoutube && !isStreamable && !isWistia) {
-                if (isFullPlaying) {
-                    videoContainer.innerHTML = '';
-                    frame.classList.remove('is-playing');
-                    isFullPlaying = false;
-                    return;
-                }
                 const overlay = document.getElementById('showreel-overlay');
                 if (overlay) overlay.style.display = 'none';
-                videoContainer.innerHTML = '';
                 const vidEl = document.createElement('video');
                 vidEl.src = normalizeMediaPath(vid);
                 vidEl.controls = true;
                 vidEl.playsInline = true;
+                vidEl.autoplay = true;
                 vidEl.preload = 'auto';
-                vidEl.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;background:#000;';
+                vidEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;background:#000;';
                 videoContainer.appendChild(vidEl);
-                frame.classList.add('is-playing');
-                isFullPlaying = true;
                 vidEl.addEventListener('ended', () => {
                     frame.classList.remove('is-playing');
                     isFullPlaying = false;
                     videoContainer.innerHTML = '';
-                });
-                vidEl.play();
+                    if (overlay) overlay.style.display = '';
+                }, { once: true });
+                try { vidEl.play(); } catch(e) { console.warn('Showreel play failed:', e); }
             } else if (isStreamable) {
                 const createShowreelIframe = () => {
                     if (!videoContainer) return;
@@ -4445,7 +4564,16 @@ function initPortfolioApp() {
             });
         }
 
-        // Click event handler on showreel viewport / frame / button to play or replay full video anytime
+        // Unmute hint badge click — upgrade to full audio playback
+        const unmuteHint = document.getElementById('showreel-unmute-hint');
+        if (unmuteHint) {
+            unmuteHint.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!isFullPlaying) playFullShowreel();
+            });
+        }
+
+        // Click on showreel: upgrade from muted preview to full unmuted playback
         viewport.addEventListener('click', (e) => {
             if (e.target.closest('#btn-edit-showreel') || e.target.closest('.showreel-edit-overlay')) return;
             if (document.body.classList.contains('editor-active')) return;
@@ -4453,18 +4581,29 @@ function initPortfolioApp() {
             playFullShowreel();
         });
 
-        // Auto-play showreel muted when scrolled into view
+        // Auto-play showreel MUTED (silent preview) when scrolled into view or on load
         if (typeof IntersectionObserver !== 'undefined') {
             const showreelObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting && !isFullPlaying && !autoPlayed) {
                         autoPlayed = true;
-                        playFullShowreel();
+                        startMutedPreview(); // silent auto-preview, click to unmute
                     }
                 });
-            }, { threshold: 0.4 });
+            }, { threshold: 0.05 });
             showreelObserver.observe(viewport);
         }
+
+        // Immediate check on load in case hero showreel is already within viewport
+        setTimeout(() => {
+            if (!autoPlayed && !isFullPlaying) {
+                const rect = viewport.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    autoPlayed = true;
+                    startMutedPreview();
+                }
+            }
+        }, 200);
 
         // Stop all video previews (used when entering CMS mode)
         window.stopAllPreviews = function() {
@@ -4477,6 +4616,7 @@ function initPortfolioApp() {
             videoContainer.innerHTML = '';
             frame.classList.remove('is-playing');
             isFullPlaying = false;
+            mutedPreviewEl = null;
             autoPlayed = false;
             // Ready for replay
             const waveformEl = document.getElementById('waveform-canvas');
