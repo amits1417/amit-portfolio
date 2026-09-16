@@ -1813,7 +1813,7 @@ function initPortfolioApp() {
             const iframe = document.createElement('iframe');
             iframe.className = 'hover-video-preview';
             iframe.setAttribute('data-preview-type', 'youtube');
-            iframe.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&vq=hd1080`;
+            iframe.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&cc_load_policy=0&playsinline=1&vq=hd1080`;
             iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:1;z-index:5;background:#000;';
             iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
             iframe.setAttribute('allowfullscreen', 'true');
@@ -1821,11 +1821,29 @@ function initPortfolioApp() {
             iframe.setAttribute('webkit-playsinline', '1');
 
             const shield = mediaContainer.querySelector('.project-media-click-shield');
+
+            // Clean startup poster: covers YouTube's own loading overlay/play button while autoplay kicks in,
+            // then fades away so the muted looping preview is revealed with zero player chrome.
+            const poster = document.createElement('img');
+            poster.className = 'youtube-preview-poster';
+            poster.alt = '';
+            poster.src = `https://img.youtube.com/vi/${cleanId}/hqdefault.jpg`;
+
             if (shield) {
+                mediaContainer.insertBefore(poster, shield);
                 mediaContainer.insertBefore(iframe, shield);
             } else {
+                mediaContainer.appendChild(poster);
                 mediaContainer.appendChild(iframe);
             }
+
+            const fadePoster = setTimeout(() => {
+                poster.style.opacity = '0';
+                setTimeout(() => {
+                    if (poster.parentNode) poster.parentNode.removeChild(poster);
+                }, 600);
+            }, 1300);
+            poster._fadeTimer = fadePoster;
             return;
         }
 
@@ -1885,6 +1903,13 @@ function initPortfolioApp() {
         if (iframe) {
             iframe.src = 'about:blank';
             iframe.remove();
+        }
+
+        // Remove startup poster thumbnail (YouTube fade-out overlay)
+        const poster = mediaContainer.querySelector('img.youtube-preview-poster');
+        if (poster) {
+            if (poster._fadeTimer) clearTimeout(poster._fadeTimer);
+            poster.remove();
         }
     }
 
@@ -4675,6 +4700,7 @@ function initPortfolioApp() {
         // Stop all video previews (used when entering CMS mode)
         window.stopAllPreviews = function() {
             document.querySelectorAll('.hover-video-preview').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('img.youtube-preview-poster').forEach(el => el.remove());
             document.querySelectorAll('.project-card.playing-inline').forEach(card => {
                 const media = card.querySelector('.project-media');
                 if (media) media.querySelectorAll('iframe, video').forEach(v => v.remove());
@@ -5141,6 +5167,9 @@ function initPortfolioApp() {
                         el.remove();
                     }
                 } catch(e) {}
+            });
+            document.querySelectorAll('img.youtube-preview-poster').forEach(el => {
+                try { el.remove(); } catch(e) {}
             });
             document.querySelectorAll('.project-card').forEach(c => {
                 try {
