@@ -1753,6 +1753,8 @@ function initPortfolioApp() {
     }
 
     function playCardPreview(card) {
+        // Automatic grid previews disabled — thumbnails only, video opens fullscreen on click
+        return;
         if (!card) return;
         if (document.body.classList.contains('editor-active')) return;
         const isModalActive = document.getElementById('video-modal') && document.getElementById('video-modal').classList.contains('active');
@@ -1928,6 +1930,8 @@ function initPortfolioApp() {
 
     // Scroll-based auto preview: every grid video visible in the viewport plays muted automatically
     function initScrollAutoPreview() {
+        // Automatic grid previews disabled — thumbnails only, video opens fullscreen on click
+        return;
         if (window._scrollPreviewObserver) {
             try { window._scrollPreviewObserver.disconnect(); } catch(e) {}
             window._scrollPreviewObserver = null;
