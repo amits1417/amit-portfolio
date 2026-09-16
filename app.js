@@ -4504,49 +4504,94 @@ function initPortfolioApp() {
 
         // Toggle playback sequence:
         // 1. Automated preview (muted loop)
-        // 2. Click: unmuted playback starting from beginning (0:00)
-        // 3. Click again: pause video; next click resumes play. No play button on top.
+        // 2. Click/Tap: unmuted playback starting from beginning (0:00) with audio
+        // 3. Click/Tap again: toggle pause and play. No play button or badge on top.
+        let isTransitioningShowreel = false;
+
         function handleShowcaseClick() {
             if (document.body.classList.contains('editor-active')) return;
+            if (isTransitioningShowreel) return;
 
-            const activeVid = document.getElementById('hero-showcase-video') || mutedPreviewEl;
-            if (activeVid) {
-                // Step 1 -> Step 2: First click transitions from preview to unmuted playback from start
-                if (!hasStartedUnmuted) {
-                    hasStartedUnmuted = true;
+            let activeVid = document.getElementById('hero-showcase-video') || mutedPreviewEl;
+            if (!activeVid && videoContainer) {
+                activeVid = videoContainer.querySelector('video');
+            }
+
+            // Step 1 -> Step 2: First click transitions from preview to unmuted playback from start (0:00)
+            if (!hasStartedUnmuted) {
+                hasStartedUnmuted = true;
+                isTransitioningShowreel = true;
+                setTimeout(() => { isTransitioningShowreel = false; }, 400);
+
+                frame.classList.add('is-playing', 'is-full-playing');
+
+                const overlay = document.getElementById('showreel-overlay');
+                if (overlay) overlay.style.display = 'none';
+                const unmuteBadge = document.getElementById('showreel-unmute-hint');
+                if (unmuteBadge) unmuteBadge.style.display = 'none';
+                const waveformEl = document.getElementById('waveform-canvas');
+                if (waveformEl) waveformEl.style.display = 'none';
+                const backdrop = viewport.querySelector('.showreel-glow-backdrop');
+                if (backdrop) backdrop.style.display = 'none';
+
+                if (activeVid) {
+                    activeVid.pause();
                     activeVid.removeAttribute('muted');
                     activeVid.muted = false;
                     activeVid.defaultMuted = false;
                     activeVid.volume = 1;
                     activeVid.loop = false;
                     activeVid.controls = false;
-                    activeVid.currentTime = 0;
-                    frame.classList.add('is-playing', 'is-full-playing');
-
-                    const overlay = document.getElementById('showreel-overlay');
-                    if (overlay) overlay.style.display = 'none';
-                    const unmuteBadge = document.getElementById('showreel-unmute-hint');
-                    if (unmuteBadge) unmuteBadge.style.display = 'none';
-                    const waveformEl = document.getElementById('waveform-canvas');
-                    if (waveformEl) waveformEl.style.display = 'none';
-                    const backdrop = viewport.querySelector('.showreel-glow-backdrop');
-                    if (backdrop) backdrop.style.display = 'none';
-
+                    try { activeVid.currentTime = 0; } catch(e) {}
+                    
                     const p = activeVid.play();
                     if (p !== undefined) {
                         p.catch(() => {
-                            activeVid.removeAttribute('muted');
-                            activeVid.muted = false;
-                            activeVid.defaultMuted = false;
-                            activeVid.volume = 1;
-                            activeVid.play().catch(() => {});
+                            // If mobile browser policy blocked unmuting existing node, create clean unmuted video node
+                            const src = activeVid.src || 'https://pub-069db4deb1444820b524ff7460ae854f.r2.dev/Amit%20Sharma%20(AI%20Avtar%20introduction).mp4';
+                            videoContainer.innerHTML = '';
+                            const freshVid = document.createElement('video');
+                            freshVid.id = 'hero-showcase-video';
+                            freshVid.src = src;
+                            freshVid.playsInline = true;
+                            freshVid.setAttribute('playsinline', '');
+                            freshVid.setAttribute('webkit-playsinline', '');
+                            freshVid.autoplay = true;
+                            freshVid.loop = false;
+                            freshVid.controls = false;
+                            freshVid.muted = false;
+                            freshVid.defaultMuted = false;
+                            freshVid.volume = 1;
+                            freshVid.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;background:#000;cursor:pointer;';
+                            videoContainer.appendChild(freshVid);
+                            freshVid.play().catch(() => {});
                         });
                     }
-                    appendConsoleLog('> Main showreel streaming inline (Full Audio)... Active.');
-                    return;
+                } else {
+                    const src = 'https://pub-069db4deb1444820b524ff7460ae854f.r2.dev/Amit%20Sharma%20(AI%20Avtar%20introduction).mp4';
+                    videoContainer.innerHTML = '';
+                    const freshVid = document.createElement('video');
+                    freshVid.id = 'hero-showcase-video';
+                    freshVid.src = src;
+                    freshVid.playsInline = true;
+                    freshVid.setAttribute('playsinline', '');
+                    freshVid.setAttribute('webkit-playsinline', '');
+                    freshVid.autoplay = true;
+                    freshVid.loop = false;
+                    freshVid.controls = false;
+                    freshVid.muted = false;
+                    freshVid.defaultMuted = false;
+                    freshVid.volume = 1;
+                    freshVid.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;background:#000;cursor:pointer;';
+                    videoContainer.appendChild(freshVid);
+                    freshVid.play().catch(() => {});
                 }
+                appendConsoleLog('> Main showreel streaming inline (Full Audio)... Active.');
+                return;
+            }
 
-                // Step 2 -> Step 3: Toggle pause and play on subsequent clicks
+            // Step 2 -> Step 3: Toggle pause and play on subsequent clicks
+            if (activeVid) {
                 if (activeVid.paused) {
                     activeVid.play().catch(() => {});
                     appendConsoleLog('> Main showreel resumed.');
@@ -4554,23 +4599,21 @@ function initPortfolioApp() {
                     activeVid.pause();
                     appendConsoleLog('> Main showreel paused.');
                 }
-                return;
             }
         }
 
-        // Direct click + touch handler on viewport (ensures desktop & mobile tap works instantly with audio)
-        let lastClickTime = 0;
+        // Unified click & tap handler on viewport (ensures clean toggle without 300ms mobile touch double-fire)
+        let lastShowreelTapTime = 0;
         function onShowreelTap(e) {
             if (e.target.closest('#btn-edit-showreel') || e.target.closest('.showreel-edit-overlay')) return;
             if (document.body.classList.contains('editor-active')) return;
             const now = Date.now();
-            if (now - lastClickTime < 250) return;
-            lastClickTime = now;
+            if (now - lastShowreelTapTime < 400) return;
+            lastShowreelTapTime = now;
             handleShowcaseClick();
         }
 
         viewport.addEventListener('click', onShowreelTap);
-        viewport.addEventListener('touchend', onShowreelTap, { passive: true });
 
         // Auto-play showreel MUTED when scrolled into view if not yet playing
         if (typeof IntersectionObserver !== 'undefined') {
@@ -5032,7 +5075,23 @@ function initPortfolioApp() {
             }
             
             // Clean up any active previews while modal is playing
-            document.querySelectorAll('.project-card').forEach(stopCardPreview);
+            document.querySelectorAll('.hover-video-preview').forEach(el => {
+                try {
+                    if (el.tagName === 'VIDEO') {
+                        el.pause();
+                        el.currentTime = 0;
+                        el.style.display = 'none';
+                    } else {
+                        el.src = 'about:blank';
+                        el.remove();
+                    }
+                } catch(e) {}
+            });
+            document.querySelectorAll('.project-card').forEach(c => {
+                try {
+                    if (typeof stopCardPreview === 'function') stopCardPreview(c);
+                } catch(e) {}
+            });
             
             const wrapper = videoModal.querySelector('.video-modal-iframe-wrapper');
             const isImage = isImageProject(proj);
@@ -5351,7 +5410,7 @@ function initPortfolioApp() {
         }
 
         function openLightbox(proj) {
-            if (videoModal && modalIframe) {
+            if (videoModal) {
                 const cat = proj.category;
                 
                 // Slide/swipe gallery view should ONLY work for 'shorts' and 'graphics'

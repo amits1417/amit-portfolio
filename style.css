@@ -6765,3 +6765,20 @@ body.editor-active .card-edit-overlay {
     margin-left: 3px;
 }
 
+/* Strict Clean Showcase Viewport & Modal Rules */
+.scroll-indicator,
+#scroll-indicator,
+.scroll-discover-btn,
+.showreel-overlay,
+#showreel-overlay,
+#play-showreel-btn,
+.showreel-unmute-hint,
+#showreel-unmute-hint,
+.showreel-frame .glass-play-overlay,
+.showreel-frame .glass-controls {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+}
+
