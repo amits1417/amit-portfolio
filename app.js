@@ -5910,7 +5910,7 @@ function initPortfolioApp() {
             const editId = document.getElementById('edit-project-id').value;
             const category = editId === 'showreel' ? 'long' : document.getElementById('modal-project-category').value;
             
-            const title = document.getElementById('modal-project-title').value.trim();
+            let title = document.getElementById('modal-project-title').value.trim();
             const year = '';
             
             const mediaSrc = document.getElementById('modal-media-source').value;
