@@ -1464,6 +1464,15 @@ html.light-mode .marquee-dot,
     opacity: 1 !important;
 }
 
+/* Clean YouTube preview: zoom the embed and center it so the player's top/bottom chrome
+   (progress bar, title bar, scrubber) sits outside the visible area */
+.project-media iframe.hover-video-preview[data-preview-type="youtube"] {
+    top: -7.5% !important;
+    left: -7.5% !important;
+    width: 115% !important;
+    height: 115% !important;
+}
+
 /* Transparent click shield layer ensures 100% reliable tap/click detection over active preview iframes */
 .project-media-click-shield {
     position: absolute;

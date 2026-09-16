@@ -1812,6 +1812,7 @@ function initPortfolioApp() {
             if (mediaContainer.querySelector('.hover-video-preview')) return;
             const iframe = document.createElement('iframe');
             iframe.className = 'hover-video-preview';
+            iframe.setAttribute('data-preview-type', 'youtube');
             iframe.src = `https://www.youtube.com/embed/${cleanId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanId}&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&fs=0&enablejsapi=1`;
             iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:none;opacity:1;z-index:5;background:#000;';
             iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
