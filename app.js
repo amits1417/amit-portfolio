@@ -1891,6 +1891,57 @@ function initPortfolioApp() {
     window.playCardPreview = playCardPreview;
     window.stopCardPreview = stopCardPreview;
 
+    function isElementInViewport(el) {
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 && r.height === 0) return false;
+        const vw = window.innerWidth || document.documentElement.clientWidth;
+        const vh = window.innerHeight || document.documentElement.clientHeight;
+        return r.bottom > 0 && r.top < vh && r.right > 0 && r.left < vw;
+    }
+
+    // Scroll-based auto preview: every grid video visible in the viewport plays muted automatically
+    function initScrollAutoPreview() {
+        if (window._scrollPreviewObserver) {
+            try { window._scrollPreviewObserver.disconnect(); } catch(e) {}
+            window._scrollPreviewObserver = null;
+        }
+        if (document.body.classList.contains('editor-active')) return;
+        if (typeof IntersectionObserver === 'undefined') return;
+
+        const container = document.getElementById('portfolio-grids-container') || document.querySelector('.grids-container');
+        if (!container) return;
+
+        const cards = Array.from(container.querySelectorAll('.video-trigger-card'));
+        const videoCards = cards.filter(card => {
+            const proj = getCardProject(card);
+            if (!proj) return false;
+            return !(proj.category && proj.category.toLowerCase().includes('graphic'));
+        });
+        if (!videoCards.length) return;
+
+        const modalActive = () => {
+            const modal = document.getElementById('video-modal');
+            return modal && modal.classList.contains('active');
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            if (document.body.classList.contains('editor-active')) return;
+            if (modalActive()) return;
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    playCardPreview(entry.target);
+                } else {
+                    stopCardPreview(entry.target);
+                }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -6% 0px' });
+
+        videoCards.forEach(card => observer.observe(card));
+        window._scrollPreviewObserver = observer;
+    }
+    window.initScrollAutoPreview = initScrollAutoPreview;
+
     function renderGridCategory(gridEl, category, isEditorActive, aspectRatio) {
         gridEl.innerHTML = '';
         const catProjects = projects.filter(p => p.category === category);
@@ -2024,13 +2075,13 @@ function initPortfolioApp() {
                         playCardPreview(this);
                     };
                     cardEl.onmouseleave = function() {
-                        stopCardPreview(this);
+                        if (!isElementInViewport(this)) stopCardPreview(this);
                     };
                     cardEl.addEventListener('mouseenter', function() {
                         playCardPreview(this);
                     });
                     cardEl.addEventListener('mouseleave', function() {
-                        stopCardPreview(this);
+                        if (!isElementInViewport(this)) stopCardPreview(this);
                     });
                 }
                 cardEl.addEventListener('click', function(ev) {
@@ -2239,6 +2290,12 @@ function initPortfolioApp() {
         const showreelImg = document.querySelector('.showreel-img');
         if (showreelImg) {
             showreelImg.src = normalizeMediaPath(config.thumbLink) || './assets/showreel.png';
+        }
+        
+        // Keep the inline muted preview video in sync with the configured media source
+        const heroVid = document.getElementById('hero-showcase-video');
+        if (heroVid && config.mediaLink && heroVid.getAttribute('src') !== normalizeMediaPath(config.mediaLink)) {
+            heroVid.src = normalizeMediaPath(config.mediaLink);
         }
         
         const playBtn = document.getElementById('play-showreel-btn');
@@ -3014,6 +3071,8 @@ function initPortfolioApp() {
         
         initInlineTextCMS();
         applyContentEditable();
+        
+        initScrollAutoPreview();
         
         if (typeof ScrollTrigger !== 'undefined') {
             ScrollTrigger.refresh();
@@ -4183,6 +4242,7 @@ function initPortfolioApp() {
 
                 setTimeout(() => {
                     initPreviewCanvases();
+                    if (typeof initScrollAutoPreview === 'function') initScrollAutoPreview();
                 }, 50);
             });
         });
@@ -4234,10 +4294,9 @@ function initPortfolioApp() {
 
 
     /* ==========================================================================
-       PORTFOLIO AUTO VIEWPORT & HOVER PREVIEW (ALL VISIBLE GRID VIDEOS AUTOPLAY)
+       PORTFOLIO HOVER PREVIEW (MOUSEENTER / MOUSELEAVE)
+       Scroll-based auto preview is handled by initScrollAutoPreview() below.
        ========================================================================== */
-    let gridVideoObserver = null;
-
     function initPreviewCanvases() {
         const projectCards = document.querySelectorAll('.project-card');
         if (!projectCards.length) return;
@@ -4257,60 +4316,11 @@ function initPortfolioApp() {
                 playCardPreview(this);
             };
             card.onmouseleave = function() {
-                const rect = this.getBoundingClientRect();
-                const inView = rect.top < window.innerHeight && rect.bottom > 0;
-                if (!inView) {
+                if (!isElementInViewport(this)) {
                     stopCardPreview(this);
                 }
             };
         });
-
-        // Disconnect previous observer to avoid duplicate observations
-        if (gridVideoObserver) {
-            gridVideoObserver.disconnect();
-        }
-
-        // Viewport IntersectionObserver: ALL video cards currently visible in viewport automatically play preview
-        if (typeof IntersectionObserver !== 'undefined') {
-            gridVideoObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const card = entry.target;
-                    const pItem = card.closest('.portfolio-item');
-                    const isHidden = pItem && (pItem.style.display === 'none' || pItem.classList.contains('hide-item'));
-                    if (entry.isIntersecting && !isHidden) {
-                        playCardPreview(card);
-                    } else {
-                        stopCardPreview(card);
-                    }
-                });
-            }, {
-                threshold: [0, 0.1, 0.25],
-                rootMargin: '60px 0px 60px 0px'
-            });
-
-            videoCards.forEach(card => gridVideoObserver.observe(card));
-        }
-
-        // Immediate check of all visible video cards across viewport
-        function triggerVisiblePreviews() {
-            videoCards.forEach(card => {
-                const pItem = card.closest('.portfolio-item');
-                const isHidden = pItem && (pItem.style.display === 'none' || pItem.classList.contains('hide-item'));
-                if (isHidden) {
-                    stopCardPreview(card);
-                    return;
-                }
-                const rect = card.getBoundingClientRect();
-                const inView = rect.top < (window.innerHeight + 60) && rect.bottom > -60;
-                if (inView) {
-                    playCardPreview(card);
-                } else {
-                    stopCardPreview(card);
-                }
-            });
-        }
-
-        setTimeout(triggerVisiblePreviews, 100);
     }
 
     /* ==========================================================================
@@ -4504,20 +4514,28 @@ function initPortfolioApp() {
 
         // Toggle playback sequence:
         // 1. Automated preview (muted loop)
-        // 2. Click/Tap: unmuted playback starting from beginning (0:00) with audio
-        // 3. Click/Tap again: toggle pause and play. No play button or badge on top.
+        // 2. Click/Tap: open fullscreen overlay (video modal) and play with full audio
+        // 3. Inside fullscreen: click on the video toggles pause/play; click on blank area exits back to muted preview
         let isTransitioningShowreel = false;
+
+        const SHOWREEL_DEFAULT_SRC = 'https://pub-069db4deb1444820b524ff7460ae854f.r2.dev/Amit%20Sharma%20(AI%20Avtar%20introduction).mp4';
+
+        function getShowreelMediaLink() {
+            try {
+                const stored = localStorage.getItem('amit_portfolio_showreel');
+                if (stored) {
+                    const cfg = JSON.parse(stored);
+                    if (cfg && cfg.mediaLink) return cfg.mediaLink;
+                }
+            } catch(e) {}
+            return SHOWREEL_DEFAULT_SRC;
+        }
 
         function handleShowcaseClick() {
             if (document.body.classList.contains('editor-active')) return;
             if (isTransitioningShowreel) return;
 
-            let activeVid = document.getElementById('hero-showcase-video') || mutedPreviewEl;
-            if (!activeVid && videoContainer) {
-                activeVid = videoContainer.querySelector('video');
-            }
-
-            // Step 1 -> Step 2: First click transitions from preview to unmuted playback from start (0:00)
+            // Step 1 -> Step 2: First click opens fullscreen player with audio
             if (!hasStartedUnmuted) {
                 hasStartedUnmuted = true;
                 isTransitioningShowreel = true;
@@ -4534,73 +4552,96 @@ function initPortfolioApp() {
                 const backdrop = viewport.querySelector('.showreel-glow-backdrop');
                 if (backdrop) backdrop.style.display = 'none';
 
-                if (activeVid) {
-                    activeVid.pause();
-                    activeVid.removeAttribute('muted');
-                    activeVid.muted = false;
-                    activeVid.defaultMuted = false;
-                    activeVid.volume = 1;
-                    activeVid.loop = false;
-                    activeVid.controls = false;
-                    try { activeVid.currentTime = 0; } catch(e) {}
-                    
-                    const p = activeVid.play();
-                    if (p !== undefined) {
-                        p.catch(() => {
-                            // If mobile browser policy blocked unmuting existing node, create clean unmuted video node
-                            const src = activeVid.src || 'https://pub-069db4deb1444820b524ff7460ae854f.r2.dev/Amit%20Sharma%20(AI%20Avtar%20introduction).mp4';
-                            videoContainer.innerHTML = '';
-                            const freshVid = document.createElement('video');
-                            freshVid.id = 'hero-showcase-video';
-                            freshVid.src = src;
-                            freshVid.playsInline = true;
-                            freshVid.setAttribute('playsinline', '');
-                            freshVid.setAttribute('webkit-playsinline', '');
-                            freshVid.autoplay = true;
-                            freshVid.loop = false;
-                            freshVid.controls = false;
-                            freshVid.muted = false;
-                            freshVid.defaultMuted = false;
-                            freshVid.volume = 1;
-                            freshVid.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;background:#000;cursor:pointer;';
-                            videoContainer.appendChild(freshVid);
-                            freshVid.play().catch(() => {});
-                        });
-                    }
-                } else {
-                    const src = 'https://pub-069db4deb1444820b524ff7460ae854f.r2.dev/Amit%20Sharma%20(AI%20Avtar%20introduction).mp4';
-                    videoContainer.innerHTML = '';
-                    const freshVid = document.createElement('video');
-                    freshVid.id = 'hero-showcase-video';
-                    freshVid.src = src;
-                    freshVid.playsInline = true;
-                    freshVid.setAttribute('playsinline', '');
-                    freshVid.setAttribute('webkit-playsinline', '');
-                    freshVid.autoplay = true;
-                    freshVid.loop = false;
-                    freshVid.controls = false;
-                    freshVid.muted = false;
-                    freshVid.defaultMuted = false;
-                    freshVid.volume = 1;
-                    freshVid.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;background:#000;cursor:pointer;';
-                    videoContainer.appendChild(freshVid);
-                    freshVid.play().catch(() => {});
+                // Pause inline muted preview so the two don't play simultaneously
+                const inlineVid = document.getElementById('hero-showcase-video');
+                if (inlineVid && !inlineVid.paused) {
+                    try { inlineVid.pause(); } catch(e) {}
                 }
-                appendConsoleLog('> Main showreel streaming inline (Full Audio)... Active.');
+
+                let config = { title: "Featured Software Demos & explainers", mediaSource: "link", mediaLink: SHOWREEL_DEFAULT_SRC };
+                const storedConfig = localStorage.getItem('amit_portfolio_showreel');
+                if (storedConfig) {
+                    try { config = JSON.parse(storedConfig) || config; } catch(e) {}
+                }
+
+                const showreelProject = {
+                    id: 'showreel',
+                    title: config.title || 'Featured Showreel',
+                    category: 'long',
+                    desc: '',
+                    client: '',
+                    year: '',
+                    mediaSource: config.mediaSource || 'link',
+                    mediaLink: config.mediaLink || SHOWREEL_DEFAULT_SRC
+                };
+
+                if (typeof window.openLightbox === 'function') {
+                    window._showreelFullscreenActive = true;
+                    window.openLightbox(showreelProject);
+                    appendConsoleLog('> Main showreel streaming FULLSCREEN (Full Audio)... Active.');
+                } else {
+                    hasStartedUnmuted = false;
+                }
                 return;
             }
-
-            // Step 2 -> Step 3: Toggle pause and play on subsequent clicks
-            if (activeVid) {
-                if (activeVid.paused) {
-                    activeVid.play().catch(() => {});
-                    appendConsoleLog('> Main showreel resumed.');
-                } else {
-                    activeVid.pause();
-                    appendConsoleLog('> Main showreel paused.');
-                }
-            }
         }
+
+        // Restore the muted looping inline preview after fullscreen playback closes
+        window.restoreShowreelPreview = function() {
+            hasStartedUnmuted = false;
+            window._showreelFullscreenActive = false;
+
+            const vc = document.getElementById('showreel-video-container');
+            if (!vc) return;
+
+            let vid = document.getElementById('hero-showcase-video');
+            const src = getShowreelMediaLink();
+            if (!vid || !vid.parentNode) {
+                vc.innerHTML = '';
+                vid = document.createElement('video');
+                vid.id = 'hero-showcase-video';
+                vid.src = src;
+                vid.playsInline = true;
+                vid.setAttribute('playsinline', '');
+                vid.setAttribute('webkit-playsinline', '');
+                vid.muted = true;
+                vid.defaultMuted = true;
+                vid.volume = 0;
+                vid.loop = true;
+                vid.autoplay = true;
+                vid.controls = false;
+                vid.setAttribute('muted', '');
+                vid.setAttribute('autoplay', '');
+                vid.setAttribute('loop', '');
+                vid.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;background:#000;cursor:pointer;';
+                vc.appendChild(vid);
+            } else {
+                vid.muted = true;
+                vid.defaultMuted = true;
+                vid.volume = 0;
+                vid.loop = true;
+                vid.controls = false;
+                vid.setAttribute('muted', '');
+                vid.removeAttribute('controls');
+            }
+
+            frame.classList.add('is-playing');
+            frame.classList.remove('is-full-playing');
+
+            const waveformEl = document.getElementById('waveform-canvas');
+            if (waveformEl) waveformEl.style.display = '';
+            const backdrop = viewport.querySelector('.showreel-glow-backdrop');
+            if (backdrop) backdrop.style.display = '';
+            const overlay = document.getElementById('showreel-overlay');
+            if (overlay) overlay.style.display = 'none';
+            const unmuteBadge = document.getElementById('showreel-unmute-hint');
+            if (unmuteBadge) unmuteBadge.style.display = 'none';
+
+            try {
+                const p = vid.play();
+                if (p !== undefined) p.catch(() => {});
+            } catch(e) {}
+        };
 
         // Unified click & tap handler on viewport (ensures clean toggle without 300ms mobile touch double-fire)
         let lastShowreelTapTime = 0;
@@ -4642,6 +4683,7 @@ function initPortfolioApp() {
             frame.classList.remove('is-playing');
             frame.classList.remove('is-full-playing');
             hasStartedUnmuted = false;
+            window._showreelFullscreenActive = false;
             // Ready for replay
             const waveformEl = document.getElementById('waveform-canvas');
             if (waveformEl) waveformEl.style.display = '';
@@ -5051,6 +5093,18 @@ function initPortfolioApp() {
         setTimeout(() => {
             if (typeof initPreviewCanvases === 'function') initPreviewCanvases();
         }, 120);
+        
+        // If this was the fullscreen showreel, restore the muted inline preview
+        if (window._showreelFullscreenActive && typeof window.restoreShowreelPreview === 'function') {
+            try { window.restoreShowreelPreview(); } catch(e) {}
+        }
+        
+        // Re-arm scroll-based auto preview so visible grid videos resume muted previews
+        setTimeout(() => {
+            if (typeof initScrollAutoPreview === 'function' && !document.body.classList.contains('editor-active')) {
+                try { initScrollAutoPreview(); } catch(e) {}
+            }
+        }, 180);
     };
 
     if (modalCloseBtn) {
