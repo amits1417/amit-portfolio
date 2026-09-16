@@ -1753,12 +1753,12 @@ function initPortfolioApp() {
     }
 
     function playCardPreview(card) {
-        // Automatic grid previews disabled — thumbnails only, video opens fullscreen on click
-        return;
         if (!card) return;
         if (document.body.classList.contains('editor-active')) return;
         const isModalActive = document.getElementById('video-modal') && document.getElementById('video-modal').classList.contains('active');
         if (isModalActive) return;
+        // Grid previews are desktop-hover only. Touch devices skip inline preview — a tap opens the video directly.
+        if (window.matchMedia && !window.matchMedia('(hover: hover)').matches) return;
 
         const mediaContainer = card.querySelector('.project-media');
         if (!mediaContainer) return;
@@ -1807,6 +1807,10 @@ function initPortfolioApp() {
             } catch (e) {}
             return;
         }
+
+        // Direct-video (R2 MP4) hover preview handled above.
+        // YouTube, Wistia & Streamable cards keep their current behavior — thumbnail only, no inline preview.
+        return;
 
         // YouTube Video (controls=0, muted, loop, no visible native controls)
         const cleanId = extractYouTubeId(proj.mediaLink);
@@ -2105,13 +2109,13 @@ function initPortfolioApp() {
                         playCardPreview(this);
                     };
                     cardEl.onmouseleave = function() {
-                        if (!isElementInViewport(this)) stopCardPreview(this);
+                        stopCardPreview(this);
                     };
                     cardEl.addEventListener('mouseenter', function() {
                         playCardPreview(this);
                     });
                     cardEl.addEventListener('mouseleave', function() {
-                        if (!isElementInViewport(this)) stopCardPreview(this);
+                        stopCardPreview(this);
                     });
                 }
                 cardEl.addEventListener('click', function(ev) {
@@ -4346,9 +4350,7 @@ function initPortfolioApp() {
                 playCardPreview(this);
             };
             card.onmouseleave = function() {
-                if (!isElementInViewport(this)) {
-                    stopCardPreview(this);
-                }
+                stopCardPreview(this);
             };
         });
     }
