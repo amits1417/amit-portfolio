@@ -4514,11 +4514,13 @@ function initPortfolioApp() {
                 // Step 1 -> Step 2: First click transitions from preview to unmuted playback from start
                 if (!hasStartedUnmuted) {
                     hasStartedUnmuted = true;
-                    activeVid.currentTime = 0;
+                    activeVid.removeAttribute('muted');
                     activeVid.muted = false;
+                    activeVid.defaultMuted = false;
                     activeVid.volume = 1;
                     activeVid.loop = false;
                     activeVid.controls = false;
+                    activeVid.currentTime = 0;
                     frame.classList.add('is-playing', 'is-full-playing');
 
                     const overlay = document.getElementById('showreel-overlay');
@@ -4530,7 +4532,16 @@ function initPortfolioApp() {
                     const backdrop = viewport.querySelector('.showreel-glow-backdrop');
                     if (backdrop) backdrop.style.display = 'none';
 
-                    activeVid.play().catch(() => {});
+                    const p = activeVid.play();
+                    if (p !== undefined) {
+                        p.catch(() => {
+                            activeVid.removeAttribute('muted');
+                            activeVid.muted = false;
+                            activeVid.defaultMuted = false;
+                            activeVid.volume = 1;
+                            activeVid.play().catch(() => {});
+                        });
+                    }
                     appendConsoleLog('> Main showreel streaming inline (Full Audio)... Active.');
                     return;
                 }
@@ -4547,16 +4558,19 @@ function initPortfolioApp() {
             }
         }
 
-        // Direct click + touch handler on viewport (ensures desktop & mobile tap works instantly)
+        // Direct click + touch handler on viewport (ensures desktop & mobile tap works instantly with audio)
         let lastClickTime = 0;
-        viewport.addEventListener('click', (e) => {
+        function onShowreelTap(e) {
             if (e.target.closest('#btn-edit-showreel') || e.target.closest('.showreel-edit-overlay')) return;
             if (document.body.classList.contains('editor-active')) return;
             const now = Date.now();
-            if (now - lastClickTime < 220) return;
+            if (now - lastClickTime < 250) return;
             lastClickTime = now;
             handleShowcaseClick();
-        });
+        }
+
+        viewport.addEventListener('click', onShowreelTap);
+        viewport.addEventListener('touchend', onShowreelTap, { passive: true });
 
         // Auto-play showreel MUTED when scrolled into view if not yet playing
         if (typeof IntersectionObserver !== 'undefined') {
