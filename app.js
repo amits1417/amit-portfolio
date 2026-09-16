@@ -1764,17 +1764,10 @@ function initPortfolioApp() {
         const proj = getCardProject(card);
         if (!proj) return;
 
-        // Skip graphics cards completely — hover preview is only for video projects
+        // Skip graphics cards completely — preview is only for video projects
         const isGraphics = (proj.category && proj.category.toLowerCase().includes('graphic')) ||
                            (card.closest('.portfolio-item') && card.closest('.portfolio-item').getAttribute('data-category') === 'graphics');
         if (isGraphics) return;
-
-        // Stop preview on all other cards first
-        document.querySelectorAll('.project-card').forEach(otherCard => {
-            if (otherCard !== card) {
-                stopCardPreview(otherCard);
-            }
-        });
 
         // Direct MP4 / WebM / Cloudflare R2 / Uploaded Video
         if (proj.mediaSource === 'upload' || isDirectVideoUrl(proj.mediaLink)) {
@@ -4187,6 +4180,10 @@ function initPortfolioApp() {
                 if (typeof ScrollTrigger !== 'undefined') {
                     ScrollTrigger.refresh();
                 }
+
+                setTimeout(() => {
+                    initPreviewCanvases();
+                }, 50);
             });
         });
     }
@@ -4237,13 +4234,13 @@ function initPortfolioApp() {
 
 
     /* ==========================================================================
-       PORTFOLIO HOVER RENDERING PREVIEW (SELF-HOSTED MP4 & YOUTUBE CONTROLS=0)
+       PORTFOLIO AUTO VIEWPORT & HOVER PREVIEW (ALL VISIBLE GRID VIDEOS AUTOPLAY)
        ========================================================================== */
+    let gridVideoObserver = null;
+
     function initPreviewCanvases() {
         const projectCards = document.querySelectorAll('.project-card');
         if (!projectCards.length) return;
-
-        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent);
 
         const videoCards = Array.from(projectCards).filter(card => {
             const pItem = card.closest('.portfolio-item');
@@ -4260,38 +4257,60 @@ function initPortfolioApp() {
                 playCardPreview(this);
             };
             card.onmouseleave = function() {
-                stopCardPreview(this);
+                const rect = this.getBoundingClientRect();
+                const inView = rect.top < window.innerHeight && rect.bottom > 0;
+                if (!inView) {
+                    stopCardPreview(this);
+                }
             };
         });
 
-        // Mobile / Touch scroll-based autoplay into view & pause when scrolling away
+        // Disconnect previous observer to avoid duplicate observations
+        if (gridVideoObserver) {
+            gridVideoObserver.disconnect();
+        }
+
+        // Viewport IntersectionObserver: ALL video cards currently visible in viewport automatically play preview
         if (typeof IntersectionObserver !== 'undefined') {
-            if (isTouchDevice || window.innerWidth <= 768) {
-                const mobileScrollObserver = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        const card = entry.target;
-                        if (entry.isIntersecting) {
-                            playCardPreview(card);
-                        } else {
-                            stopCardPreview(card);
-                        }
-                    });
-                }, { threshold: 0.5 });
-
-                videoCards.forEach(card => mobileScrollObserver.observe(card));
-            }
-
-            // Viewport safety observer: pause and hide when completely scrolled out of view
-            const viewportSafetyObserver = new IntersectionObserver((entries) => {
+            gridVideoObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    if (!entry.isIntersecting && !entry.target.matches(':hover')) {
-                        stopCardPreview(entry.target);
+                    const card = entry.target;
+                    const pItem = card.closest('.portfolio-item');
+                    const isHidden = pItem && (pItem.style.display === 'none' || pItem.classList.contains('hide-item'));
+                    if (entry.isIntersecting && !isHidden) {
+                        playCardPreview(card);
+                    } else {
+                        stopCardPreview(card);
                     }
                 });
-            }, { threshold: 0 });
+            }, {
+                threshold: [0, 0.1, 0.25],
+                rootMargin: '60px 0px 60px 0px'
+            });
 
-            videoCards.forEach(card => viewportSafetyObserver.observe(card));
+            videoCards.forEach(card => gridVideoObserver.observe(card));
         }
+
+        // Immediate check of all visible video cards across viewport
+        function triggerVisiblePreviews() {
+            videoCards.forEach(card => {
+                const pItem = card.closest('.portfolio-item');
+                const isHidden = pItem && (pItem.style.display === 'none' || pItem.classList.contains('hide-item'));
+                if (isHidden) {
+                    stopCardPreview(card);
+                    return;
+                }
+                const rect = card.getBoundingClientRect();
+                const inView = rect.top < (window.innerHeight + 60) && rect.bottom > -60;
+                if (inView) {
+                    playCardPreview(card);
+                } else {
+                    stopCardPreview(card);
+                }
+            });
+        }
+
+        setTimeout(triggerVisiblePreviews, 100);
     }
 
     /* ==========================================================================
@@ -4427,7 +4446,7 @@ function initPortfolioApp() {
         return { video: vid, wrap: wrap };
     }
 
-    // Auto-preview showreel muted when section scrolls into view & handle full playback
+    // Auto-preview showreel muted when section scrolls into view & handle tap/click toggle sequence
     (function() {
         const viewport = document.getElementById('showreel-viewport');
         if (!viewport) return;
@@ -4435,13 +4454,24 @@ function initPortfolioApp() {
         const videoContainer = document.getElementById('showreel-video-container');
         if (!frame || !videoContainer) return;
 
-        let autoPlayed = false;
-        let isFullPlaying = false;
-        let mutedPreviewEl = null; // tracks the auto-muted preview video element
+        let hasStartedUnmuted = false;
+        let mutedPreviewEl = null;
 
         const heroVid = document.getElementById('hero-showcase-video');
         if (heroVid) {
             mutedPreviewEl = heroVid;
+            heroVid.muted = true;
+            heroVid.defaultMuted = true;
+            heroVid.volume = 0;
+            heroVid.loop = true;
+            heroVid.playsInline = true;
+            heroVid.controls = false;
+            heroVid.setAttribute('muted', '');
+            heroVid.setAttribute('playsinline', '');
+            heroVid.setAttribute('webkit-playsinline', '');
+            heroVid.setAttribute('autoplay', '');
+            heroVid.setAttribute('loop', '');
+
             const markPlaying = () => {
                 frame.classList.add('is-playing');
             };
@@ -4457,7 +4487,7 @@ function initPortfolioApp() {
                 p.catch(() => {
                     // Fallback on first user gesture
                     const onFirstGesture = () => {
-                        if (heroVid && heroVid.paused && !isFullPlaying) {
+                        if (heroVid && heroVid.paused && !hasStartedUnmuted) {
                             heroVid.play().catch(() => {});
                         }
                     };
@@ -4466,256 +4496,82 @@ function initPortfolioApp() {
                     });
                 });
             }
+
+            heroVid.addEventListener('ended', () => {
+                hasStartedUnmuted = false;
+            });
         }
 
-        // Phase 1: Auto muted preview (for fallback or dynamic changes)
-        function startMutedPreview() {
-            if (document.body.classList.contains('editor-active')) return;
-            const existingVid = document.getElementById('hero-showcase-video');
-            if (existingVid) {
-                if (existingVid.paused && !isFullPlaying) {
-                    existingVid.play().catch(() => {});
-                }
-                return;
-            }
-            if (isFullPlaying || mutedPreviewEl) return;
-            const playBtn = document.getElementById('play-showreel-btn');
-            const vid = playBtn ? (playBtn.getAttribute('data-video-id') || '') : '';
-            if (!vid) return;
-
-            const isDirectMp4 = isDirectVideoUrl(vid);
-            if (!isDirectMp4) return;
-
-            videoContainer.innerHTML = '';
-            const previewVid = document.createElement('video');
-            previewVid.id = 'hero-showcase-video';
-            previewVid.muted = true;
-            previewVid.defaultMuted = true;
-            previewVid.volume = 0;
-            previewVid.setAttribute('muted', '');
-            previewVid.setAttribute('playsinline', '');
-            previewVid.setAttribute('webkit-playsinline', '');
-            previewVid.setAttribute('autoplay', '');
-            previewVid.setAttribute('loop', '');
-            previewVid.playsInline = true;
-            previewVid.loop = true;
-            previewVid.autoplay = true;
-            previewVid.controls = false;
-            previewVid.preload = 'auto';
-            previewVid.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;background:#000;';
-            previewVid.src = normalizeMediaPath(vid);
-            videoContainer.appendChild(previewVid);
-            mutedPreviewEl = previewVid;
-
-            previewVid.addEventListener('playing', () => {
-                frame.classList.add('is-playing');
-            }, { once: true });
-
-            previewVid.play().catch(() => {});
-        }
-
-        // Phase 2: Full unmuted playback (with controls, triggered on click)
-        async function playFullShowreel() {
+        // Toggle playback sequence:
+        // 1. Automated preview (muted loop)
+        // 2. Click: unmuted playback starting from beginning (0:00)
+        // 3. Click again: pause video; next click resumes play. No play button on top.
+        function handleShowcaseClick() {
             if (document.body.classList.contains('editor-active')) return;
 
             const activeVid = document.getElementById('hero-showcase-video') || mutedPreviewEl;
             if (activeVid) {
-                activeVid.currentTime = 0;
-                activeVid.muted = false;
-                activeVid.volume = 1;
-                activeVid.loop = false;
-                activeVid.controls = true;
-                isFullPlaying = true;
-                frame.classList.add('is-playing');
-                frame.classList.add('is-full-playing');
-                const overlay = document.getElementById('showreel-overlay');
-                if (overlay) overlay.style.display = 'none';
-                activeVid.play().catch(() => {});
+                // Step 1 -> Step 2: First click transitions from preview to unmuted playback from start
+                if (!hasStartedUnmuted) {
+                    hasStartedUnmuted = true;
+                    activeVid.currentTime = 0;
+                    activeVid.muted = false;
+                    activeVid.volume = 1;
+                    activeVid.loop = false;
+                    activeVid.controls = false;
+                    frame.classList.add('is-playing', 'is-full-playing');
+
+                    const overlay = document.getElementById('showreel-overlay');
+                    if (overlay) overlay.style.display = 'none';
+                    const unmuteBadge = document.getElementById('showreel-unmute-hint');
+                    if (unmuteBadge) unmuteBadge.style.display = 'none';
+                    const waveformEl = document.getElementById('waveform-canvas');
+                    if (waveformEl) waveformEl.style.display = 'none';
+                    const backdrop = viewport.querySelector('.showreel-glow-backdrop');
+                    if (backdrop) backdrop.style.display = 'none';
+
+                    activeVid.play().catch(() => {});
+                    appendConsoleLog('> Main showreel streaming inline (Full Audio)... Active.');
+                    return;
+                }
+
+                // Step 2 -> Step 3: Toggle pause and play on subsequent clicks
+                if (activeVid.paused) {
+                    activeVid.play().catch(() => {});
+                    appendConsoleLog('> Main showreel resumed.');
+                } else {
+                    activeVid.pause();
+                    appendConsoleLog('> Main showreel paused.');
+                }
                 return;
             }
-
-            const playBtn = document.getElementById('play-showreel-btn');
-            let vid = playBtn ? (playBtn.getAttribute('data-video-id') || 'https://pub-069db4deb1444820b524ff7460ae854f.r2.dev/Amit%20Sharma%20(AI%20Avtar%20introduction).mp4') : 'https://pub-069db4deb1444820b524ff7460ae854f.r2.dev/Amit%20Sharma%20(AI%20Avtar%20introduction).mp4';
-            const mediaSource = playBtn ? (playBtn.getAttribute('data-media-source') || 'link') : 'link';
-            const cleanYtId = extractYouTubeId(vid);
-            const isYoutube = !!cleanYtId;
-
-            // Direct MP4
-            if ((mediaSource === 'upload' || isDirectVideoUrl(vid)) && !isYoutube) {
-                videoContainer.innerHTML = '';
-                const vidEl = document.createElement('video');
-                vidEl.id = 'hero-showcase-video';
-                vidEl.src = normalizeMediaPath(vid);
-                vidEl.controls = true;
-                vidEl.playsInline = true;
-                vidEl.autoplay = true;
-                vidEl.preload = 'auto';
-                vidEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;background:#000;';
-                videoContainer.appendChild(vidEl);
-                frame.classList.add('is-playing');
-                frame.classList.add('is-full-playing');
-                isFullPlaying = true;
-                mutedPreviewEl = vidEl;
-                const overlay = document.getElementById('showreel-overlay');
-                if (overlay) overlay.style.display = 'none';
-                vidEl.play().catch(() => {});
-                return;
-            }
-
-            // No preview running yet — load fresh with full controls
-            videoContainer.innerHTML = '';
-            mutedPreviewEl = null;
-            frame.classList.add('is-playing');
-            isFullPlaying = true;
-
-            const streamableId = extractStreamableId(vid);
-            const isStreamable = !!streamableId;
-            const wistiaId = extractWistiaId(vid);
-            const isWistia = !!wistiaId;
-
-            let resolvedWistiaId = wistiaId;
-            if (isWistia && wistiaId.length <= 12 && vid.includes('/s/')) {
-                try {
-                    const wDetails = await getWistiaDetails(vid);
-                    if (wDetails && wDetails.id) resolvedWistiaId = wDetails.id;
-                } catch(e) { console.warn('Wistia resolve failed:', e); }
-            }
-
-            if ((mediaSource === 'upload' || isDirectVideoUrl(vid)) && !isYoutube && !isStreamable && !isWistia) {
-                const overlay = document.getElementById('showreel-overlay');
-                if (overlay) overlay.style.display = 'none';
-                const vidEl = document.createElement('video');
-                vidEl.src = normalizeMediaPath(vid);
-                vidEl.controls = true;
-                vidEl.playsInline = true;
-                vidEl.autoplay = true;
-                vidEl.preload = 'auto';
-                vidEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;background:#000;';
-                videoContainer.appendChild(vidEl);
-                vidEl.addEventListener('ended', () => {
-                    frame.classList.remove('is-playing');
-                    isFullPlaying = false;
-                    videoContainer.innerHTML = '';
-                    if (overlay) overlay.style.display = '';
-                }, { once: true });
-                try { vidEl.play(); } catch(e) { console.warn('Showreel play failed:', e); }
-            } else if (isStreamable) {
-                const createShowreelIframe = () => {
-                    if (!videoContainer) return;
-                    videoContainer.innerHTML = '';
-                    const iframe = document.createElement('iframe');
-                    iframe.src = `https://streamable.com/e/${streamableId}?autoplay=1`;
-                    iframe.style.position = 'absolute';
-                    iframe.style.top = '0';
-                    iframe.style.left = '0';
-                    iframe.style.width = '100%';
-                    iframe.style.height = '100%';
-                    iframe.style.border = 'none';
-                    iframe.setAttribute('allow', 'autoplay *; fullscreen *; picture-in-picture *; encrypted-media *; accelerometer *; gyroscope *');
-                    iframe.setAttribute('allowfullscreen', 'true');
-                    iframe.setAttribute('playsinline', '1');
-                    iframe.setAttribute('webkit-playsinline', '1');
-                    iframe.setAttribute('scrolling', 'no');
-                    iframe.setAttribute('frameborder', '0');
-                    videoContainer.appendChild(iframe);
-                };
-                createShowreelIframe();
-            } else if (isWistia) {
-                const iframe = document.createElement('iframe');
-                iframe.src = `https://fast.wistia.net/embed/iframe/${resolvedWistiaId}`;
-                iframe.style.position = 'absolute';
-                iframe.style.top = '0';
-                iframe.style.left = '0';
-                iframe.style.width = '100%';
-                iframe.style.height = '100%';
-                iframe.style.border = 'none';
-                iframe.style.opacity = '1';
-                iframe.style.backgroundColor = '#000';
-                iframe.allowFullscreen = true;
-                iframe.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media';
-                iframe.setAttribute('allowfullscreen', 'true');
-                iframe.setAttribute('webkitallowfullscreen', 'true');
-                iframe.setAttribute('mozallowfullscreen', 'true');
-                iframe.setAttribute('playsinline', '1');
-                iframe.setAttribute('webkit-playsinline', '1');
-                videoContainer.appendChild(iframe);
-            } else {
-                const iframe = document.createElement('iframe');
-                iframe.src = `https://www.youtube.com/embed/${cleanYtId || vid}?autoplay=1&mute=0&start=0&controls=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&cc_load_policy=0`;
-                iframe.style.position = 'absolute';
-                iframe.style.top = '0';
-                iframe.style.left = '0';
-                iframe.style.width = '100%';
-                iframe.style.height = '100%';
-                iframe.style.border = 'none';
-                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-                iframe.allowFullscreen = true;
-                videoContainer.appendChild(iframe);
-            }
-
-            const waveformEl = document.getElementById('waveform-canvas');
-            if (waveformEl) waveformEl.style.display = 'none';
-            const backdrop = viewport.querySelector('.showreel-glow-backdrop');
-            if (backdrop) backdrop.style.display = 'none';
-            appendConsoleLog('> Main showreel streaming inline (Full Audio)... Active.');
         }
 
-        // Showreel plays instantly on click
-
-        // Direct click + touch handler on play button (ensures mobile tap works)
-        const playBtn = document.getElementById('play-showreel-btn');
-        if (playBtn) {
-            playBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (!isFullPlaying) playFullShowreel();
-            });
-            playBtn.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (!isFullPlaying) playFullShowreel();
-            });
-        }
-
-        // Unmute hint badge click — upgrade to full audio playback
-        const unmuteHint = document.getElementById('showreel-unmute-hint');
-        if (unmuteHint) {
-            unmuteHint.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (!isFullPlaying) playFullShowreel();
-            });
-        }
-
-        // Click on showreel: upgrade from muted preview to full unmuted playback
+        // Direct click + touch handler on viewport (ensures desktop & mobile tap works instantly)
+        let lastClickTime = 0;
         viewport.addEventListener('click', (e) => {
             if (e.target.closest('#btn-edit-showreel') || e.target.closest('.showreel-edit-overlay')) return;
             if (document.body.classList.contains('editor-active')) return;
-            if (isFullPlaying) return;
-            playFullShowreel();
+            const now = Date.now();
+            if (now - lastClickTime < 220) return;
+            lastClickTime = now;
+            handleShowcaseClick();
         });
 
-        // Auto-play showreel MUTED (silent preview) when scrolled into view or on load
+        // Auto-play showreel MUTED when scrolled into view if not yet playing
         if (typeof IntersectionObserver !== 'undefined') {
             const showreelObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    if (entry.isIntersecting && !isFullPlaying && !autoPlayed) {
-                        autoPlayed = true;
-                        startMutedPreview(); // silent auto-preview, click to unmute
+                    if (entry.isIntersecting && !hasStartedUnmuted) {
+                        const existingVid = document.getElementById('hero-showcase-video');
+                        if (existingVid && existingVid.paused) {
+                            existingVid.play().catch(() => {});
+                        }
                     }
                 });
             }, { threshold: 0.05 });
             showreelObserver.observe(viewport);
         }
-
-        // Immediate check on load in case hero showreel is already within viewport
-        setTimeout(() => {
-            if (!autoPlayed && !isFullPlaying) {
-                const rect = viewport.getBoundingClientRect();
-                if (rect.top < window.innerHeight && rect.bottom > 0) {
-                    autoPlayed = true;
-                    startMutedPreview();
-                }
-            }
-        }, 200);
 
         // Stop all video previews (used when entering CMS mode)
         window.stopAllPreviews = function() {
@@ -4727,9 +4583,8 @@ function initPortfolioApp() {
             });
             videoContainer.innerHTML = '';
             frame.classList.remove('is-playing');
-            isFullPlaying = false;
-            mutedPreviewEl = null;
-            autoPlayed = false;
+            frame.classList.remove('is-full-playing');
+            hasStartedUnmuted = false;
             // Ready for replay
             const waveformEl = document.getElementById('waveform-canvas');
             if (waveformEl) waveformEl.style.display = '';
@@ -5136,6 +4991,9 @@ function initPortfolioApp() {
         }
         
         appendConsoleLog(`> Playback window terminated.`);
+        setTimeout(() => {
+            if (typeof initPreviewCanvases === 'function') initPreviewCanvases();
+        }, 120);
     };
 
     if (modalCloseBtn) {
@@ -5159,8 +5017,8 @@ function initPortfolioApp() {
                 window.location.hash = 'play-video';
             }
             
-            // Clean up any active hover previews
-            document.querySelectorAll('.hover-video-preview').forEach(el => el.remove());
+            // Clean up any active previews while modal is playing
+            document.querySelectorAll('.project-card').forEach(stopCardPreview);
             
             const wrapper = videoModal.querySelector('.video-modal-iframe-wrapper');
             const isImage = isImageProject(proj);

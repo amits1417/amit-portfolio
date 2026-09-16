@@ -6446,60 +6446,21 @@ body.light-mode .graphics-view-more-btn:hover {
     display: none !important;
 }
 
-/* Hide play overlay during muted preview (unmute hint shows instead) or during full play */
+/* Hide play button overlay and unmute hint on showcase video completely across all states */
+.showreel-overlay,
+#showreel-overlay,
+.showreel-frame .showreel-overlay,
 .showreel-frame.is-playing .showreel-overlay,
-.showreel-frame.is-full-playing .showreel-overlay {
-    opacity: 0 !important;
-    pointer-events: none !important;
-    display: none !important;
-}
-
-/* Muted auto-preview: show pulsing CLICK TO UNMUTE hint */
-.showreel-frame.is-playing:not(.is-full-playing) .showreel-unmute-hint {
-    display: flex !important;
-    opacity: 1 !important;
-}
+.showreel-frame.is-full-playing .showreel-overlay,
+.showreel-unmute-hint,
+#showreel-unmute-hint,
+.showreel-frame .showreel-unmute-hint,
+.showreel-frame.is-playing .showreel-unmute-hint,
 .showreel-frame.is-full-playing .showreel-unmute-hint {
     display: none !important;
     opacity: 0 !important;
+    visibility: hidden !important;
     pointer-events: none !important;
-}
-.showreel-unmute-hint {
-    display: none;
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 15;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 20px;
-    background: rgba(10, 14, 26, 0.82);
-    border: 1.5px solid rgba(0, 240, 255, 0.55);
-    border-radius: 30px;
-    color: #fff;
-    font-size: 12.5px;
-    font-weight: 600;
-    letter-spacing: 0.4px;
-    cursor: pointer;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 12px rgba(0,240,255,0.25);
-    pointer-events: auto;
-    animation: unmuteHintPulse 2.4s ease-in-out infinite;
-    white-space: nowrap;
-}
-.showreel-unmute-hint svg {
-    width: 16px; height: 16px;
-    flex-shrink: 0;
-}
-@keyframes unmuteHintPulse {
-    0%, 100% { box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 12px rgba(0,240,255,0.25); }
-    50% { box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 22px rgba(0,240,255,0.55); }
-}
-/* Hide unmute hint once video is fully playing (user clicked) */
-.showreel-frame.is-full-playing .showreel-unmute-hint {
-    display: none !important;
 }
 
 /* ==========================================================================
