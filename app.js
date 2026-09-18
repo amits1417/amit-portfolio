@@ -4108,7 +4108,13 @@ function initPortfolioApp() {
        GSAP SCROLL INTERACTIVES
        ========================================================================== */
     function initHeroAnimations() {
-        if (typeof gsap === 'undefined') return;
+        if (typeof gsap === 'undefined') {
+            // If GSAP not available, make sure hero elements are visible
+            ['.hero-badge', '#hero-headline', '.hero-subheading', '.hero-right'].forEach(sel => {
+                document.querySelectorAll(sel).forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; });
+            });
+            return;
+        }
         
         // Navbar reveal
         if (document.getElementById('navbar')) {
@@ -4124,37 +4130,32 @@ function initPortfolioApp() {
         const heroTimeline = gsap.timeline();
         
         if (document.querySelector('.hero-badge')) {
-            heroTimeline.from(".hero-badge", {
-                y: 30,
-                opacity: 0,
-                duration: 0.8,
-                ease: "power3.out"
-            });
+            heroTimeline.fromTo(".hero-badge",
+                { y: 30, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
+            );
         }
         if (document.querySelector('#hero-headline')) {
-            heroTimeline.from("#hero-headline", {
-                y: 40,
-                opacity: 0,
-                duration: 1,
-                ease: "power4.out"
-            }, "-=0.6");
+            heroTimeline.fromTo("#hero-headline",
+                { y: 40, opacity: 0 },
+                { y: 0, opacity: 1, duration: 1, ease: "power4.out" },
+                "-=0.6"
+            );
         }
         if (document.querySelector('.hero-subheading')) {
-            heroTimeline.from(".hero-subheading", {
-                y: 20,
-                opacity: 0,
-                duration: 0.8,
-                ease: "power3.out"
-            }, "-=0.6");
+            heroTimeline.fromTo(".hero-subheading",
+                { y: 20, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
+                "-=0.6"
+            );
         }
         const heroActionsEl = document.querySelector('.hero-actions') || document.querySelector('.hero-right');
         if (heroActionsEl) {
-            heroTimeline.from(heroActionsEl, {
-                y: 20,
-                opacity: 0,
-                duration: 0.8,
-                ease: "power3.out"
-            }, "-=0.6");
+            heroTimeline.fromTo(heroActionsEl,
+                { y: 20, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
+                "-=0.6"
+            );
         }
         if (document.querySelector('.hud-frame')) {
             heroTimeline.from(".hud-frame", {
@@ -5455,8 +5456,9 @@ function initPortfolioApp() {
 
             // Populate and render the bottom gallery strip
             const galleryStrip = document.getElementById('lightbox-gallery-strip');
+            const isGraphicsProject = proj && proj.category && proj.category.toLowerCase().includes('graphic');
             if (galleryStrip) {
-                if (currentLightboxProjects.length > 1) {
+                if (currentLightboxProjects.length > 1 && isGraphicsProject) {
                     galleryStrip.style.display = 'flex';
                     galleryStrip.innerHTML = '';
                     

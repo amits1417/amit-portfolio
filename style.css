@@ -609,6 +609,7 @@ body.hover-interactive .custom-cursor-glow {
     padding: 8px 16px;
     border-radius: 30px;
     margin-bottom: 24px;
+    opacity: 0; /* hidden until GSAP animates in */
 }
 
 .badge-dot {
@@ -634,6 +635,7 @@ body.hover-interactive .custom-cursor-glow {
     margin-bottom: 28px;
     letter-spacing: -2px;
     color: #ffffff;
+    opacity: 0; /* hidden until GSAP animates in */
 }
 
 .text-glow {
@@ -657,6 +659,7 @@ body.hover-interactive .custom-cursor-glow {
     align-items: center;
     flex-wrap: wrap;
     gap: 12px;
+    opacity: 0; /* hidden until GSAP animates in */
 }
 
 .sub-sep {
@@ -5885,6 +5888,7 @@ a.downloading::before {
     width: 280px;
     flex-shrink: 0;
     align-items: stretch;
+    opacity: 0; /* hidden until GSAP animates in */
 }
 
 .hero-cta-btn {
