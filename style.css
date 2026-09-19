@@ -4935,8 +4935,16 @@ body.editor-active {
         height: 60px; /* Shorter header on mobile to leave room for tabs */
     }
     
+    /* Mobile fixed header = 60px nav row + ~44px section tabs + 12px scroll progress
+       (measured ~116px peak). Keep the hero clear of it and anchor content to the top
+       so the announcement badge can never slide up underneath the navigation. */
+    html {
+        scroll-padding-top: 132px;
+    }
+    
     #hero {
-        padding-top: 95px !important;
+        padding-top: 132px !important;
+        align-items: flex-start;
     }
     
     /* Stack software grid cards vertically on mobile */
