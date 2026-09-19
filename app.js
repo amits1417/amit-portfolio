@@ -9,19 +9,6 @@ function initPortfolioApp() {
     window._portfolioAppInitialized = true;
     // Note: checkEditURL() is called later after initDatabase() completes (lines 444, 4690)
 
-    // Keep the layout clear of the fixed header on any device. The mobile header
-    // height (nav row + section tabs + scroll ruler) varies by device rendering, so
-    // measure it and expose it as --navbar-h for the hero offset / anchor scrolling.
-    function syncNavbarHeight() {
-        const navbarEl = document.getElementById('navbar');
-        if (!navbarEl) return;
-        const h = Math.round(navbarEl.getBoundingClientRect().height);
-        if (h > 0) document.documentElement.style.setProperty('--navbar-h', h + 'px');
-    }
-    syncNavbarHeight();
-    window.addEventListener('resize', syncNavbarHeight);
-    window.addEventListener('orientationchange', syncNavbarHeight);
-
     // Helper to extract YouTube video ID from any link style (including Shorts)
     function extractYouTubeId(link) {
         if (!link) return '';

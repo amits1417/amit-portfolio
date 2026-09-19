@@ -4939,11 +4939,11 @@ body.editor-active {
        (measured ~116px peak). Keep the hero clear of it and anchor content to the top
        so the announcement badge can never slide up underneath the navigation. */
     html {
-        scroll-padding-top: calc(var(--navbar-h, 116px) + 24px);
+        scroll-padding-top: 132px;
     }
     
     #hero {
-        padding-top: calc(var(--navbar-h, 116px) + 36px) !important;
+        padding-top: 132px !important;
         align-items: flex-start;
     }
     
@@ -5896,19 +5896,6 @@ a.downloading::before {
     font-weight: 800;
     color: #ffffff !important;
     z-index: 2;
-}
-
-/* Make the header CV button visible on the light theme (white-on-white otherwise) */
-body.light-mode .nav-cv-ring-btn {
-    background: rgba(26, 32, 44, 0.06) !important;
-    border-color: rgba(26, 32, 44, 0.22) !important;
-}
-body.light-mode .nav-cv-ring-btn:hover {
-    background: rgba(26, 32, 44, 0.1) !important;
-    border-color: var(--accent-cyan) !important;
-}
-body.light-mode .nav-cv-ring-btn span {
-    color: #1a202c !important;
 }
 
 /* Split layout for Hero Section on Desktop */
