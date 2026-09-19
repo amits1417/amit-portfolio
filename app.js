@@ -1757,9 +1757,7 @@ function initPortfolioApp() {
         if (document.body.classList.contains('editor-active')) return;
         const isModalActive = document.getElementById('video-modal') && document.getElementById('video-modal').classList.contains('active');
         if (isModalActive) return;
-        // Grid previews are desktop-hover only. Touch devices skip inline preview — a tap opens the video directly.
-        if (window.matchMedia && !window.matchMedia('(hover: hover)').matches) return;
-
+        // Inline grid previews run on desktop hover and, for Cloudflare / direct videos, mobile scroll auto-preview.
         const mediaContainer = card.querySelector('.project-media');
         if (!mediaContainer) return;
 
