@@ -7,12 +7,11 @@
     <meta name="author" content="Amit Sharma">
     <title>Amit Sharma | Senior Video Editor &amp; YouTube Studio Manager</title>
     
-    <!-- Neue Montreal (primary) via Fontshare -->
-    <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
-    <link href="https://api.fontshare.com/v2/css?f[]=neue-montreal@400,500,600,700&display=swap" rel="stylesheet">
-    <!-- Google Fonts: fallback (Montserrat & DM Sans) -->
+    <!-- Inter (primary) via Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Google Fonts: fallback (Montserrat & DM Sans) -->
     <link rel="preconnect" href="https://www.youtube.com">
     <link rel="preconnect" href="https://www.youtube-nocookie.com">
     <link rel="preconnect" href="https://i.ytimg.com">
@@ -20,8 +19,9 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="vendor/plyr.css">
-    <link rel="stylesheet" href="style.css?v=16.0">
+    <link rel="stylesheet" href="style.css?v=17.0">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="/assets/favicon.png">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="manifest" href="/site.webmanifest">
     <!-- Google Analytics -->
@@ -87,7 +87,8 @@
     <header id="navbar">
         <div class="nav-container">
             <a href="#" class="nav-logo">
-                <span>AMIT</span><span class="logo-dot">.</span>
+                <img class="logo-white" src="./assets/logo-white.png" alt="Amit Sharma" width="129" height="80">
+                <img class="logo-black" src="./assets/logo-black.png" alt="Amit Sharma" width="127" height="80" style="display:none;">
             </a>
             
             <nav class="nav-menu" id="nav-menu">
@@ -602,7 +603,7 @@
                         <div class="contact-info-list">
                             <!-- Email -->
                             <div class="info-item">
-                                <i data-lucide="mail" class="info-icon"></i>
+                                <div class="info-icon"><i data-lucide="mail"></i></div>
                                 <div class="info-meta">
                                     <span class="info-label">EMAIL DIRECT</span>
                                     <a href="mailto:amits1417@gmail.com" class="info-value">amits1417@gmail.com</a>
@@ -611,7 +612,7 @@
                             
                             <!-- Phone -->
                             <div class="info-item">
-                                <i data-lucide="phone" class="info-icon"></i>
+                                <div class="info-icon"><i data-lucide="phone"></i></div>
                                 <div class="info-meta">
                                     <span class="info-label">PHONE DIRECT</span>
                                     <a href="tel:+918866414870" class="info-value">+91 88664 14870</a>
@@ -620,7 +621,7 @@
                             
                             <!-- Location -->
                             <div class="info-item">
-                                <i data-lucide="map-pin" class="info-icon"></i>
+                                <div class="info-icon"><i data-lucide="map-pin"></i></div>
                                 <div class="info-meta">
                                     <span class="info-label">LOCATION</span>
                                     <span class="info-value">Udhna, Surat, Gujarat, India</span>
@@ -750,7 +751,8 @@
         <div class="container footer-container">
             <div class="footer-top">
                 <a href="#" class="footer-logo">
-                    <span>AMIT</span><span class="logo-dot">.</span>
+                    <img class="logo-white" src="./assets/logo-white.png" alt="Amit Sharma" width="129" height="80">
+                    <img class="logo-black" src="./assets/logo-black.png" alt="Amit Sharma" width="127" height="80" style="display:none;">
                 </a>
                 
                 <div class="footer-socials">
@@ -1172,7 +1174,7 @@
     <!-- Baked default portfolio data (cloud projects) -->
     <script src="data.js?v=6.0"></script>
     <!-- Custom Application Logic -->
-    <script src="app.js?v=53.0"></script>
+    <script src="app.js?v=54.0"></script>
 <script>
 // Batch Video Import (YouTube, Wistia, Streamable) - uses window.* exposed by app.js
 (function() {

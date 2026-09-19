@@ -1932,10 +1932,8 @@ function initPortfolioApp() {
         return r.bottom > 0 && r.top < vh && r.right > 0 && r.left < vw;
     }
 
-    // Scroll-based auto preview: every grid video visible in the viewport plays muted automatically
+    // Scroll-based auto preview: Cloudflare / direct (MP4, R2) grid videos visible in the viewport play muted automatically
     function initScrollAutoPreview() {
-        // Automatic grid previews disabled — thumbnails only, video opens fullscreen on click
-        return;
         if (window._scrollPreviewObserver) {
             try { window._scrollPreviewObserver.disconnect(); } catch(e) {}
             window._scrollPreviewObserver = null;
@@ -1950,7 +1948,9 @@ function initPortfolioApp() {
         const videoCards = cards.filter(card => {
             const proj = getCardProject(card);
             if (!proj) return false;
-            return !(proj.category && proj.category.toLowerCase().includes('graphic'));
+            if (proj.category && proj.category.toLowerCase().includes('graphic')) return false;
+            // Only direct-video sources (Cloudflare R2 / MP4 / uploaded) auto-preview; YouTube / Wistia / Streamable stay thumbnails
+            return proj.mediaSource === 'upload' || isDirectVideoUrl(proj.mediaLink);
         });
         if (!videoCards.length) return;
 
