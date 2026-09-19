@@ -804,6 +804,18 @@ function initPortfolioApp() {
         } catch(e) { storedVersion = null; }
         if (storedVersion !== CURRENT_DB_VERSION) {
             try {
+                const _backupData = {};
+                ['amit_portfolio_projects','amit_portfolio_sections','amit_portfolio_showreel','amit_portfolio_layout_order','amit_portfolio_software','amit_portfolio_deleted_software','amit_portfolio_theme','amit_portfolio_services','amit_portfolio_cms_text','amit_portfolio_education','amit_portfolio_timeline','amit_portfolio_clients'].forEach(function(k){ var v=localStorage.getItem(k); if(v) _backupData[k]=v; });
+                if (_backupData.amit_portfolio_projects) {
+                    try { localStorage.setItem('amit_portfolio_pre_migration_backup', JSON.stringify(_backupData)); } catch(e){}
+                    try {
+                        var _fbUrl = localStorage.getItem('amit_portfolio_firebase_url') || 'https://amit-portfolio-f0d71-default-rtdb.firebaseio.com';
+                        if (_fbUrl.endsWith('/')) _fbUrl=_fbUrl.slice(0,-1);
+                        fetch(_fbUrl+'/backup_projects.json',{method:'PUT',body:JSON.stringify(_backupData)}).catch(function(){});
+                    } catch(e){}
+                }
+            } catch(e){}
+            try {
                 localStorage.removeItem('amit_portfolio_projects');
                 localStorage.removeItem('amit_portfolio_sections');
                 localStorage.removeItem('amit_portfolio_showreel');
@@ -1114,19 +1126,18 @@ function initPortfolioApp() {
                     return !isCorruptMedia && !isCorruptThumb;
                 });
                 
-                if (cleanCloudProjects.length < cloudProjects.length) {
-                    projects = cleanCloudProjects;
-                    localStorage.setItem('amit_portfolio_projects', JSON.stringify(projects));
-                    pushToCloud('projects', projects, true);
-                    hasChanges = true;
-                } else if (JSON.stringify(projects) !== JSON.stringify(cleanCloudProjects)) {
-                    const localHasFewer = projects.length < cleanCloudProjects.length;
-                    if (localHasFewer) {
-                        pushToCloud('projects', projects, true);
-                        hasChanges = true;
-                    } else {
+                if (JSON.stringify(projects) !== JSON.stringify(cleanCloudProjects)) {
+                    try {
+                        fetch(firebaseDbUrl+'/backup_cloud_projects_before_sync.json',{method:'PUT',body:JSON.stringify(cleanCloudProjects)}).catch(function(){});
+                        try { localStorage.setItem('amit_portfolio_backup_projects', JSON.stringify(projects)); } catch(e){}
+                    } catch(e){}
+                    const localIsBundledDefault = JSON.stringify(projects) === JSON.stringify(defaultProjects);
+                    if (localIsBundledDefault) {
                         projects = cleanCloudProjects;
                         localStorage.setItem('amit_portfolio_projects', JSON.stringify(projects));
+                        hasChanges = true;
+                    } else {
+                        pushToCloudPromise('projects', projects).catch(function(){});
                         hasChanges = true;
                     }
                 }
