@@ -1147,7 +1147,8 @@ function initPortfolioApp() {
                         fetch(firebaseDbUrl+'/backup_cloud_projects_before_sync.json',{method:'PUT',body:JSON.stringify(cleanCloudProjects)}).catch(function(){});
                         try { localStorage.setItem('amit_portfolio_backup_projects', JSON.stringify(projects)); } catch(e){}
                     } catch(e){}
-                    const localIsBundledDefault = JSON.stringify(projects) === JSON.stringify(defaultProjects);
+                    const bakedData = (typeof window.CLOUD_DEFAULT_PROJECTS !== 'undefined' && Array.isArray(window.CLOUD_DEFAULT_PROJECTS)) ? window.CLOUD_DEFAULT_PROJECTS : defaultProjects;
+                    const localIsBundledDefault = JSON.stringify(projects) === JSON.stringify(bakedData);
                     if (localIsBundledDefault) {
                         projects = cleanCloudProjects;
                         localStorage.setItem('amit_portfolio_projects', JSON.stringify(projects));
