@@ -1022,6 +1022,26 @@ function initPortfolioApp() {
     }
     initDatabase();
 
+    // RECOVERY MODE: open ?restore=1 to push local data to cloud
+    if (window.location.search.includes('restore=1')) {
+        document.title = 'Recovery Mode — Pushing data...';
+        document.body.innerHTML = '<div style="font-family:sans-serif;padding:40px;text-align:center"><h2>Restoring data...</h2><p id="status">Pushing localStorage to Firebase...</p></div>';
+        const fbUrl = localStorage.getItem('amit_portfolio_firebase_url') || 'https://amit-portfolio-f0d71-default-rtdb.firebaseio.com';
+        const localData = localStorage.getItem('amit_portfolio_projects');
+        const localCount = localData ? JSON.parse(localData).length : 0;
+        document.getElementById('status').textContent = 'Found ' + localCount + ' projects. Pushing to cloud...';
+        fetch(fbUrl + '/projects.json', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: localData || '[]'
+        }).then(r => {
+            document.getElementById('status').innerHTML = '<h2 style="color:green">DONE!</h2><p>Pushed ' + localCount + ' projects to cloud. Status: ' + r.status + '</p><p>Now open the main site normally.</p>';
+        }).catch(e => {
+            document.getElementById('status').innerHTML = '<h2 style="color:red">FAILED</h2><p>' + e.message + '</p>';
+        });
+        return; // Don't run normal sync
+    }
+
     async function fetchFirebaseCloudData(url) {
         try {
             console.log("Checking Firebase cloud database for updates...");
