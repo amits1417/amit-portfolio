@@ -1046,10 +1046,15 @@ function initPortfolioApp() {
             
             console.log(`Sync status: local=${localTimestamp}, cloud=${cloudTimestamp}`);
             
-            // If local data exists and timestamps match, no need to re-download everything
+            // Skip only if timestamps match AND local is NOT bigger than cloud (no data to push)
             if (localTimestamp > 0 && cloudTimestamp > 0 && localTimestamp === cloudTimestamp && localStorage.getItem('amit_portfolio_projects')) {
-                console.log("Local database is already in sync with cloud.");
-                return;
+                const _lp = JSON.parse(localStorage.getItem('amit_portfolio_projects') || '[]');
+                const _cpCount = (cloudProjects && Array.isArray(cloudProjects)) ? cloudProjects.length : 0;
+                if (_lp.length <= _cpCount) {
+                    console.log("Local database is already in sync with cloud.");
+                    return;
+                }
+                console.log("Timestamps match but local has more data — pushing to cloud.");
             }
             
             // Firebase stores arrays as objects {0:val,1:val,...} — convert back
