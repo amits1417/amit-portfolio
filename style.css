@@ -4648,6 +4648,14 @@ body.editor-active {
 .project-like-container {
     margin-left: auto;
 }
+/* Like button floats over the media — grid cards show video only, no details text below */
+.project-card .project-media .project-like-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 20;
+    margin-left: 0;
+}
 .project-like-btn {
     position: relative;
     background: rgba(255, 255, 255, 0.03);

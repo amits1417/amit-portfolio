@@ -2041,8 +2041,6 @@ function initPortfolioApp() {
                 else if (autoStreamId) thumbImgSrc = `https://cdn-cf-east.streamable.com/image/${autoStreamId}.jpg`;
                 else thumbImgSrc = fallbackThumb;
             }
-            const hasDetailsText = (proj.title && proj.title.trim() !== '') || (proj.client && proj.client.trim() !== '') || (proj.role && proj.role.trim() !== '') || (proj.tools && proj.tools.trim() !== '') || (proj.desc && proj.desc.trim() !== '');
-            const hideDetails = !hasDetailsText || category === 'shorts' || isGraphicsCat;
             
             const imgSrc = normalizeMediaPath(thumbImgSrc);
             const imgTagHTML = `<img src="${imgSrc}" alt="${proj.title || 'Work Preview'}" loading="lazy" decoding="async" onerror="this.src='./assets/showreel_cover_compelling.png'">`;
@@ -2078,17 +2076,6 @@ function initPortfolioApp() {
                         <div class="video-watermark">Amit Sharma</div>
                         ${!isGraphicsCat ? '<div class="project-overlay-glow"></div>' : ''}
                         <div class="project-media-click-shield"></div>
-                    </div>
-                    <div class="project-details" ${hideDetails ? 'style="display: none !important;"' : ''}>
-                        <h3 class="project-title">${proj.title}</h3>
-                        ${proj.client || proj.role || proj.tools || proj.desc ? `
-                            <div class="project-meta-info">
-                                ${proj.client ? `<span class="meta-label"><b>Client:</b> ${proj.client}</span>` : ''}
-                                ${proj.role ? `<span class="meta-label"><b>Role:</b> ${proj.role}</span>` : ''}
-                                ${proj.tools ? `<span class="meta-label"><b>Tools:</b> ${proj.tools}</span>` : ''}
-                                ${proj.desc ? `<p class="project-description-short" title="${proj.desc}">${proj.desc}</p>` : ''}
-                            </div>
-                        ` : ''}
                         ${likeButtonHTML}
                     </div>
                     ${cardEditOverlayHTML}
@@ -2117,7 +2104,7 @@ function initPortfolioApp() {
                     });
                 }
                 cardEl.addEventListener('click', function(ev) {
-                    if (ev.target.closest('.card-hud-btn') || ev.target.closest('.cms-checkbox-wrapper') || ev.target.classList.contains('cms-delete-checkbox') || ev.target.closest('.cms-media-delete-btn')) return;
+                    if (ev.target.closest('.card-hud-btn') || ev.target.closest('.cms-checkbox-wrapper') || ev.target.classList.contains('cms-delete-checkbox') || ev.target.closest('.cms-media-delete-btn') || ev.target.closest('.project-like-btn')) return;
                     if (document.body.classList.contains('editor-active')) return;
                     const pid = this.getAttribute('data-project-id');
                     const pj = projects.find(p => p.id === pid);
