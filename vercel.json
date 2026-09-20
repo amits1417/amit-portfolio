@@ -33,11 +33,20 @@
       ]
     },
     {
-      "source": "/(app\\.js|style\\.css|index\\.html)",
+      "source": "(/|/index\\.html|/edit|/admin|/cms)",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "no-store, no-cache, must-revalidate, max-age=0, s-maxage=0, proxy-revalidate"
+          "value": "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0, proxy-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(app\\.js|style\\.css|data\\.js)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
         }
       ]
     }
