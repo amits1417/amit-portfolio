@@ -6229,6 +6229,10 @@ function initPortfolioApp() {
         consoleDrawerTrigger.addEventListener('click', toggleCMSDrawer);
     }
 
+    if (cmsMinimizeBtn) {
+        cmsMinimizeBtn.addEventListener('click', toggleCMSDrawer);
+    }
+
     const consoleResetBtn = document.getElementById('console-reset-btn');
     if (consoleResetBtn) {
         consoleResetBtn.addEventListener('click', () => {
