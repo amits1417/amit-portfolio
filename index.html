@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Amit Sharma - Senior Video Editor, Digital YouTube Studio Manager, and Mechanical Engineer. Premium portfolio showcasing software walkthroughs, motion graphics, and MLM/Crypto explainer animations.">
     <meta name="author" content="Amit Sharma">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Amit Sharma | Senior Video Editor &amp; YouTube Studio Manager</title>
     
     <!-- Inter (primary) via Google Fonts -->
@@ -1010,33 +1013,6 @@
 
 
 
-                <!-- Column 4: Page Sections Layout Reorder -->
-                <div class="console-column">
-                    <h4 class="console-col-title">Page Layout Reorder</h4>
-                    <div id="console-layout-list" style="max-height: 120px; overflow-y: auto; border: 1px solid rgba(255, 255, 255, 0.05); padding: 6px; border-radius: 4px; display: flex; flex-direction: column; gap: 4px;">
-                        <!-- Sections list with reorder buttons -->
-                    </div>
-                </div>
-
-                <!-- Batch Video Import (YouTube, Wistia & Streamable) -->
-                <div class="console-column">
-                    <h4 class="console-col-title">Batch Video Import (YouTube / Wistia / Streamable)</h4>
-                    <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 8px; line-height: 1.3;">Paste multiple YouTube, Wistia, or Streamable links / embed codes (one per line) to add all at once.</p>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <select id="batch-yt-category" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: #fff; padding: 6px; border-radius: 4px; font-size: 0.75rem; outline: none; width: 100%;">
-                            <option value="long">16:9 Landscape</option>
-                            <option value="shorts">9:16 Shorts</option>
-                            <option value="graphics">4:3 Graphics</option>
-                        </select>
-                        <textarea id="batch-yt-urls" rows="4" placeholder="https://youtube.com/watch?v=...&#10;https://amits1417.wistia.com/medias/...&#10;https://fast.wistia.net/embed/iframe/...&#10;https://streamable.com/..." style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: #fff; padding: 6px; border-radius: 4px; font-size: 0.75rem; outline: none; width: 100%; resize: vertical; font-family: inherit;"></textarea>
-                        <button type="button" class="console-btn btn-success" id="btn-batch-yt-import" style="padding: 8px; width: 100%; margin: 0; background: var(--accent-cyan); color: var(--bg-primary); font-weight: 700; border: none; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 4px; cursor: pointer;">
-                            <i data-lucide="video"></i>
-                            <span>Import All Videos</span>
-                        </button>
-                        <div id="batch-yt-status" style="font-size: 0.65rem; color: var(--accent-cyan); text-align: center; font-weight: 600; min-height: 1.2em;"></div>
-                    </div>
-                </div>
-
                 <!-- Column 9: Graphics Batch Upload -->
                 <div class="console-column">
                     <h4 class="console-col-title">Graphics Batch Upload</h4>
@@ -1118,97 +1094,7 @@
     <!-- Baked default portfolio data (cloud projects) -->
     <script src="data.js?v=6.0"></script>
     <!-- Custom Application Logic -->
-    <script src="app.js?v=63.0"></script>
-<script>
-// Batch Video Import (YouTube, Wistia, Streamable) - uses window.* exposed by app.js
-(function() {
-    function attachBatchImport() {
-        var btn = document.getElementById('btn-batch-yt-import');
-        if (!btn) { setTimeout(attachBatchImport, 500); return; }
-        if (btn._batchAttached) return;
-        btn._batchAttached = true;
-        btn.onclick = async function() {
-            try {
-                var ta = document.getElementById('batch-yt-urls');
-                var sel = document.getElementById('batch-yt-category');
-                var st = document.getElementById('batch-yt-status');
-                if (!ta || !sel || !st) return;
-                if (!document.body.classList.contains('editor-active')) {
-                    st.textContent = 'Unlock CMS panel with password first.';
-                    return;
-                }
-                var raw = ta.value.trim();
-                if (!raw) { st.textContent = 'Paste at least one YouTube, Wistia, or Streamable link.'; return; }
-                var lines = raw.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
-                var cat = sel.value;
-                var added = 0, failed = 0;
-                for (var i = 0; i < lines.length; i++) {
-                    var line = lines[i];
-                    var ytId = window.extractYouTubeId ? window.extractYouTubeId(line) : '';
-                    var wistiaId = window.extractWistiaId ? window.extractWistiaId(line) : '';
-                    var stId = window.extractStreamableId ? window.extractStreamableId(line) : '';
-                    if (!ytId && !wistiaId && !stId) { failed++; continue; }
-                    
-                    var mediaLink = '';
-                    var thumbLink = '';
-                    if (ytId) {
-                        mediaLink = 'https://youtu.be/' + ytId;
-                        thumbLink = 'https://img.youtube.com/vi/' + ytId + '/maxresdefault.jpg';
-                    } else if (wistiaId) {
-                        mediaLink = 'https://fast.wistia.net/embed/iframe/' + wistiaId;
-                        thumbLink = 'https://fast.wistia.com/embed/medias/' + wistiaId + '/swatch';
-                    } else if (stId) {
-                        mediaLink = 'https://streamable.com/' + stId;
-                        thumbLink = 'https://cdn-cf-east.streamable.com/image/' + stId + '.jpg';
-                    }
-
-                    var newObj = {
-                        id: 'proj_' + Date.now() + '_' + Math.floor(Math.random() * 100000),
-                        title: '',
-                        category: cat,
-                        year: '',
-                        mediaSource: 'link',
-                        mediaLink: mediaLink,
-                        thumbSource: 'auto',
-                        thumbLink: thumbLink
-                    };
-                    var firstIdx = window.projects.findIndex(function(p){ return p.category === cat; });
-                    if (firstIdx !== -1) {
-                        window.projects.splice(firstIdx, 0, newObj);
-                    } else {
-                        window.projects.unshift(newObj);
-                    }
-                    added++;
-                    st.textContent = 'Importing... ' + added + ' done';
-                }
-                if (added > 0) {
-                    st.textContent = 'Saving ' + added + ' video(s) to cloud...';
-                    try {
-                        await window.saveDatabase();
-                        if (window.appendConsoleLog) window.appendConsoleLog('> Batch import: ' + added + ' videos saved to Firebase.');
-                    } catch (saveErr) {
-                        if (window.appendConsoleLog) window.appendConsoleLog('> Batch import: Firebase save failed: ' + saveErr.message);
-                        st.textContent = 'Cloud save failed! Data may be lost on refresh.';
-                        ta.value = '';
-                        return;
-                    }
-                    window.renderProjects();
-                    st.textContent = '\u2713 ' + added + ' video(s) added.' + (failed ? ' ' + failed + ' invalid skipped.' : '');
-                    if (window.appendConsoleLog) window.appendConsoleLog('> Batch import complete: ' + added + ' added, ' + failed + ' failed.');
-                } else {
-                    st.textContent = failed > 0 ? 'No valid YouTube, Wistia, or Streamable links found (' + failed + ' invalid).' : 'No valid YouTube, Wistia, or Streamable links found.';
-                }
-                ta.value = '';
-            } catch (err) {
-                var st = document.getElementById('batch-yt-status');
-                if (st) st.textContent = 'Error: ' + err.message;
-                console.error('Batch import error:', err);
-            }
-        };
-    }
-    attachBatchImport();
-})();
-</script>
+    <script src="app.js?v=64.0"></script>
 </body>
 </html>
 
