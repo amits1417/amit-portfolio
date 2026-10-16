@@ -1,54 +1,21 @@
 {
-  "cleanUrls": false,
-  "functions": {
-    "api/streamable.js": {
-      "maxDuration": 10
-    },
-    "api/wistia.js": {
-      "maxDuration": 10
-    }
-  },
-  "rewrites": [
-    { "source": "/edit", "destination": "/index.html?edit" },
-    { "source": "/admin", "destination": "/index.html?edit" },
-    { "source": "/cms", "destination": "/index.html?edit" }
+  "cleanUrls": true,
+  "redirects": [
+    { "source": "/edit", "destination": "/admin", "permanent": false },
+    { "source": "/cms", "destination": "/admin", "permanent": false }
   ],
   "headers": [
     {
-      "source": "/(assets|node_modules)/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }]
     },
     {
-      "source": "/(.*)\\.(png|jpg|jpeg|gif|webp|svg|mp4|webm|woff2|woff|ttf|ico|webmanifest)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
+      "source": "/(|index|admin|config.js|data.js)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
     },
     {
-      "source": "(/|/index\\.html|/edit|/admin|/cms)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0, proxy-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/(app\\.js|style\\.css|data\\.js)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
+      "source": "/admin",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
     }
   ]
 }

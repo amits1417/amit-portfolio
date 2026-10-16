@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin — Amit Sharma</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0b; --bg-2:#101012; --card:#151518; --card-2:#1c1c20;
+  --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.16);
+  --text:#f3f3f1; --muted:#a0a0a8; --faint:#6b6b74;
+  --accent:#4d94ff; --ai1:#7c5cff; --ai2:#22d3ee; --ok:#22c55e; --warn:#f5a524; --bad:#ef4444;
+  --r:12px; --pad:16px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:400 15px/1.45 "Inter Tight",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;padding-bottom:env(safe-area-inset-bottom)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit}
+input,select,textarea{font:inherit;font-size:16px;color:var(--text);background:var(--bg);border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;width:100%;min-height:44px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+input[type=color]{padding:3px;width:44px;flex:none;cursor:pointer}
+input[type=checkbox]{width:20px;height:20px;min-height:0;accent-color:var(--accent)}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--muted);font-weight:500}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:0 16px;border-radius:99px;font-weight:600;font-size:14.5px;white-space:nowrap;border:1px solid var(--line-2)}
+.btn.pri{background:var(--text);color:var(--bg);border-color:var(--text)}
+.btn.pri[disabled]{opacity:.45;cursor:not-allowed}
+.btn.sm{min-height:36px;padding:0 13px;font-size:13.5px}
+.btn.danger{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,transparent)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 var(--pad)}
+.muted{color:var(--muted)} .small{font-size:13px}
+.hide{display:none!important}
+
+/* login */
+.login{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
+.login-box{width:min(400px,100%);background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 22px;display:flex;flex-direction:column;gap:14px}
+.login-box h1{font-size:24px;letter-spacing:-.02em}
+.login-box img{height:32px;width:auto;align-self:flex-start}
+.err{color:var(--bad);font-size:13.5px;min-height:18px}
+.setup{font-size:13px;color:var(--muted);background:color-mix(in srgb,var(--warn) 10%,transparent);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);border-radius:10px;padding:10px 12px}
+.setup b{color:var(--warn)}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+.top-row{display:flex;align-items:center;gap:10px;min-height:58px;flex-wrap:wrap;padding:8px 0}
+.top-row h1{font-size:17px;letter-spacing:-.01em;margin-right:auto;display:flex;align-items:center;gap:10px}
+.pill{font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;border:1px solid var(--line-2);color:var(--muted)}
+.pill.dirty{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
+.pill.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,transparent)}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:0 0 10px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;padding:8px 14px;border-radius:99px;font-size:14px;font-weight:600;color:var(--muted);border:1px solid var(--line)}
+.tab.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.tab em{font-style:normal;opacity:.7;margin-left:4px;font-weight:500}
+.banner{font-size:13px;padding:8px 12px;border-radius:10px;margin-top:14px;background:color-mix(in srgb,var(--warn) 12%,transparent);color:var(--warn)}
+
+main{padding:18px 0 80px}
+.add{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.add input{flex:1 1 260px}
+.hint{font-size:12.5px;color:var(--faint);margin-bottom:16px}
+
+/* media grid */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.item{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+.item.hidden-item .th{opacity:.35}
+.item.drag{outline:2px dashed var(--accent)}
+.th{position:relative;aspect-ratio:16/9;background:var(--card-2)}
+.grid.v .th{aspect-ratio:9/16}
+.grid.g .th{aspect-ratio:1}
+.th img,.th video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.grid.g .th img{object-fit:contain}
+.th .no{position:absolute;left:6px;top:6px;font-size:11px;font-weight:700;background:rgba(0,0,0,.65);color:#fff;padding:2px 7px;border-radius:6px}
+.th .ai-tag{position:absolute;right:6px;top:6px;font-size:10px;font-weight:800;letter-spacing:.06em;padding:2px 7px;border-radius:5px;color:#fff;background:linear-gradient(90deg,var(--ai1),var(--ai2))}
+.th .new{position:absolute;left:6px;bottom:6px;font-size:10.5px;font-weight:700;background:var(--warn);color:#000;padding:2px 7px;border-radius:5px}
+.ctl{display:flex;gap:4px;padding:6px;flex-wrap:wrap}
+.ic{min-width:38px;height:36px;border-radius:9px;display:inline-grid;place-items:center;border:1px solid var(--line);font-size:12.5px;font-weight:700;padding:0 8px;color:var(--muted)}
+.ic svg{width:16px;height:16px}
+.ic.on-ai{color:#fff;border-color:transparent;background:linear-gradient(90deg,var(--ai1),var(--ai2))}
+.ic.del{margin-left:auto;color:var(--bad)}
+
+/* forms */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.panel h2{font-size:16px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.fgrid{display:grid;gap:12px}
+.row{display:flex;gap:8px;align-items:center}
+.tool{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.tool .logo{width:40px;height:40px;border-radius:10px;background:var(--card-2);display:grid;place-items:center;flex:none;overflow:hidden;border:1px dashed var(--line-2)}
+.tool .logo img{width:26px;height:26px;object-fit:contain}
+.tool .logo b{font-size:15px}
+.tool input.name{flex:1 1 140px;min-width:120px}
+.segs{display:flex;gap:3px}
+.segs button{width:22px;height:30px;border-radius:5px;background:var(--line-2)}
+.segs button.on{background:var(--b)}
+.xrow{display:grid;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
+
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));translate:-50% 0;z-index:60;background:var(--text);color:var(--bg);font-weight:600;font-size:14px;padding:11px 18px;border-radius:12px;max-width:92vw;text-align:center;display:none}
+#toast.bad{background:var(--bad);color:#fff}
+.progress{font-size:13px;color:var(--muted)}
+
+@media (min-width:640px){ .grid{grid-template-columns:repeat(3,1fr)} .grid.v,.grid.g{grid-template-columns:repeat(4,1fr)} .fgrid.two{grid-template-columns:1fr 1fr} .xrow{grid-template-columns:2fr 2fr 1.2fr auto auto;align-items:center} }
+@media (min-width:1000px){ .grid{grid-template-columns:repeat(4,1fr)} .grid.v,.grid.g{grid-template-columns:repeat(6,1fr)} .skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start} .skills-grid .panel{margin:0} }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login" id="login">
+  <form class="login-box" id="login-form">
+    <img src="assets/logo-white.png" alt="">
+    <h1 id="l-title">Admin</h1>
+    <p class="small muted hide" id="l-first">First time here — choose your admin password.</p>
+    <input type="text" autocomplete="username" value="admin" hidden>
+    <label class="f">Password<input id="l-pass" type="password" autocomplete="current-password" required minlength="4"></label>
+    <label class="f hide" id="l-rep-wrap">Repeat password<input id="l-rep" type="password" autocomplete="new-password"></label>
+    <div class="err" id="l-err"></div>
+    <button class="btn pri" id="l-btn" type="submit">Open admin</button>
+    <a class="small muted" href="index.html" style="text-align:center">← Back to website</a>
+  </form>
+</div>
+
+<!-- APP -->
+<div id="app" class="hide">
+  <div class="top">
+    <div class="wrap">
+      <div class="top-row">
+        <h1>Admin <span class="pill" id="status">Saved</span></h1>
+        <a class="btn sm" href="index.html?draft" target="_blank" rel="noopener">Preview</a>
+        <button class="btn sm pri" id="save">Save &amp; publish</button>
+        <button class="btn sm" id="more-btn" aria-label="More">⋯</button>
+      </div>
+      <div class="row hide" id="more-menu" style="gap:8px;flex-wrap:wrap;padding-bottom:10px">
+        <a class="btn sm" href="index.html" target="_blank" rel="noopener">Open live site</a>
+        <button class="btn sm" id="discard">Discard unsaved changes</button>
+        <button class="btn sm danger" id="reset">Reset to defaults</button>
+        <button class="btn sm" id="logout">Log out</button>
+      </div>
+      <nav class="tabs" id="tabs"></nav>
+    </div>
+  </div>
+  <main class="wrap" id="view"></main>
+</div>
+<div id="toast" role="status"></div>
+
+<script src="config.js"></script>
+<script src="data.js"></script>
+<script>
+const CFG = window.SITE_CONFIG, $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const clone = o => JSON.parse(JSON.stringify(o));
+const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+/* ---------------- simple password (stored as a SHA-256 hash in Firebase "v2_admin") ---------------- */
+const demo = false;
+let adminHash = null;
+async function hash(pw){
+  const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("amit-portfolio:" + pw));
+  return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join("");
+}
+async function fetchAdminHash(){ try { const r = await db("v2_admin/hash"); return r.ok ? await r.json() : null; } catch(e) { return null; } }
+async function setPassword(pw){
+  const h = await hash(pw);
+  const r = await db("v2_admin/hash", {method:"PUT", body:JSON.stringify(h)});
+  if (!r.ok) throw new Error("Could not save the password (" + r.status + ").");
+  adminHash = h; try { localStorage.setItem("as-admin", h); } catch(e) {}
+}
+function logout(){ try { localStorage.removeItem("as-admin"); } catch(e) {} location.reload(); }
+
+/* ---------------- data ---------------- */
+let data, published, publishedMedia = new Set(), dirty = false, tab = "long";
+const db = (path, opt) => fetch(`${CFG.dbUrl}/${path}.json` + (opt?.auth ? `?auth=${opt.auth}` : ""), opt);
+function mediaIds(d){ return new Set(["long","shorts","graphics"].flatMap(c => (d[c] || []).map(x => x.src).filter(s => s?.startsWith("media:")).map(s => s.slice(6)))); }
+function normalize(d){
+  const base = clone(window.DEFAULT_DATA);
+  d = Object.assign(base, d || {});
+  d.settings = Object.assign(clone(window.DEFAULT_DATA.settings), d.settings || {});
+  ["long","shorts","graphics","skills","experience"].forEach(k => { if (!Array.isArray(d[k])) d[k] = []; });
+  d.skills.forEach(g => { if (!Array.isArray(g.tools)) g.tools = []; });
+  return d;
+}
+async function loadData(){
+  let remote = null;
+  try { const r = await db(CFG.dataNode); if (r.ok) remote = await r.json(); } catch(e) {}
+  published = remote ? normalize(remote) : null;
+  if (published) publishedMedia = mediaIds(published);
+  let draft = null; try { draft = JSON.parse(localStorage.getItem("as-draft")); } catch(e) {}
+  data = draft && draft.settings ? normalize(draft) : clone(published || window.DEFAULT_DATA);
+  dirty = JSON.stringify(data) !== JSON.stringify(published || null);
+}
+function changed(rerender){
+  dirty = true;
+  try { localStorage.setItem("as-draft", JSON.stringify(data)); }
+  catch(e) { toast("Too many new uploads to keep a draft — save & publish now.", true); }
+  updateStatus();
+  if (rerender) render();
+}
+function updateStatus(){
+  const s = $("status");
+  s.className = "pill " + (demo ? "dirty" : dirty ? "dirty" : "ok");
+  s.textContent = demo ? "Preview mode" : dirty ? (published ? "Unsaved changes" : "Not published yet") : "Published";
+  $("save").disabled = demo;
+}
+addEventListener("beforeunload", e => { if (dirty && !demo) { e.preventDefault(); e.returnValue = ""; } });
+
+async function save(){
+  if (demo) return toast("Preview mode — log in to publish.", true);
+  const btn = $("save"); btn.disabled = true; btn.textContent = "Publishing…";
+  try {
+    const auth = undefined;
+    // 1) upload new images into the media store
+    const pending = ["long","shorts","graphics"].flatMap(c => data[c]).filter(x => x.src?.startsWith("data:"));
+    let n = 0;
+    for (const it of pending){
+      btn.textContent = `Uploading ${++n}/${pending.length}…`;
+      const id = it.id;
+      const r = await db(`${CFG.mediaNode}/${id}`, {method:"PUT", auth, body:JSON.stringify(it.src)});
+      if (!r.ok) throw new Error(await errText(r));
+      it.src = "media:" + id;
+    }
+    // 2) publish content
+    btn.textContent = "Publishing…";
+    const r = await db(CFG.dataNode, {method:"PUT", auth, body:JSON.stringify(data)});
+    if (!r.ok) throw new Error(await errText(r));
+    // 3) remove images that are no longer used
+    const now = mediaIds(data);
+    for (const id of publishedMedia) if (!now.has(id)) await db(`${CFG.mediaNode}/${id}`, {method:"DELETE", auth}).catch(() => {});
+    published = clone(data); publishedMedia = now; dirty = false;
+    try { localStorage.removeItem("as-draft"); localStorage.setItem("as-data", JSON.stringify(data)); } catch(e) {}
+    toast("Published ✓ Your website is updated.");
+    render();
+  } catch(e) {
+    toast(e.message, true);
+  } finally {
+    btn.textContent = "Save & publish"; updateStatus();
+  }
+}
+async function errText(r){ let j = {}; try { j = await r.json(); } catch(e) {} return r.status === 401 || /permission/i.test(j.error || "") ? "Permission denied by the Firebase database rules." : "Save failed: " + (j.error || r.status); }
+
+/* ---------------- helpers ---------------- */
+let tt; function toast(m, bad){ const t = $("toast"); t.textContent = m; t.className = bad ? "bad" : ""; t.style.display = "block"; clearTimeout(tt); tt = setTimeout(() => t.style.display = "none", 3600); }
+function parseLink(s){
+  s = s.trim(); if (!s) return null;
+  const y = s.match(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/|\/live\/)([A-Za-z0-9_-]{11})/) || (/^[A-Za-z0-9_-]{11}$/.test(s) ? [0, s] : null);
+  if (y) return {src:"yt:" + y[1], video:true};
+  if (/^https?:\/\/\S+\.(mp4|webm|mov|m4v)(\?\S*)?$/i.test(s)) return {src:s, video:true};
+  if (/^https?:\/\/\S+$/i.test(s)) return {src:s, video:false};
+  return null;
+}
+function thumb(it, cat){
+  const s = it.src || "";
+  if (s.startsWith("yt:")) return `<img src="https://i.ytimg.com/vi/${esc(s.slice(3))}/hqdefault.jpg" alt="" loading="lazy">`;
+  if (s.startsWith("media:")) return `<img data-media="${esc(s.slice(6))}" alt="">`;
+  if (/\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(s)) return `<video src="${esc(s)}#t=1" muted playsinline preload="metadata"></video>`;
+  return `<img src="${esc(s)}" alt="" loading="lazy">`;
+}
+function compress(file, max = 1400, q = .82){
+  return new Promise((res, rej) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement("canvas"); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      let out = c.toDataURL("image/webp", q);
+      if (!out.startsWith("data:image/webp")) out = c.toDataURL("image/jpeg", q);
+      URL.revokeObjectURL(url);
+      res({src:out, r:+(img.height / img.width).toFixed(3)});
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error("Could not read " + file.name)); };
+    img.src = url;
+  });
+}
+const ratioOf = src => new Promise(res => { const i = new Image(); i.onload = () => res(+(i.height / i.width).toFixed(3)); i.onerror = () => res(1); i.src = src; });
+
+/* ---------------- views ---------------- */
+const TABS = [["long","Landscape"],["shorts","Shorts"],["graphics","Graphics"],["skills","Skills"],["profile","Profile"]];
+const I = {
+  up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 15 6-6 6 6"/></svg>',
+  down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>',
+  eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  off:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6 0 10 7 10 7a17 17 0 0 1-3.2 3.9M6.6 6.6C3.8 8.4 2 12 2 12s4 7 10 7c1.8 0 3.4-.6 4.8-1.4M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>',
+  del:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>'
+};
+function render(){
+  $("tabs").innerHTML = TABS.map(([k,n]) => `<button class="tab${k === tab ? " on" : ""}" data-tab="${k}">${n}${data[k] && k !== "skills" ? `<em>${data[k].length}</em>` : ""}</button>`).join("");
+  const v = $("view");
+  v.innerHTML = (demo ? `<div class="banner">Preview mode: changes stay on this device. Use “Preview” to see them on the site. Log in to publish.</div><div style="height:14px"></div>` : (!published ? `<div class="banner">Nothing published yet — this is the default content. Press “Save &amp; publish” once to put it live.</div><div style="height:14px"></div>` : ""))
+    + (tab === "skills" ? skillsView() : tab === "profile" ? profileView() : listView(tab));
+  hydrate();
+}
+function listView(cat){
+  const items = data[cat];
+  const isG = cat === "graphics";
+  return `<div class="add">
+      <input id="add-link" placeholder="${isG ? "Paste an image link" : "Paste a YouTube or Cloudflare video link"}" inputmode="url" autocomplete="off">
+      <button class="btn pri" data-act="add-link">Add</button>
+      ${isG ? `<label class="btn">Upload images<input id="upload" type="file" accept="image/*" multiple hidden></label>` : ""}
+    </div>
+    <p class="hint">${isG ? "Images are resized and compressed automatically. " : "New videos go to the front. "}Tap AI to tag a ${isG ? "graphic" : "video"} as AI, the eye to hide it, arrows to reorder${matchMedia("(hover:hover)").matches ? " (or drag)" : ""}.</p>
+    <div class="grid ${cat === "shorts" ? "v" : isG ? "g" : ""}" id="grid">${items.map((it,i) => `
+      <div class="item${it.hidden ? " hidden-item" : ""}" data-i="${i}" draggable="true">
+        <div class="th">${thumb(it, cat)}<span class="no">${i+1}</span>${it.ai ? '<span class="ai-tag">AI</span>' : ""}${it.src?.startsWith("data:") ? '<span class="new">New</span>' : ""}</div>
+        <div class="ctl">
+          <button class="ic${it.ai ? " on-ai" : ""}" data-act="ai" data-i="${i}" title="AI tag" aria-pressed="${!!it.ai}">AI</button>
+          <button class="ic" data-act="hide" data-i="${i}" title="${it.hidden ? "Show" : "Hide"}">${it.hidden ? I.off : I.eye}</button>
+          <button class="ic" data-act="up" data-i="${i}" title="Move up" ${i === 0 ? "disabled" : ""}>${I.up}</button>
+          <button class="ic" data-act="down" data-i="${i}" title="Move down" ${i === items.length - 1 ? "disabled" : ""}>${I.down}</button>
+          <button class="ic del" data-act="del" data-i="${i}" title="Delete">${I.del}</button>
+        </div>
+      </div>`).join("")}</div>`;
+}
+function skillsView(){
+  return `<p class="hint">Click a logo to change it (link or upload). Click the bars to set the level.</p><div class="skills-grid">${data.skills.map((g,gi) => `
+    <div class="panel">
+      <h2><input value="${esc(g.name)}" data-k="skills.${gi}.name" style="font-weight:700"><input type="color" value="${esc(g.color)}" data-k="skills.${gi}.color" title="Category colour"></h2>
+      ${g.tools.map((t,ti) => `<div class="tool" style="--b:${String(t.c).toUpperCase() === "#FFFFFF" ? "var(--text)" : esc(t.c)}">
+        <button class="logo" data-act="icon" data-g="${gi}" data-t="${ti}" title="Change logo">${t.i ? `<img src="${esc(t.i)}" alt="">` : `<b>${esc((t.n||"?")[0])}</b>`}</button>
+        <input class="name" value="${esc(t.n)}" data-k="skills.${gi}.tools.${ti}.n" aria-label="Tool name">
+        <span class="segs">${[1,2,3,4,5].map(k => `<button class="${k <= t.l ? "on" : ""}" data-act="lvl" data-g="${gi}" data-t="${ti}" data-l="${k}" aria-label="Level ${k}"></button>`).join("")}</span>
+        <input type="color" value="${esc(t.c)}" data-k="skills.${gi}.tools.${ti}.c" title="Brand colour">
+        <button class="ic" data-act="t-up" data-g="${gi}" data-t="${ti}" ${ti === 0 ? "disabled" : ""}>${I.up}</button>
+        <button class="ic del" data-act="t-del" data-g="${gi}" data-t="${ti}">${I.del}</button>
+      </div>`).join("")}
+      <button class="btn sm" data-act="t-add" data-g="${gi}" style="margin-top:10px">+ Add tool</button>
+    </div>`).join("")}</div>`;
+}
+function profileView(){
+  const s = data.settings, f = (k, label, type = "text") => `<label class="f">${label}<input type="${type}" value="${esc(s[k])}" data-k="settings.${k}"></label>`;
+  return `<div class="panel"><h2>Hero</h2><div class="fgrid two">
+      ${f("name","Name")}${f("role","Role badge")}${f("available","Availability")}${f("tags","Tags line")}</div></div>
+    <div class="panel"><h2>Showreel (the only video with a title)</h2><div class="fgrid two">
+      <label class="f">Title<input value="${esc(s.showreel.title)}" data-k="settings.showreel.title"></label>
+      <label class="f">Video link (Cloudflare / mp4)<input value="${esc(s.showreel.src)}" data-k="settings.showreel.src" inputmode="url"></label>
+      <label class="f">Cover image link<input value="${esc(s.showreel.poster)}" data-k="settings.showreel.poster" inputmode="url"></label></div></div>
+    <div class="panel"><h2>Numbers</h2><div class="fgrid two">${s.stats.map((x,i) => `<div class="row"><input value="${esc(x.n)}" data-k="settings.stats.${i}.n" style="max-width:90px" aria-label="Number"><input value="${esc(x.l)}" data-k="settings.stats.${i}.l" aria-label="Label"></div>`).join("")}</div></div>
+    <div class="panel"><h2>Contact</h2><div class="fgrid two">
+      ${f("whatsapp","WhatsApp number (digits, with 91)","tel")}${f("phone","Phone (shown)","tel")}${f("email","Email","email")}${f("location","Location")}
+      <label class="f">CV link<input value="${esc(s.cv)}" data-k="settings.cv"></label></div></div>
+    <div class="panel"><h2>Experience</h2>
+      ${data.experience.map((x,i) => `<div class="xrow">
+        <input value="${esc(x.role)}" data-k="experience.${i}.role" placeholder="Role">
+        <input value="${esc(x.org)}" data-k="experience.${i}.org" placeholder="Company, city">
+        <input value="${esc(x.time)}" data-k="experience.${i}.time" placeholder="2024 – now">
+        <label class="row small muted"><input type="checkbox" ${x.now ? "checked" : ""} data-k="experience.${i}.now"> Now</label>
+        <button class="ic del" data-act="x-del" data-i="${i}">${I.del}</button></div>`).join("")}
+      <button class="btn sm" data-act="x-add" style="margin-top:10px">+ Add job</button>
+      <label class="f" style="margin-top:14px">Education<input value="${esc(data.education)}" data-k="education"></label>
+    </div>
+    <div class="panel"><h2>Admin password</h2><button class="btn sm" data-act="pw">Change password</button></div>`;
+}
+
+// load uploaded images inside the admin grid
+const mediaCache = {};
+function hydrate(){
+  document.querySelectorAll("img[data-media]").forEach(img => {
+    const id = img.dataset.media;
+    (mediaCache[id] ||= db(`${CFG.mediaNode}/${encodeURIComponent(id)}`).then(r => r.json()).catch(() => "")).then(u => { if (u) img.src = u; });
+  });
+  const up = $("upload");
+  if (up) up.onchange = async () => {
+    const files = [...up.files]; let ok = 0;
+    for (const f of files){
+      try { const c = await compress(f); data.graphics.unshift({id:uid("g_"), src:c.src, r:c.r, ai:false}); ok++; toast(`Added ${ok}/${files.length}`); }
+      catch(e) { toast(e.message, true); }
+    }
+    if (ok) changed(true);
+  };
+  const link = $("add-link");
+  if (link) link.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); act("add-link"); } };
+}
+
+/* ---------------- actions ---------------- */
+function setPath(path, value){
+  const ks = path.split("."); let o = data;
+  ks.slice(0, -1).forEach(k => o = o[k]);
+  o[ks.at(-1)] = value;
+}
+document.addEventListener("input", e => {
+  const k = e.target.dataset.k; if (!k) return;
+  setPath(k, e.target.type === "checkbox" ? e.target.checked : e.target.value);
+  if (/tools\.\d+\.c$/.test(k)) e.target.closest(".tool").style.setProperty("--b", e.target.value.toUpperCase() === "#FFFFFF" ? "var(--text)" : e.target.value);
+  changed(false);
+});
+async function act(a, el = {dataset:{}}){
+  const d = el.dataset, i = +d.i, list = data[tab];
+  if (a === "add-link"){
+    const p = parseLink($("add-link").value);
+    if (!p) return toast("That doesn't look like a YouTube, video or image link.", true);
+    if (tab !== "graphics" && !p.video) return toast("Paste a YouTube link or a direct video link (.mp4).", true);
+    if (list.some(x => x.src === p.src)) return toast("That one is already in the list.", true);
+    const it = {id:uid(tab === "graphics" ? "g_" : "v_"), src:p.src, ai:tab !== "graphics"};
+    if (tab === "graphics") it.r = await ratioOf(p.src);
+    list.unshift(it); $("add-link").value = ""; changed(true); toast("Added");
+  }
+  else if (a === "ai"){ list[i].ai = !list[i].ai; changed(true); }
+  else if (a === "hide"){ list[i].hidden = !list[i].hidden; changed(true); }
+  else if (a === "up" && i > 0){ [list[i-1], list[i]] = [list[i], list[i-1]]; changed(true); }
+  else if (a === "down" && i < list.length - 1){ [list[i+1], list[i]] = [list[i], list[i+1]]; changed(true); }
+  else if (a === "del"){ if (confirm("Delete this item?")) { list.splice(i, 1); changed(true); } }
+  else if (a === "lvl"){ data.skills[+d.g].tools[+d.t].l = +d.l; changed(true); }
+  else if (a === "t-add"){ data.skills[+d.g].tools.push({n:"New tool", l:3, c:"#4d94ff", i:""}); changed(true); }
+  else if (a === "t-del"){ if (confirm("Remove this tool?")) { data.skills[+d.g].tools.splice(+d.t, 1); changed(true); } }
+  else if (a === "t-up"){ const t = data.skills[+d.g].tools, j = +d.t; [t[j-1], t[j]] = [t[j], t[j-1]]; changed(true); }
+  else if (a === "icon"){
+    const t = data.skills[+d.g].tools[+d.t];
+    const url = prompt("Paste a logo link, or leave empty and press OK to upload a file:", t.i?.startsWith("data:") ? "" : t.i || "");
+    if (url === null) return;
+    if (url.trim()) { t.i = url.trim(); changed(true); return; }
+    const inp = document.createElement("input"); inp.type = "file"; inp.accept = "image/*";
+    inp.onchange = async () => { if (!inp.files[0]) return; const c = await compress(inp.files[0], 64, .9); t.i = c.src; changed(true); };
+    inp.click();
+  }
+  else if (a === "pw"){
+    const p1 = prompt("New admin password (at least 4 characters):"); if (p1 === null) return;
+    if (p1.length < 4) return toast("Too short — use at least 4 characters.", true);
+    if (prompt("Type it again:") !== p1) return toast("The two passwords don't match.", true);
+    try { await setPassword(p1); toast("Password changed ✓"); } catch(e) { toast(e.message, true); }
+  }
+  else if (a === "x-add"){ data.experience.unshift({role:"", org:"", time:"", now:false}); changed(true); }
+  else if (a === "x-del"){ if (confirm("Remove this job?")) { data.experience.splice(i, 1); changed(true); } }
+}
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-tab]"); if (t) { tab = t.dataset.tab; render(); scrollTo(0, 0); return; }
+  const b = e.target.closest("[data-act]"); if (b && !b.disabled) act(b.dataset.act, b);
+});
+// drag to reorder (mouse)
+let dragFrom = null;
+document.addEventListener("dragstart", e => { const it = e.target.closest?.(".item"); if (it) { dragFrom = +it.dataset.i; it.classList.add("drag"); } });
+document.addEventListener("dragend", e => { document.querySelectorAll(".item.drag").forEach(x => x.classList.remove("drag")); });
+document.addEventListener("dragover", e => { if (dragFrom !== null && e.target.closest(".item")) e.preventDefault(); });
+document.addEventListener("drop", e => {
+  const it = e.target.closest(".item"); if (!it || dragFrom === null) return;
+  e.preventDefault(); const to = +it.dataset.i, list = data[tab];
+  const [m] = list.splice(dragFrom, 1); list.splice(to, 0, m); dragFrom = null; changed(true);
+});
+
+$("save").onclick = save;
+$("more-btn").onclick = () => $("more-menu").classList.toggle("hide");
+$("logout").onclick = () => { if (!dirty || demo || confirm("You have unsaved changes. Log out anyway?")) logout(); };
+$("discard").onclick = () => { if (!confirm("Throw away all unsaved changes?")) return; data = clone(published || window.DEFAULT_DATA); dirty = false; try { localStorage.removeItem("as-draft"); } catch(e) {} updateStatus(); render(); };
+$("reset").onclick = () => { if (!confirm("Replace everything with the default content? (Nothing goes live until you publish.)")) return; data = clone(window.DEFAULT_DATA); changed(true); };
+
+/* ---------------- start ---------------- */
+async function enter(){
+  $("login").classList.add("hide"); $("app").classList.remove("hide");
+  $("view").innerHTML = '<p class="progress">Loading…</p>';
+  await loadData(); updateStatus(); render();
+}
+let firstTime = false;
+$("login-form").onsubmit = async e => {
+  e.preventDefault(); $("l-err").textContent = "";
+  const pw = $("l-pass").value;
+  try {
+    if (firstTime){
+      if (pw.length < 4) throw new Error("Use at least 4 characters.");
+      if (pw !== $("l-rep").value) throw new Error("The two passwords don't match.");
+      await setPassword(pw);
+    } else {
+      if (await hash(pw) !== adminHash) throw new Error("Wrong password.");
+      try { localStorage.setItem("as-admin", adminHash); } catch(e) {}
+    }
+    enter();
+  } catch(err) { $("l-err").textContent = err.message; }
+};
+(async () => {
+  adminHash = await fetchAdminHash();
+  let remembered = null; try { remembered = localStorage.getItem("as-admin"); } catch(e) {}
+  if (adminHash && remembered === adminHash) return enter();   // stays logged in on this device
+  firstTime = !adminHash;
+  if (firstTime){
+    $("l-first").classList.remove("hide"); $("l-rep-wrap").classList.remove("hide");
+    $("l-title").textContent = "Set admin password"; $("l-btn").textContent = "Save password & open";
+    $("l-pass").autocomplete = "new-password";
+  }
+  $("l-pass").focus();
+})();
+</script>
+</body>
+</html>

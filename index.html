@@ -1,1101 +1,533 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Amit Sharma - Senior Video Editor, Digital YouTube Studio Manager, and Mechanical Engineer. Premium portfolio showcasing software walkthroughs, motion graphics, and MLM/Crypto explainer animations.">
-    <meta name="author" content="Amit Sharma">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>Amit Sharma | Senior Video Editor &amp; YouTube Studio Manager</title>
-    
-    <!-- Inter (primary) via Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Google Fonts: fallback (Montserrat & DM Sans) -->
-    <link rel="preconnect" href="https://www.youtube.com">
-    <link rel="preconnect" href="https://www.youtube-nocookie.com">
-    <link rel="preconnect" href="https://i.ytimg.com">
-    <link rel="dns-prefetch" href="https://www.youtube.com">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="vendor/plyr.css">
-    <link rel="stylesheet" href="style.css?v=18.0">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" href="/assets/favicon.png">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="manifest" href="/site.webmanifest">
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YWZ0W04BX1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-YWZ0W04BX1');
-    </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Amit Sharma — AI Video Editor</title>
+<meta name="description" content="Amit Sharma, AI video editor in Surat, India: AI videos, explainers, ads and reels. Available in Surat or remote.">
+<meta property="og:title" content="Amit Sharma — AI Video Editor">
+<meta property="og:description" content="AI videos, explainers, ads and reels.">
+<meta property="og:image" content="https://amit-portfolio-fresh.vercel.app/assets/showreel_cover_compelling.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://i.ytimg.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>try{var t=localStorage.getItem("as-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<style>
+:root{
+  --bg:#0a0a0b; --bg-2:#101012; --card:#151518; --card-2:#1c1c20;
+  --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.15);
+  --text:#f3f3f1; --muted:#a0a0a8; --faint:#6b6b74;
+  --accent:#4d94ff; --ai1:#7c5cff; --ai2:#22d3ee; --ok:#22c55e;
+  --seg-off:rgba(255,255,255,.09);
+  --r:14px; --max:1200px; --pad:16px; --hdr:58px;
+  /* glass */
+  --glass:rgba(22,22,28,.58); --glass-strong:rgba(14,14,18,.78); --glass-line:rgba(255,255,255,.1);
+  --blob1:rgba(124,92,255,.30); --blob2:rgba(34,211,238,.16); --blob3:rgba(77,148,255,.20);
+  color-scheme:dark;
+}
+[data-theme="light"]{
+  --bg:#f6f5f2; --bg-2:#eeece7; --card:#ffffff; --card-2:#f1f0ec;
+  --line:rgba(0,0,0,.08); --line-2:rgba(0,0,0,.16);
+  --text:#121214; --muted:#55555e; --faint:#8a8a93;
+  --accent:#1f6fe5; --ai1:#6a46f5; --ai2:#0891b2;
+  --seg-off:rgba(0,0,0,.08);
+  --glass:rgba(255,255,255,.62); --glass-strong:rgba(250,249,246,.82); --glass-line:rgba(0,0,0,.08);
+  --blob1:rgba(124,92,255,.16); --blob2:rgba(34,211,238,.14); --blob3:rgba(77,148,255,.12);
+  color-scheme:light;
+}
+/* fixed, static colour field behind everything (cheap: gradients only, nothing moves) */
+html{background:var(--bg)}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(42% 32% at 88% 6%,var(--blob1),transparent 72%),
+             radial-gradient(38% 30% at 6% 34%,var(--blob2),transparent 72%),
+             radial-gradient(46% 36% at 72% 88%,var(--blob3),transparent 72%)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--hdr) + 8px)}
+body{background:transparent;color:var(--text);font:400 16px/1.5 "Inter Tight",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+img,video{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:8px}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--pad)}
+section{padding:44px 0}
+.ai-grad{background:linear-gradient(90deg,var(--ai1),var(--ai2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.draft-bar{background:#f5a524;color:#000;font-size:13px;font-weight:600;text-align:center;padding:6px 16px}
+.draft-bar a{text-decoration:underline}
+
+/* header */
+header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:var(--hdr);gap:10px}
+.brand img{height:28px;width:auto}
+.brand .logo-dark{display:none}
+[data-theme="light"] .brand .logo-light{display:none}
+[data-theme="light"] .brand .logo-dark{display:block}
+.links{display:none}
+.nav-right{display:flex;align-items:center;gap:8px}
+.icon-btn{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line-2)}
+.icon-btn svg{width:18px;height:18px}
+.sun{display:none}[data-theme="light"] .sun{display:block}[data-theme="light"] .moon{display:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border-radius:99px;font-weight:600;font-size:15px;white-space:nowrap;transition:background .2s,opacity .2s}
+.btn svg{width:17px;height:17px;flex:none}
+.btn-primary{background:var(--text);color:var(--bg)}
+.btn-ghost{border:1px solid var(--line-2)}
+.btn-wa{background:#1faa53;color:#fff}
+.btn-sm{min-height:38px;padding:0 15px;font-size:14px}
+.menu{position:fixed;inset:calc(var(--hdr) + env(safe-area-inset-top)) 0 auto 0;background:var(--bg);border-bottom:1px solid var(--line);padding:6px var(--pad) 18px;display:none;flex-direction:column;z-index:49}
+.menu.open{display:flex}
+.menu a{padding:13px 2px;font-size:17px;font-weight:500;border-bottom:1px solid var(--line)}
+.menu a:last-child{border-bottom:0}
+
+/* hero */
+.hero{padding:22px 0 0}
+.hero-top{display:flex;flex-direction:column;gap:14px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.role,.avail{display:inline-flex;align-items:center;gap:7px;min-height:30px;padding:0 12px;border-radius:99px;font-size:12.5px;font-weight:600}
+.role{font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:1px solid color-mix(in srgb,var(--ai1) 45%,transparent);background:color-mix(in srgb,var(--ai1) 12%,transparent)}
+.role svg{width:14px;height:14px;color:var(--ai2)}
+.avail{border:1px solid var(--line-2);color:var(--muted)}
+.avail i{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.hero h1{font-size:clamp(36px,9vw,64px);line-height:1;letter-spacing:-.04em;font-weight:700}
+.hero .tags{color:var(--muted);font-size:15px;margin-top:8px}
+.hero-cta{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.reel{margin-top:18px;position:relative;border-radius:var(--r);overflow:hidden;aspect-ratio:16/9;background:#000;border:1px solid var(--line);cursor:pointer}
+.reel video{width:100%;height:100%;object-fit:cover}
+.reel-bar{position:absolute;left:10px;right:10px;bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.chip-dark{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:0 12px;border-radius:99px;background:rgba(10,10,12,.72);color:#fff;font-size:12.5px;font-weight:600;border:1px solid rgba(255,255,255,.14)}
+.chip-dark svg{width:14px;height:14px}
+.chip-dark .ai-tag{position:static}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);margin-top:14px;border:1px solid var(--line);border-radius:var(--r)}
+.stat{padding:12px 6px;text-align:center}
+.stat+.stat{border-left:1px solid var(--line)}
+.stat b{display:block;font-size:clamp(20px,5vw,34px);letter-spacing:-.03em;line-height:1.1;font-weight:700}
+.stat span{display:block;color:var(--muted);font-size:11.5px;line-height:1.25;margin-top:3px}
+
+/* section heads */
+.sh{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.sh h2{font-size:clamp(22px,4vw,30px);letter-spacing:-.03em;font-weight:700;line-height:1.15}
+.count{font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent);white-space:nowrap}
+.sh .hint{margin-left:auto;color:var(--faint);font-size:13px;white-space:nowrap}
+.block+.block{margin-top:36px}
+
+/* rails on phones */
+.rail{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 calc(var(--pad) * -1);padding:0 var(--pad) 4px;scroll-padding:0 var(--pad);scrollbar-width:none;overscroll-behavior-x:contain}
+.rail::-webkit-scrollbar{display:none}
+.rail>.card{flex:none;scroll-snap-align:start}
+.grid-long>.card{width:84%}
+.grid-v>.card{width:44%}
+
+.card{position:relative;border-radius:var(--r);overflow:hidden;background:var(--card-2);border:1px solid var(--line);cursor:pointer;display:block;width:100%}
+.thumb{position:relative;aspect-ratio:16/9;overflow:hidden}
+.grid-v .thumb{aspect-ratio:9/16}
+.thumb img,.thumb video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.badge-play{position:absolute;right:9px;bottom:9px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.94);display:grid;place-items:center}
+.badge-play svg{width:13px;height:13px;color:#000;margin-left:2px}
+.ai-tag{position:absolute;left:9px;top:9px;font-size:10.5px;font-weight:800;letter-spacing:.08em;padding:3px 8px;border-radius:6px;color:#fff;background:linear-gradient(90deg,var(--ai1),var(--ai2))}
+.gfx{columns:2;column-gap:10px}
+.gfx .card{margin-bottom:10px;break-inside:avoid;border-radius:10px}
+.gfx .thumb{aspect-ratio:var(--ar)}
+.more{display:flex;justify-content:center;margin-top:14px}
+.more .btn{width:100%;max-width:320px}
+
+/* skills — old-site style */
+.skills{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.sk-grid{display:grid;gap:12px}
+.sk-card{border-radius:var(--r);background:var(--card);border:1px solid var(--line);overflow:hidden}
+.sk-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:2px solid var(--c);font-weight:700;font-size:16px;color:var(--c)}
+.sk-head svg{width:18px;height:18px}
+.sk-list{padding:6px 8px 10px}
+.sk-row{display:flex;align-items:center;gap:12px;padding:8px}
+.sk-row+.sk-row{border-top:1px solid var(--line)}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--card-2);display:grid;place-items:center;flex:none;overflow:hidden}
+.logo img{width:24px;height:24px;object-fit:contain}
+.logo b{font-size:14px;font-weight:700;color:var(--b)}
+.sk-name{flex:1;font-size:14.5px;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.segs{display:flex;gap:3px;flex:none}
+.segs i{width:14px;height:6px;border-radius:2px;background:var(--seg-off)}
+.segs i.on{background:var(--b)}
+
+/* experience + contact */
+.xp{list-style:none;border-top:1px solid var(--line)}
+.xp li{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.xp h3{font-size:15.5px;font-weight:600;line-height:1.3}
+.xp .org{color:var(--muted);font-size:13.5px}
+.xp time{color:var(--faint);font-size:12.5px;white-space:nowrap;grid-row:1;grid-column:2;font-variant-numeric:tabular-nums}
+.now{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok);margin-left:6px;vertical-align:2px}
+.edu{margin-top:12px;color:var(--muted);font-size:13.5px}
+.about-cta{margin-top:16px}
+.contact-h{margin-top:44px}
+.ways{display:grid;gap:10px}
+.way{display:flex;align-items:center;gap:13px;padding:12px 14px;border-radius:var(--r);border:1px solid var(--line);background:var(--card);min-height:62px}
+.way .wi{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:var(--card-2);flex:none}
+.way .wi svg{width:19px;height:19px}
+.way small{display:block;color:var(--muted);font-size:12px;line-height:1.2}
+.way b{font-weight:600;font-size:15.5px;word-break:break-all}
+.way .arr{margin-left:auto;color:var(--faint)}
+.way.wa .wi{background:rgba(37,211,102,.14);color:#25d366}
+footer{padding:22px 0 calc(26px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.ai-note{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--muted);padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--card);margin-bottom:18px}
+.ai-note .ai-tag{position:static;flex:none}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:13.5px}
+
+/* lightbox */
+dialog{border:0;padding:0;background:transparent;max-width:none;max-height:none;width:100%;height:100%;color:#fff}
+dialog::backdrop{background:rgba(5,5,7,.95)}
+.lb{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:62px 12px 84px;position:relative}
+.lb-stage{width:min(1200px,100%);display:flex;flex-direction:column;align-items:center;gap:10px}
+.lb-media{width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000}
+.lb-media.v{width:auto;height:min(72vh,820px);max-width:100%;aspect-ratio:9/16}
+.lb-media.img{aspect-ratio:auto;background:none;width:auto;display:flex;justify-content:center}
+.lb-media.img img{max-height:76vh;width:auto;border-radius:10px}
+.lb-media iframe,.lb-media video{width:100%;height:100%;border:0}
+.lb-cap{font-size:13px;color:rgba(255,255,255,.6);text-align:center;min-height:18px}
+.lb-x,.lb-nav{position:absolute;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center;color:#fff}
+.lb-x{top:calc(10px + env(safe-area-inset-top));right:10px}
+.lb-prev{left:calc(50% - 60px);bottom:calc(18px + env(safe-area-inset-bottom))}.lb-next{right:calc(50% - 60px);bottom:calc(18px + env(safe-area-inset-bottom))}
+.lb-x svg,.lb-nav svg{width:22px;height:22px}
+
+@media (min-width:760px){
+  :root{--pad:28px;--hdr:66px}
+  section{padding:72px 0}
+  .hero{padding:44px 0 0}
+  .hero-top{flex-direction:row;align-items:flex-end;justify-content:space-between;gap:30px}
+  .hero-cta{display:flex}
+  .reel{margin-top:28px;border-radius:20px;aspect-ratio:16/8}
+  .reel-bar{left:16px;right:16px;bottom:16px}
+  .stats{margin-top:18px}
+  .stat{padding:18px 10px}.stat span{font-size:13px}
+  .sh{margin-bottom:20px}
+  .block+.block{margin-top:56px}
+  .rail{display:grid;overflow:visible;margin:0;padding:0;gap:16px}
+  .grid-long>.card,.grid-v>.card{width:auto}
+  .grid-long{grid-template-columns:repeat(2,1fr)}
+  .grid-v{grid-template-columns:repeat(4,1fr)}
+  .swipe{display:none}
+  .gfx{columns:3;column-gap:14px}.gfx .card{margin-bottom:14px}
+  .sk-grid{grid-template-columns:repeat(2,1fr);gap:16px}
+  .ways{grid-template-columns:repeat(3,1fr)}
+  .lb{padding:70px 80px}
+  .lb-prev{left:18px;top:50%;bottom:auto;translate:0 -50%}.lb-next{right:18px;top:50%;bottom:auto;translate:0 -50%}
+  .lb-media.v{height:min(80vh,820px)}
+}
+@media (min-width:1060px){
+  .links{display:flex;gap:2px}
+  .links a{padding:8px 14px;border-radius:99px;font-size:15px;color:var(--muted)}
+  .menu-btn,.menu{display:none!important}
+  .grid-long{grid-template-columns:repeat(3,1fr)}
+  .grid-v{grid-template-columns:repeat(5,1fr)}
+  .gfx{columns:4}
+  .sk-grid{grid-template-columns:repeat(4,1fr)}
+  .exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+  .contact-h{margin-top:0}
+  .ways{grid-template-columns:1fr}
+}
+@media (hover:hover){
+  .links a:hover{color:var(--text);background:var(--card)}
+  .btn-primary:hover{opacity:.88}.btn-ghost:hover,.icon-btn:hover{background:var(--card)}
+  .card .thumb img{transition:transform .5s ease}.card:hover .thumb img{transform:scale(1.04)}
+  .way:hover{border-color:var(--line-2)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+
+/* frosted glass — last so it wins; only a few surfaces blur, so scrolling stays smooth */
+header,.menu,.stats,.sk-card,.way,.ai-note,.avail{background:var(--glass);border-color:var(--glass-line);-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%)}
+header,.menu{background:var(--glass-strong)}
+.skills{background:color-mix(in srgb,var(--bg-2) 35%,transparent);border-color:var(--glass-line)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  header,.menu,.stats,.sk-card,.way,.ai-note,.avail{background:var(--glass-strong)}
+}
+</style>
 </head>
 <body>
-    <script>
-        (function() {
-            var t;
-            try { t = localStorage.getItem('amit_portfolio_theme'); } catch(e) {}
-            document.body.classList.add('theme-' + (t || 'neon-cyber'));
-            var lm;
-            try { lm = localStorage.getItem('amit_portfolio_light_mode'); } catch(e) {}
-            if (lm === 'true') {
-                document.body.classList.add('light-mode');
-                document.documentElement.classList.add('light-mode');
-                document.documentElement.style.setProperty('--text-primary', '#1a202c');
-            }
-            // Instant Edit Mode URL Detector & Preloader Emergency Failsafe
-            var href = window.location.href.toLowerCase();
-            if (href.indexOf('edit') !== -1 || href.indexOf('admin') !== -1 || href.indexOf('cms') !== -1) {
-                window._isEditRequested = true;
-                try { localStorage.setItem('cms_authenticated', 'true'); } catch(e) {}
-            }
-            var l = document.getElementById('loader');
-            if (l) { l.style.display = 'none'; }
-        })();
-    </script>
-    <button class="floating-theme-toggle" id="floating-theme-toggle" title="Toggle light/dark mode" aria-label="Toggle light/dark mode">
-        <i data-lucide="sun" class="sun-icon" style="width:18px;height:18px;"></i>
-        <i data-lucide="moon" class="moon-icon" style="width:18px;height:18px;"></i>
-    </button>
-    <!-- Parallax Video Editing Timeline Background -->
-    <div id="parallax-timeline-bg"></div>
+<div class="draft-bar" id="draft-bar" hidden>Preview of unsaved admin changes · <a href="admin.html">back to admin</a></div>
 
-    <!-- Premium Loading Screen -->
-    <div id="loader" class="loader-container">
-        <div class="loader-content">
-            <div class="loader-logo">
-                <span class="logo-accent">A</span>MIT<span class="logo-dot">.</span>
-            </div>
-            <div class="loader-progress-bg">
-                <div id="loader-progress-bar" class="loader-progress-bar"></div>
-            </div>
-            <div class="loader-percentage-container">
-                <span class="loader-label">LOADING PORTFOLIO</span>
-                <span id="loader-percentage" class="loader-percentage">00</span>
-            </div>
-        </div>
+<header>
+  <div class="wrap nav">
+    <a href="#" class="brand" aria-label="Home">
+      <img class="logo-light" src="assets/logo-white.png" alt="Amit Sharma" width="45" height="28">
+      <img class="logo-dark" src="assets/logo-black.png" alt="Amit Sharma" width="45" height="28">
+    </a>
+    <nav class="links"><a href="#work">Work</a><a href="#skills">Skills</a><a href="#experience">Experience</a><a href="#contact">Contact</a></nav>
+    <div class="nav-right">
+      <button class="icon-btn" id="theme" aria-label="Switch light or dark mode">
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <a href="#contact" class="btn btn-primary btn-sm">Hire me</a>
+      <button class="icon-btn menu-btn" id="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
     </div>
+  </div>
+  <nav class="menu" id="menu"><a href="#work">Work</a><a href="#skills">Skills</a><a href="#experience">Experience</a><a href="#contact">Contact</a></nav>
+</header>
 
-    <!-- Custom Cursor Glow -->
-    <div id="custom-cursor" class="custom-cursor"></div>
-    <div id="custom-cursor-glow" class="custom-cursor-glow"></div>
-
-    <!-- Sticky Navigation Bar -->
-    <header id="navbar">
-        <div class="nav-container">
-            <a href="#" class="nav-logo">
-                <img class="logo-white" src="./assets/logo-white.png" alt="Amit Sharma" width="129" height="80">
-                <img class="logo-black" src="./assets/logo-black.png" alt="Amit Sharma" width="127" height="80" style="display:none;">
-            </a>
-            
-            <nav class="nav-menu" id="nav-menu">
-                <a href="#hero" class="nav-link active">Home</a>
-                <a href="#portfolio" class="nav-link">Portfolio</a>
-                <a href="#about" class="nav-link">About Me</a>
-                <a href="#services" class="nav-link">Services</a>
-                <a href="./assets/Amit_Sharma_CV.pdf" download class="nav-cv-ring-btn" title="Download CV"><span>CV</span></a>
-                <a href="#contact" class="nav-link nav-cta">Contact</a>
-                <button class="theme-mode-toggle" id="theme-mode-toggle" title="Toggle light/dark mode" aria-label="Toggle light/dark mode">
-                    <i data-lucide="sun" class="sun-icon" style="width:16px;height:16px;"></i>
-                    <i data-lucide="moon" class="moon-icon" style="width:16px;height:16px;"></i>
-                </button>
-            </nav>
-            
-            <div class="mobile-header-ctas">
-                <button class="theme-mode-toggle" id="theme-mode-toggle-mobile" title="Toggle light/dark mode" aria-label="Toggle light/dark mode" style="width:32px;height:32px;margin-left:0;">
-                    <i data-lucide="sun" class="sun-icon" style="width:14px;height:14px;"></i>
-                    <i data-lucide="moon" class="moon-icon" style="width:14px;height:14px;"></i>
-                </button>
-                <a href="./assets/Amit_Sharma_CV.pdf" download class="nav-cv-ring-btn" title="Download CV">
-                    <span>CV</span>
-                </a>
-                <a href="https://wa.me/918866414870" target="_blank" rel="noopener noreferrer" class="mobile-header-cta-btn btn-wa-header" title="WhatsApp">
-                    <i data-lucide="message-circle" style="width: 14px; height: 14px;"></i>
-                    <span>WhatsApp</span>
-                </a>
-            </div>
-            
-            <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </button>
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-top">
+        <div>
+          <div class="badges">
+            <span class="role"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 5.6L19.5 9l-5.7 1.6L12 16l-1.8-5.4L4.5 9l5.7-1.4zM19 15l.9 2.6 2.6.9-2.6.9L19 22l-.9-2.6-2.6-.9 2.6-.9zM5 15l.7 1.8 1.8.7-1.8.7L5 20l-.7-1.8-1.8-.7 1.8-.7z"/></svg><span class="ai-grad" data-t="role"></span></span>
+            <span class="avail"><i></i><span data-t="available"></span></span>
+          </div>
+          <h1 data-t="name"></h1>
+          <p class="tags" data-t="tags"></p>
         </div>
-        <!-- Mobile Sticky Navigation Tabs -->
-        <div class="mobile-sections-tabs" id="mobile-sections-tabs">
-            <a href="#hero" class="mobile-nav-tab active" data-target="hero">Home</a>
-            <a href="#portfolio" class="mobile-nav-tab" data-target="portfolio">Portfolio</a>
-            <a href="#about" class="mobile-nav-tab" data-target="about">About Me</a>
-            <a href="#services" class="mobile-nav-tab" data-target="services">Services</a>
-            <a href="#contact" class="mobile-nav-tab" data-target="contact">Contact</a>
+        <div class="hero-cta">
+          <a target="_blank" rel="noopener" class="btn btn-wa" data-href="wa">WhatsApp</a>
+          <a target="_blank" rel="noopener" class="btn btn-ghost" data-href="cv">Download CV</a>
         </div>
-        <!-- Header Scroll Progress Bar (Premiere Pro Timeline Style) -->
-        <div class="header-scroll-progress-container" id="header-scroll-progress-container">
-            <div class="header-scroll-progress-ruler"></div>
-            <div class="header-scroll-progress-bar" id="header-scroll-progress-bar"></div>
+      </div>
+      <div class="reel" id="reel-box">
+        <video id="reel" muted autoplay loop playsinline preload="metadata"></video>
+        <div class="reel-bar">
+          <span class="chip-dark"><span class="ai-tag">AI</span><span id="reel-title"></span></span>
+          <button class="chip-dark" id="unmute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 5 6 9H2v6h4l5 4zM23 9l-6 6M17 9l6 6"/></svg><span>Sound</span></button>
         </div>
-    </header>
-
-    <!-- Main Content Container -->
-    <main>
-        
-        <!-- Hero Section -->
-        <section id="hero">
-            <!-- Animated Particle Background -->
-            <canvas id="hero-canvas"></canvas>
-            
-            <div class="hero-container container">
-                <div class="hero-content-split">
-                    <!-- Left: Text content -->
-                    <div class="hero-left">
-                        <div class="hero-badge">
-                            <span class="badge-dot"></span>
-                            <span class="badge-text">AVAILABLE FOR FULL-TIME WORK ONLY • SURAT &amp; REMOTE</span>
-                        </div>
-                        <h1 class="hero-title" id="hero-headline" style="line-height: 1.1; font-weight: 900; letter-spacing: -0.01em; margin-bottom: 0; margin-top: 15px; text-transform: uppercase;">
-                            AMIT SHARMA
-                        </h1>
-                        <div class="hero-title-underline"></div>
-                        <p class="hero-subheading" style="font-weight: 700; font-size: 1.15rem; color: var(--text-primary); margin: 18px 0 12px 0;">
-                            Senior Video Editor • AI Video &amp; Graphics Expert • YouTube Studio Manager
-                        </p>
-                        <p class="hero-tagline" style="font-size: 0.95rem; color: var(--text-secondary); margin: 12px 0 0 0; font-weight: 500;">
-                            Specialist in SaaS Explainers • MLM/Crypto Animations • AI Talking Head Videos
-                        </p>
-                    </div>
-                    
-                    <!-- Right: Stacked Buttons -->
-                    <div class="hero-right">
-                        <a href="#portfolio" class="btn btn-primary magnetic hero-cta-btn" id="hero-btn-portfolio">
-                            <span>View Portfolio</span>
-                            <i data-lucide="arrow-up-right"></i>
-                        </a>
-                        <a href="#contact" class="btn btn-secondary magnetic hero-cta-btn" id="hero-btn-contact">
-                            <span>Let's Connect</span>
-                            <i data-lucide="message-square"></i>
-                        </a>
-                        <a href="./assets/Amit_Sharma_CV.pdf" download class="btn btn-outline magnetic hero-cta-btn" id="hero-btn-cv" style="border-radius: 50px; padding: 12px 28px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); color: var(--text-primary); transition: all 0.3s;">
-                            <i data-lucide="download" style="width: 14px; height: 14px; color: var(--accent-cyan);"></i> <span>Download CV</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Featured Showreel Container (Embedded directly under hero text) -->
-                <div class="showreel-container">
-                    <div class="showreel-viewport" id="showreel-viewport">
-                        <div class="showreel-glow-backdrop"></div>
-                        
-                        <div class="showreel-frame" id="showreel-frame" style="cursor:pointer;">
-                            <div class="showreel-video-container" id="showreel-video-container" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;overflow:hidden;border-radius:16px;cursor:pointer;">
-                                <video id="hero-showcase-video" src="https://pub-069db4deb1444820b524ff7460ae854f.r2.dev/Amit%20Sharma%20(AI%20Avtar%20introduction).mp4" playsinline webkit-playsinline muted autoplay loop preload="auto" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;background:#000;cursor:pointer;"></video>
-                            </div>
-                            <img src="./assets/showreel_cover_compelling.png" alt="Showreel Video Cover" class="showreel-img" loading="eager" decoding="async">
-                            
-                            <!-- Showreel Edit Overlay -->
-                            <div class="showreel-edit-overlay">
-                                <button type="button" class="card-hud-btn btn-edit-hud" data-id="showreel" id="btn-edit-showreel">
-                                    <i data-lucide="edit-2"></i> Edit Showreel
-                                </button>
-                            </div>
-                            
-                            <!-- Audio visualizer simulation overlay -->
-                            <canvas id="waveform-canvas" class="waveform-canvas"></canvas>
-                            
-                            <div class="showreel-overlay" id="showreel-overlay" style="display:none !important;">
-                                <!-- Trigger Modal Video Player -->
-                                <button class="play-btn-circle magnetic" data-video-id="https://pub-069db4deb1444820b524ff7460ae854f.r2.dev/Amit%20Sharma%20(AI%20Avtar%20introduction).mp4" data-media-source="link" id="play-showreel-btn" aria-label="Play Showreel">
-                                    <div class="play-btn-pulse"></div>
-                                    <i data-lucide="play" class="play-btn-icon"></i>
-                                </button>
-                                <span class="play-btn-label">STREAM SHOWREEL</span>
-                            </div>
-                            
-                            <!-- Muted Preview Unmute Badge -->
-                            <div class="showreel-unmute-hint" id="showreel-unmute-hint" role="button" aria-label="Click to unmute video" style="display:none !important;">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:rgba(0,240,255,0.9)"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19" fill="currentColor" stroke="none"/><line x1="23" y1="9" x2="17" y2="15"/></svg>
-                                CLICK TO UNMUTE
-                            </div>
-                        </div>
-                    </div>
-                </div>
-        </section>
-
-        <!-- Dynamic Stats Strip -->
-        <section id="stats-strip" class="stats-strip-container redesign-only">
-            <div class="container">
-                <div class="stats-row">
-                    <div class="stat-item">
-                        <h3 class="stat-number">4+</h3>
-                        <p class="stat-label">YEARS EXPERIENCE</p>
-                    </div>
-                    <div class="stat-item">
-                        <h3 class="stat-number">500+</h3>
-                        <p class="stat-label">VIDEOS EDITED</p>
-                    </div>
-                    <div class="stat-item">
-                        <h3 class="stat-number">4+</h3>
-                        <p class="stat-label">CHANNELS MANAGED</p>
-                    </div>
-                    <div class="stat-item">
-                        <h3 class="stat-number">10+</h3>
-                        <p class="stat-label">AI TOOLS MASTERED</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Infinite Skills Marquee -->
-        <section id="skills-marquee-section">
-            <div class="marquee-container">
-                <div class="marquee-content">
-                    <div class="marquee-track">
-                        <span class="marquee-item"><span>VIDEO EDITING</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>MOTION GRAPHICS</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>AI TALKING HEADS</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>MLM &amp; CRYPTO EXPLAINERS</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>SOFTWARE DEMOS</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>YOUTUBE MANAGEMENT</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>GRAPHICS DESIGN</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>VIDEO EDITING</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>MOTION GRAPHICS</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>AI TALKING HEADS</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>MLM &amp; CRYPTO EXPLAINERS</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>SOFTWARE DEMOS</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>YOUTUBE MANAGEMENT</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>GRAPHICS DESIGN</span><span class="marquee-dot"></span></span>
-                    </div>
-                    <div class="marquee-track" aria-hidden="true">
-                        <span class="marquee-item"><span>VIDEO EDITING</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>MOTION GRAPHICS</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>AI TALKING HEADS</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>MLM &amp; CRYPTO EXPLAINERS</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>SOFTWARE DEMOS</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>YOUTUBE MANAGEMENT</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>GRAPHICS DESIGN</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>VIDEO EDITING</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>MOTION GRAPHICS</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>AI TALKING HEADS</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>MLM &amp; CRYPTO EXPLAINERS</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>SOFTWARE DEMOS</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>YOUTUBE MANAGEMENT</span><span class="marquee-dot"></span></span>
-                        <span class="marquee-item"><span>GRAPHICS DESIGN</span><span class="marquee-dot"></span></span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-
-        <!-- Dynamic Sections Wrapper for Reordering -->
-        <div id="dynamic-sections-container">
-        
-        <!-- Interactive Portfolio Showcase -->
-        <section id="portfolio" class="section">
-            <div class="container">
-                
-                <div class="section-header">
-                    <div class="section-badge">SELECTED ARCHIVES</div>
-                    <h2 class="section-title">Video Editing Showcase</h2>
-                    <p class="section-desc">A premium portfolio gallery displaying actual creations built for <strong>Code Elevator</strong>, <strong>MLM World</strong>, and <strong>Gujarat Career Academy</strong>, streaming directly from YouTube.</p>
-                </div>
-                
-                <!-- Category Filter -->
-                <div class="portfolio-filters" id="portfolio-filters">
-                    <button class="filter-btn active" data-filter="all">All Creations</button>
-                    <button class="filter-btn" data-filter="long">Landscape Videos</button>
-                    <button class="filter-btn" data-filter="shorts">Shorts &amp; Reels</button>
-                    <button class="filter-btn" data-filter="graphics">Graphics &amp; Design</button>
-                </div>
-                
-                <!-- Restructured Video Editing Showcase -->
-                <div id="portfolio-grids-container">
-                <!-- ==========================================
-                     LONG FORM VIDEOS SECTION (16:9 Landscape - 3 Columns)
-                     ========================================== -->
-                <div class="portfolio-grid grid-16-9" id="long-videos-grid"></div>
-                
-                <!-- ==========================================
-                     SHORTS & REELS SECTION (9:16 Portrait - 4 Columns)
-                     ========================================== -->
-                <div class="portfolio-grid grid-9-16" id="shorts-reels-grid"></div>
-
-                <!-- ==========================================
-                     GRAPHICS & DESIGN SECTION (4:3 Aspect - 4 Columns)
-                     ========================================== -->
-                <div class="portfolio-grid grid-graphics" id="graphics-grid">
-                    <!-- Loaded dynamically via app.js -->
-                </div>
-
-                </div> <!-- Close #portfolio-grids-container -->
-            </div>
-        </section>
-        
-        <!-- Services Section --> -->
-        <section id="services" class="section section-dark-bg">
-            <div class="container">
-                
-                <div class="section-header">
-                    <div class="section-badge">SERVICES DECK</div>
-                    <h2 class="section-title">Expert Offerings</h2>
-                    <p class="section-desc">Combining video production, animated motion graphics, and channel management to scale digital brands and YouTube ecosystems.</p>
-                </div>
-                
-                <div class="services-grid" id="services-grid-container">
-                    
-                    <!-- Card 1: Video Editing -->
-                    <div class="service-card" id="service-1">
-                        <div class="service-glow"></div>
-                        <div class="service-icon-box">
-                            <i data-lucide="video" class="service-icon"></i>
-                        </div>
-                        <h3 class="service-title">Video Editing</h3>
-                        <p class="service-text">High-retention commercial ads, software demos, and corporate videos with seamless pacing, sound mastering, and clean color grading.</p>
-                        <ul class="service-bullets">
-                            <li>Software Demos &amp; Walkthroughs</li>
-                            <li>Audio &amp; Voiceover Mastering</li>
-                            <li>Advanced Color Grading (Rec.709)</li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Card 2: Motion Graphics -->
-                    <div class="service-card" id="service-2">
-                        <div class="service-glow"></div>
-                        <div class="service-icon-box">
-                            <i data-lucide="sparkles" class="service-icon"></i>
-                        </div>
-                        <h3 class="service-title">Motion Graphics</h3>
-                        <p class="service-text">Interactive 2D animated explainers, compensation structure visualizations, kinetic typography, and premium branding assets.</p>
-                        <ul class="service-bullets">
-                            <li>2D Explainers &amp; Visualizers</li>
-                            <li>Kinetic Typography Promos</li>
-                            <li>Custom Vector Asset Design</li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Card 3: Graphic Design -->
-                    <div class="service-card" id="service-3">
-                        <div class="service-glow"></div>
-                        <div class="service-icon-box">
-                            <i data-lucide="palette" class="service-icon"></i>
-                        </div>
-                        <h3 class="service-title">Graphic Design</h3>
-                        <p class="service-text">Conversion-optimized social media banners, advertisement layouts, and digital branding assets designed to drive leads and sales.</p>
-                        <ul class="service-bullets">
-                            <li>High-CTR Marketing Ads</li>
-                            <li>Brand Identity Assets</li>
-                            <li>Social Media Campaign Visuals</li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Card 4: AI Content Production -->
-                    <div class="service-card" id="service-4">
-                        <div class="service-glow"></div>
-                        <div class="service-icon-box">
-                            <i data-lucide="cpu" class="service-icon"></i>
-                        </div>
-                        <h3 class="service-title">AI Content Production</h3>
-                        <p class="service-text">Integrating state-of-the-art AI video and audio generation tools to accelerate output speeds while maintaining premium visual quality.</p>
-                        <ul class="service-bullets">
-                            <li>AI Avatar Conversions</li>
-                            <li>Text-to-Video Pipelines</li>
-                            <li>Dynamic Voice Synthesis</li>
-                        </ul>
-                    </div>
-                    
-                </div>
-            </div>
-        </section>
-
-        <!-- Technical Toolkit & Statistics -->
-        <section id="expertise" class="section">
-            <div class="container">
-                <div class="expertise-grid">
-                    
-                    <!-- Left: Skills and Tools -->
-                    <div class="expertise-skills">
-                        <div class="section-badge">SOFTWARE TOOLKIT</div>
-                        <h2 class="section-title">Technical Proficiency</h2>
-                        <p class="section-desc">A professional workflow utilizing industry-standard creative programs, live streaming layouts, and state-of-the-art AI design pipelines.</p>
-                        
-                        <div class="software-grid" id="software-skills-grid">
-                            <div class="software-card">
-                                <i data-lucide="video" class="software-icon"></i>
-                                <h4 class="software-name">Adobe Premiere Pro</h4>
-                                <span class="software-tag">Video Editing</span>
-                            </div>
-                            <div class="software-card">
-                                <i data-lucide="sparkles" class="software-icon"></i>
-                                <h4 class="software-name">Adobe After Effects</h4>
-                                <span class="software-tag">Motion Graphics</span>
-                            </div>
-                            <div class="software-card">
-                                <i data-lucide="image" class="software-icon"></i>
-                                <h4 class="software-name">Photoshop &amp; Illustrator</h4>
-                                <span class="software-tag">Graphics Design</span>
-                            </div>
-                            <div class="software-card">
-                                <i data-lucide="cpu" class="software-icon"></i>
-                                <h4 class="software-name">HeyGen &amp; ElevenLabs</h4>
-                                <span class="software-tag">AI Video &amp; Voice</span>
-                            </div>
-                            <div class="software-card">
-                                <i data-lucide="radio" class="software-icon"></i>
-                                <h4 class="software-name">OBS Studio</h4>
-                                <span class="software-tag">Live Stream Setup</span>
-                            </div>
-                            <div class="software-card">
-                                <i data-lucide="pencil-ruler" class="software-icon"></i>
-                                <h4 class="software-name">CorelDraw &amp; Canva</h4>
-                                <span class="software-tag">Layout &amp; Branding</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>
-        </section>
-
-
-
-        <!-- About Me & CV Section -->
-        <section id="about" class="section">
-            <div class="container">
-                <div class="about-grid">
-                    
-                    <!-- Left: Bio & Editorial Content -->
-                    <div class="about-bio">
-                        <div class="section-badge">ABOUT AMIT</div>
-                        <h2 class="section-title">Amit Sharma</h2>
-                        <p class="bio-subtitle legacy-only">Senior Video Editor &amp; Motion Designer</p>
-                        <p class="bio-subtitle redesign-only" style="font-weight: 600; color: var(--accent-cyan); margin-bottom: 20px;">Senior Video Editor &amp; AI Video Expert • YouTube Studio Manager</p>
-                        
-                        <div class="bio-features-list legacy-only">
-                            <div class="bio-feature-item">
-                                <div class="bio-feature-icon-wrapper">
-                                    <i data-lucide="video" class="bio-feature-icon"></i>
-                                </div>
-                                <div class="bio-feature-divider"></div>
-                                <p class="bio-feature-text">Over 4 years of professional experience delivering end-to-end creative production, specializing in high-retention video editing, SaaS software demos, and interactive motion graphics.</p>
-                            </div>
-                            <div class="bio-feature-item">
-                                <div class="bio-feature-icon-wrapper">
-                                    <i data-lucide="cpu" class="bio-feature-icon"></i>
-                                </div>
-                                <div class="bio-feature-divider"></div>
-                                <p class="bio-feature-text">Pioneering AI-assisted workflows using Runway, Midjourney, HeyGen, and ElevenLabs to accelerate content output speed while maintaining premium creative design standards.</p>
-                            </div>
-                            <div class="bio-feature-item">
-                                <div class="bio-feature-icon-wrapper">
-                                    <i data-lucide="briefcase" class="bio-feature-icon"></i>
-                                </div>
-                                <div class="bio-feature-divider"></div>
-                                <p class="bio-feature-text">Partnering with marketing teams, digital brands, and international clients to construct scalable video pipelines that drive customer acquisition and user engagement.</p>
-                            </div>
-                        </div>
-
-                        <div class="bio-text-redesign redesign-only" style="margin-bottom: 25px;">
-                            <p style="font-size: 1.05rem; line-height: 1.6; margin-bottom: 15px; color: var(--text-primary);">Creative video editor and studio manager with 4+ years of expertise in motion graphics, AI video production, and high-converting digital content — built for SaaS, MLM, and crypto platforms.</p>
-                            <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-primary);">Engineering background gives a unique edge in technical explainer videos — turning complex software and blockchain concepts into visuals audiences actually understand and act on.</p>
-                        </div>
-                        
-                        <!-- Education Subcard -->
-                        <div class="education-box legacy-only">
-                            <h4 class="edu-title"><i data-lucide="graduation-cap" class="edu-icon"></i> Education Background</h4>
-                            <div class="edu-list" id="edu-list-container">
-                                <div class="edu-item">
-                                    <span class="edu-deg">Bachelor of Engineering in Mechanical</span>
-                                    <span class="edu-loc">C.K. Pithawala College of Engineering &amp; Technology, Surat (GTU)</span>
-                                    <span class="edu-meta">2012 - 2015 • CGPA: 7.50</span>
-                                </div>
-                                <div class="edu-item">
-                                    <span class="edu-deg">Diploma in Mechanical Engineering</span>
-                                    <span class="edu-loc">Government Polytechnic, Valsad (GTU)</span>
-                                    <span class="edu-meta">2009 - 2012 • CGPA: 8.47</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Footnote Education for Redesign -->
-                        <div class="about-footnote-wrapper redesign-only" style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 15px;">
-                            <p class="about-footnote" style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;"><i data-lucide="graduation-cap" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 4px; color: var(--accent-cyan);"></i> B.E. Mechanical Engineering — C.K. Pithawala College, Surat (GTU) • 2012–2015</p>
-                        </div>
-
-                        <!-- Download CV Button in About Section -->
-                        <div class="about-actions redesign-only" style="margin-top: 20px;">
-                            <a href="./assets/Amit_Sharma_CV.pdf" download class="btn btn-primary magnetic" style="border-radius: 50px; padding: 12px 28px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--accent-cyan); box-shadow: none !important;">
-                                <i data-lucide="download" style="width: 14px; height: 14px; color: #ffffff;"></i> <span style="color: #ffffff;">Download CV</span>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <!-- Right: Vertical Timeline -->
-                    <div class="about-timeline" id="experience">
-                        <div class="timeline-title">Career Milestones</div>
-                        
-                        <div class="timeline-container" id="timeline-events-container">
-                            <div class="timeline-line"></div>
-                            
-                            <!-- Timeline Event 1 -->
-                            <div class="timeline-event" id="timeline-event-1">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-card-wrapper">
-                                    <span class="timeline-year">Nov 2025 - Present</span>
-                                    <h4 class="timeline-headline">Senior Video Editor &amp; Motion Designer</h4>
-                                    <span class="timeline-org">Code Elevator, Surat</span>
-                                    <p class="timeline-desc">Produce high-converting promotional videos and SaaS software explainers. Coordinated with marketing teams to build automated talking-head AI avatar workflows, decreasing video production turnaround times by 40%.</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Timeline Event 2 -->
-                            <div class="timeline-event" id="timeline-event-2">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-card-wrapper">
-                                    <span class="timeline-year">Sep 2025 - Nov 2025</span>
-                                    <h4 class="timeline-headline">Digital Studio Manager &amp; Video Editor</h4>
-                                    <span class="timeline-org">Gujarat Career Academy, Surat</span>
-                                    <p class="timeline-desc">Managed complete video production cycle for digital ad campaigns. Designed high-CTR YouTube thumbnails, motion graphics sequences, and social media reels that increased click-through rates by 25%.</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Timeline Event 3 -->
-                            <div class="timeline-event" id="timeline-event-3">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-card-wrapper">
-                                    <span class="timeline-year">Aug 2022 - Jul 2025</span>
-                                    <h4 class="timeline-headline">Lead Video Editor &amp; Content Strategist</h4>
-                                    <span class="timeline-org">Yuva Upnishad Foundation Online, Surat</span>
-                                    <p class="timeline-desc">Supervised a content team of writers and designers to publish educational video libraries. Coordinated studio recording operations, live broadcasts, and audio mastering pipelines.</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Timeline Event 4 -->
-                            <div class="timeline-event" id="timeline-event-4">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-card-wrapper">
-                                    <span class="timeline-year">Feb 2020 - Aug 2022</span>
-                                    <h4 class="timeline-headline">Digital Content &amp; Graphic Designer</h4>
-                                    <span class="timeline-org">Yuva Upnishad Publication, Surat</span>
-                                    <p class="timeline-desc">Designed publication layouts, marketing banners, and visual assets. Coordinated printing production cycles and optimized layout review pipelines.</p>
-                                </div>
-                            </div>
-                            
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>
-        </section>
-
-        <!-- Futuristic Contact Section -->
-        <section id="contact" class="section section-dark-bg">
-            <div class="container">
-                <div class="contact-grid">
-                    
-                    <!-- Left: Contact Details and Instant Booking -->
-                    <div class="contact-details-box">
-                        <div class="section-badge">INQUIRIES</div>
-                        <h2 class="section-title">Let's Work Together</h2>
-                        <p class="section-desc">Discuss a video project, animated explainer sequence, or request assistance managing your studio setup.</p>
-                        
-                        <div class="contact-info-list">
-                            <!-- Email -->
-                            <div class="info-item">
-                                <div class="info-icon"><i data-lucide="mail"></i></div>
-                                <div class="info-meta">
-                                    <span class="info-label">EMAIL DIRECT</span>
-                                    <a href="mailto:amits1417@gmail.com" class="info-value">amits1417@gmail.com</a>
-                                </div>
-                            </div>
-                            
-                            <!-- Phone -->
-                            <div class="info-item">
-                                <div class="info-icon"><i data-lucide="phone"></i></div>
-                                <div class="info-meta">
-                                    <span class="info-label">PHONE DIRECT</span>
-                                    <a href="tel:+918866414870" class="info-value">+91 88664 14870</a>
-                                </div>
-                            </div>
-                            
-                            <!-- Location -->
-                            <div class="info-item">
-                                <div class="info-icon"><i data-lucide="map-pin"></i></div>
-                                <div class="info-meta">
-                                    <span class="info-label">LOCATION</span>
-                                    <span class="info-value">Udhna, Surat, Gujarat, India</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="quick-ctas">
-                            <!-- WhatsApp CTA -->
-                            <a href="https://wa.me/918866414870?text=Hi%20Amit,%20I%20visited%20your%20portfolio%20website%20and%20would%20like%20to%20discuss%20work-related%20projects." target="_blank" rel="noopener noreferrer" class="btn btn-secondary quick-btn magnetic" id="whatsapp-cta">
-                                <i data-lucide="message-square"></i>
-                                <span>WhatsApp Direct chat</span>
-                            </a>
-                         </div>
-                    </div>
-                    
-                    <!-- Right: Futuristic Booking Form -->
-                    <div class="contact-form-box">
-                        <div class="form-glow"></div>
-                        <h3 class="form-title">Send a Message</h3>
-                        <p class="redesign-only" style="font-size: 0.8rem; color: var(--accent-cyan); margin-bottom: 20px; font-weight: 600;"><span class="badge-dot" style="display: inline-block; background-color: var(--accent-cyan); width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; box-shadow: 0 0 8px var(--accent-cyan);"></span>Available for Projects — Surat & Remote</p>
-                        
-                        <form id="project-brief-form" onsubmit="return false;">
-                            
-                            <!-- Name -->
-                            <div class="form-group">
-                                <input type="text" id="form-name" class="form-input" placeholder=" " required>
-                                <label for="form-name" class="form-label">Full Name</label>
-                                <span class="input-line"></span>
-                            </div>
-                            
-                            <!-- Email -->
-                            <div class="form-group">
-                                <input type="email" id="form-email" class="form-input" placeholder=" " required>
-                                <label for="form-email" class="form-label">Email Address</label>
-                                <span class="input-line"></span>
-                            </div>
-                            
-                            <!-- Company Name -->
-                            <div class="form-group">
-                                <input type="text" id="form-company" class="form-input" placeholder=" " required>
-                                <label for="form-company" class="form-label">Company Name</label>
-                                <span class="input-line"></span>
-                            </div>
-                            
-                            <!-- Budget Slider (visible in legacy version) -->
-                            <div class="slider-group legacy-only">
-                                <div class="slider-header">
-                                    <span class="slider-label">Estimated Budget</span>
-                                    <span class="slider-value" id="budget-value">₹50,000</span>
-                                </div>
-                                <input type="range" id="form-budget" class="form-range" min="10000" max="150000" step="5000" value="50000">
-                                <div class="slider-range-labels">
-                                    <span>₹10,000</span>
-                                    <span>₹1,50,000+</span>
-                                </div>
-                            </div>
-                            
-                            <!-- Message -->
-                            <div class="form-group">
-                                <textarea id="form-message" class="form-input form-textarea" placeholder=" " required>Hi Amit, I looked at your portfolio and would like to discuss more.</textarea>
-                                <label for="form-message" class="form-label">Message</label>
-                                <span class="input-line"></span>
-                            </div>
-                            
-                            <!-- Form Actions Group -->
-                            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
-                                <button type="submit" class="btn btn-primary form-submit-btn magnetic" id="form-submit-btn" style="width: 100%; justify-content: center; margin: 0;">
-                                    <span>Email Me</span>
-                                    <i data-lucide="send" class="submit-icon"></i>
-                                </button>
-                                <div style="display: flex; gap: 10px; width: 100%;">
-                                    <a href="./assets/Amit_Sharma_CV.pdf" download class="btn btn-secondary magnetic" style="flex: 1; text-align: center; justify-content: center; font-size: 0.85rem; padding: 12px; margin: 0; display: flex; align-items: center; gap: 6px;">
-                                        <i data-lucide="download" style="width: 16px; height: 16px;"></i>
-                                        <span>Download CV</span>
-                                    </a>
-                                    <a href="https://wa.me/918866414870?text=Hi%20Amit,%20I%20visited%20your%20portfolio%20website%20and%20would%20like%20to%20discuss%20work-related%20projects." target="_blank" rel="noopener noreferrer" class="btn btn-secondary magnetic" style="flex: 1; text-align: center; justify-content: center; font-size: 0.85rem; padding: 12px; margin: 0; display: flex; align-items: center; gap: 6px; background: rgba(37, 211, 102, 0.05); border-color: rgba(37, 211, 102, 0.2);">
-                                        <i data-lucide="message-square" style="width: 16px; height: 16px; color: #25D366;"></i>
-                                        <span>WhatsApp</span>
-                                    </a>
-                                </div>
-                            </div>
-                            
-                        </form>
-                        
-                        <!-- Success Message Panel -->
-                        <div id="form-success-panel" class="form-success-panel">
-                            <i data-lucide="shield-check" class="success-icon"></i>
-                            <h4>Message Sent!</h4>
-                            <p>Thank you for reaching out. I will reply within 12 hours.</p>
-                            <button class="btn btn-secondary btn-small" id="reset-form-btn">New Message</button>
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>
-        </section>
-        </div>
-        
-    </main>
-
-    <!-- Video Modal Player overlay -->
-    <div id="video-modal" class="video-modal-overlay">
-        <!-- Navigation Buttons for Lightbox -->
-        <button class="lightbox-nav-btn prev-btn" id="lightbox-prev-btn" aria-label="Previous Graphic" style="display: none;">
-            <i data-lucide="chevron-left"></i>
-        </button>
-        <button class="lightbox-nav-btn next-btn" id="lightbox-next-btn" aria-label="Next Graphic" style="display: none;">
-            <i data-lucide="chevron-right"></i>
-        </button>
-
-        <div class="video-modal-container">
-            <button class="video-modal-close" id="video-modal-close-btn" aria-label="Close Video Player">
-                <i data-lucide="x"></i>
-            </button>
-            <div class="video-modal-iframe-wrapper">
-                <iframe id="video-modal-iframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-        </div>
-        
-        <!-- Bottom Gallery Thumbnail Strip -->
-        <div class="lightbox-gallery-strip" id="lightbox-gallery-strip"></div>
+      </div>
+      <div class="stats" id="stats"></div>
     </div>
+  </section>
 
-    <!-- Footer Section -->
-    <footer>
-        <div class="container footer-container">
-            <div class="footer-top">
-                <a href="#" class="footer-logo">
-                    <img class="logo-white" src="./assets/logo-white.png" alt="Amit Sharma" width="129" height="80">
-                    <img class="logo-black" src="./assets/logo-black.png" alt="Amit Sharma" width="127" height="80" style="display:none;">
-                </a>
-                
-                <div class="footer-socials">
-                    <a href="https://wa.me/918866414870" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="WhatsApp Direct Chat">
-                        <i data-lucide="message-square"></i>
-                    </a>
-                    <a href="mailto:amits1417@gmail.com" class="social-link" aria-label="Email Address">
-                        <i data-lucide="mail"></i>
-                    </a>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p class="copyright legacy-only">&copy; 2026 Amit Sharma Visuals. All Rights Reserved. <a href="?edit" onclick="if(window.triggerCMSUnlock){window.triggerCMSUnlock();return false;}" style="color: rgba(255,255,255,0.2); text-decoration: none; margin-left: 10px; font-size: 0.72rem;">[ ⚡ CMS Edit ]</a></p>
-                <p class="copyright redesign-only">&copy; 2026 Amit Sharma Visuals. All Rights Reserved. <a href="?edit" onclick="if(window.triggerCMSUnlock){window.triggerCMSUnlock();return false;}" style="color: rgba(255,255,255,0.2); text-decoration: none; margin-left: 10px; font-size: 0.72rem;">[ ⚡ CMS Edit ]</a></p>
-                <a href="#hero" class="back-to-top magnetic" id="back-to-top" aria-label="Back to Top">
-                    <span class="back-text">BACK TO TOP</span>
-                    <i data-lucide="arrow-up" class="back-icon"></i>
-                </a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Studio Creator Mode Toggle HUD -->
-    <div class="studio-hud-toggle" id="studio-hud-toggle">
-        <div class="studio-hud-glow"></div>
-        <button class="studio-toggle-btn" id="studio-toggle-btn">
-            <i data-lucide="settings" class="studio-icon"></i>
-            <span class="studio-btn-text">STUDIO CREATOR MODE</span>
-        </button>
-        <button class="studio-toggle-btn btn-danger" id="studio-bulk-delete-btn" style="display: none; background: #ea4335 !important; border-color: #ea4335 !important; color: #fff !important; box-shadow: 0 10px 30px rgba(234, 67, 53, 0.3);">
-            <i data-lucide="trash-2" class="studio-icon"></i>
-            <span class="studio-btn-text">DELETE SELECTED</span>
-        </button>
+  <section id="work" style="padding-top:28px">
+    <div class="wrap">
+      <div class="block" id="b-long">
+        <div class="sh"><h2>Landscape videos</h2><span class="count" id="c-long"></span><span class="hint swipe">Swipe →</span></div>
+        <div class="rail grid-long" id="g-long"></div>
+      </div>
+      <div class="block" id="b-shorts">
+        <div class="sh"><h2>Shorts &amp; reels</h2><span class="count" id="c-shorts"></span><span class="hint swipe">Swipe →</span></div>
+        <div class="rail grid-v" id="g-shorts"></div>
+      </div>
+      <div class="block" id="b-graphics">
+        <div class="sh"><h2>Graphics</h2><span class="count" id="c-graphics"></span></div>
+        <div class="gfx" id="g-graphics"></div>
+        <div class="more"><button class="btn btn-ghost" id="more"></button></div>
+      </div>
     </div>
+  </section>
 
-    <!-- Password Prompt Modal (Glassmorphic) -->
-    <div id="password-lock-modal" class="project-editor-modal-overlay">
-        <div class="project-modal-container" style="max-width: 400px; padding: 25px;">
-            <div class="project-modal-header" style="margin-bottom: 15px; padding-bottom: 10px;">
-                <h3>CMS Access Authorization</h3>
-                <button class="project-modal-close" id="password-modal-close-btn" aria-label="Close Modal">
-                    <i data-lucide="x"></i>
-                </button>
-            </div>
-            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 20px;">Please enter your Studio password to enable Creator editing controls.</p>
-            <form id="password-lock-form" onsubmit="return false;">
-                <div class="modal-form-group" style="margin-bottom: 15px;">
-                    <label for="lock-password-input">Studio Password</label>
-                    <input type="password" id="lock-password-input" required placeholder="Enter studio password" style="width: 100%;">
-                </div>
-                <div class="modal-actions" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.05);">
-                    <button type="submit" class="btn btn-primary" id="password-submit-btn" style="width: 100%; padding: 12px;">
-                        <span>Authorize Access</span>
-                        <i data-lucide="shield-alert"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
+  <section id="skills" class="skills">
+    <div class="wrap">
+      <div class="sh"><h2>Skills &amp; software</h2></div>
+      <div class="sk-grid" id="sk-grid"></div>
     </div>
+  </section>
 
-    <!-- Project Editor Modal (Glassmorphic) -->
-    <div id="project-editor-modal" class="project-editor-modal-overlay">
-        <div class="project-modal-container">
-            <div class="project-modal-header">
-                <h3 id="modal-title-text">Add New Project</h3>
-                <button class="project-modal-close" id="project-modal-close-btn" aria-label="Close Modal">
-                    <i data-lucide="x"></i>
-                </button>
-            </div>
-            <form id="project-modal-form" onsubmit="return false;">
-                <input type="hidden" id="edit-project-id" value="">
-                <input type="hidden" id="modal-project-category" value="long">
-                
-                <div class="form-group-row">
-                    <div class="modal-form-group" id="modal-title-group">
-                        <label for="modal-project-title">Project Title</label>
-                        <input type="text" id="modal-project-title" placeholder="Leave empty to auto-fetch from YouTube">
-                    </div>
-                </div>
-
-                <div class="form-group-row border-top">
-                    <div class="modal-form-group">
-                        <label for="modal-media-source">Media Stream Source</label>
-                        <select id="modal-media-source">
-                            <option value="link">External URL (YouTube / Wistia / Streamable / Embed)</option>
-                            <option value="upload">Upload File (Video / Image)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="modal-form-group" id="media-link-container">
-                        <label for="modal-media-link">YouTube / Wistia / Streamable Link or Embed Code</label>
-                        <input type="text" id="modal-media-link" placeholder="e.g. YouTube, Wistia (fast.wistia.net/...), Streamable, or Embed code">
-                    </div>
-                    
-                    <div class="modal-form-group hidden" id="media-upload-container">
-                        <label for="modal-media-file" class="file-upload-label">
-                            <i data-lucide="upload-cloud"></i> Choose Media File
-                        </label>
-                        <input type="file" id="modal-media-file" class="file-upload-input" accept="video/*,image/*">
-                        <span id="media-file-status" class="file-status-text">No file chosen</span>
-                    </div>
-                </div>
-
-                <div class="form-group-row">
-                    <div class="modal-form-group">
-                        <label for="modal-thumb-source">Thumbnail Source</label>
-                        <select id="modal-thumb-source">
-                            <option value="auto">Auto-detect (YouTube / Wistia / Streamable) / Link</option>
-                            <option value="upload">Upload Custom Image</option>
-                            <option value="timeline">Select from Video Timeline</option>
-                        </select>
-                    </div>
-                    
-                    <div class="modal-form-group" id="thumb-link-container">
-                        <label for="modal-thumb-link">Thumbnail Image URL</label>
-                        <input type="text" id="modal-thumb-link" placeholder="e.g. https://img.youtube.com/vi/... or Streamable thumb URL">
-                    </div>
-                    
-                    <div class="modal-form-group hidden" id="thumb-upload-container">
-                        <label for="modal-thumb-file" class="file-upload-label">
-                            <i data-lucide="image"></i> Choose Thumbnail Image
-                        </label>
-                        <input type="file" id="modal-thumb-file" class="file-upload-input" accept="image/*">
-                        <span id="thumb-file-status" class="file-status-text">No file chosen</span>
-                    </div>
-                    
-                    <div class="modal-form-group hidden" id="thumb-timeline-container" style="grid-column: span 2; width: 100%;">
-                        <label>Select Thumbnail from Video Timeline</label>
-                        <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 8px;">Load a local uploaded video above, then drag the slider to capture the exact frame.</p>
-                        <div style="display: flex; gap: 15px; align-items: center; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 4px; border: 1px solid var(--border-color);">
-                            <div style="width: 120px; height: 68px; background: #000; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;">
-                                <video id="timeline-picker-video" style="width: 100%; height: 100%; object-fit: cover;" muted></video>
-                                <img id="timeline-picker-youtube-img" style="width: 100%; height: 100%; object-fit: cover; display: none;" alt="YouTube Thumbnail Preview">
-                                <span id="timeline-picker-error" style="position: absolute; font-size: 0.6rem; color: #ff3333; text-align: center; display: none;">No Video Loaded</span>
-                            </div>
-                            <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
-                                <input type="range" id="timeline-picker-range" min="0" max="100" value="0" style="width: 100%; accent-color: var(--accent-cyan); cursor: pointer;">
-                                <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-muted);">
-                                    <span id="timeline-picker-time">0:00</span>
-                                    <div style="display: flex; gap: 6px;">
-                                        <button type="button" id="btn-fetch-wistia-thumb" class="console-btn" style="padding: 4px 10px; font-size: 0.7rem; margin: 0; display: none; align-items: center; gap: 4px; background: var(--accent-purple, #9b59b6); color: white;">
-                                            <i data-lucide="image" style="width: 12px; height: 12px;"></i> Fetch Wistia Frame
-                                        </button>
-                                        <button type="button" id="btn-capture-frame" class="console-btn btn-primary" style="padding: 4px 10px; font-size: 0.7rem; margin: 0; display: inline-flex; align-items: center; gap: 4px;">
-                                            <i data-lucide="camera" style="width: 12px; height: 12px;"></i> Capture Frame
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="modal-upload-progress-container" class="upload-progress-container hidden">
-                    <div class="progress-bar-label">Uploading: <span id="upload-percent-text">0%</span></div>
-                    <div class="modal-progress-bg">
-                        <div id="modal-upload-progress-bar" class="modal-upload-progress-bar"></div>
-                    </div>
-                </div>
-
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary modal-cancel-btn" id="modal-cancel-btn">Cancel</button>
-                    <button type="submit" class="btn btn-primary modal-save-btn" id="modal-save-btn">
-                        <span>Save Project</span>
-                        <i data-lucide="check"></i>
-                    </button>
-                </div>
-            </form>
+  <section id="experience">
+    <div class="wrap exp-grid">
+      <div>
+        <div class="sh"><h2>Experience</h2></div>
+        <ol class="xp" id="xp"></ol>
+        <p class="edu" data-t="education"></p>
+        <a class="btn btn-primary about-cta" target="_blank" rel="noopener" data-href="cv">Download CV
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></a>
+      </div>
+      <div id="contact" style="scroll-margin-top:calc(var(--hdr) + 8px)">
+        <div class="sh contact-h"><h2>Let's work together</h2></div>
+        <div class="ways">
+          <a class="way wa" target="_blank" rel="noopener" data-href="wa">
+            <span class="wi"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.4.6-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.6 2 1.1 1 2 1.3 2.3 1.4.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg></span>
+            <div><small>WhatsApp</small><b data-t="phone"></b></div><span class="arr">→</span></a>
+          <a class="way" data-href="mail">
+            <span class="wi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg></span>
+            <div><small>Email</small><b data-t="email"></b></div><span class="arr">→</span></a>
+          <a class="way" data-href="tel">
+            <span class="wi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span>
+            <div><small>Call</small><b data-t="phone"></b></div><span class="arr">→</span></a>
         </div>
+      </div>
     </div>
+  </section>
+</main>
 
-    <!-- Floating Vertical Scroll Spy Side Navigation -->
-    <nav class="side-scroll-spy" id="side-scroll-spy">
-        <ul>
-            <li><a href="#hero" class="spy-link active" data-target="hero"><span class="spy-dot-container"><span class="spy-dot"></span></span><span class="spy-label">Home</span></a></li>
-            <li><a href="#portfolio" class="spy-link" data-target="portfolio"><span class="spy-dot-container"><span class="spy-dot"></span></span><span class="spy-label">Showcase</span></a></li>
-            <li><a href="#about" class="spy-link" data-target="about"><span class="spy-dot-container"><span class="spy-dot"></span></span><span class="spy-label">About &amp; CV</span></a></li>
-            <li><a href="#expertise" class="spy-link" data-target="expertise"><span class="spy-dot-container"><span class="spy-dot"></span></span><span class="spy-label">Toolkit</span></a></li>
-            <li><a href="#services" class="spy-link" data-target="services"><span class="spy-dot-container"><span class="spy-dot"></span></span><span class="spy-label">Services</span></a></li>
-            <li><a href="#testimonials" class="spy-link" data-target="testimonials"><span class="spy-dot-container"><span class="spy-dot"></span></span><span class="spy-label">Reviews</span></a></li>
-            <li><a href="#contact" class="spy-link" data-target="contact"><span class="spy-dot-container"><span class="spy-dot"></span></span><span class="spy-label">Contact</span></a></li>
-        </ul>
-    </nav>
+<footer>
+  <div class="wrap">
+    <p class="ai-note" id="ai-note"><span class="ai-tag">AI</span>This label means AI tools were used to make that video.</p>
+    <div class="foot"><span id="copy"></span><a href="#">Back to top ↑</a></div>
+  </div>
+</footer>
 
-    <!-- Studio Console Drawer / Local CMS Admin -->
-    <div id="studio-console-drawer" class="studio-console-drawer">
-        <div class="console-drawer-header" id="console-drawer-trigger" title="Click anywhere on this bar to Minimize or Expand the CMS Panel">
-            <div class="console-drawer-title" style="display: flex; align-items: center; gap: 10px;">
-                <span class="console-dot-green"></span>
-                <span>STUDIO DEVELOPER HUB / LOCAL CMS</span>
-                <div id="cms-cloud-sync-status" class="cms-sync-status-badge synced" style="font-size: 0.62rem; padding: 2px 7px; border-radius: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; border: 1px solid rgba(16, 185, 129, 0.2); background: rgba(16, 185, 129, 0.1); color: #10b981; transition: all 0.3s ease;">
-                    <span class="sync-status-dot" style="width: 5px; height: 5px; border-radius: 50%; display: inline-block; background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
-                    <span class="sync-status-text">Saved</span>
-                </div>
-            </div>
-            <div class="console-drawer-arrow">
-                <i data-lucide="chevron-up" id="console-drawer-arrow-icon"></i>
-            </div>
-        </div>
-        <div class="console-drawer-content">
-            <p class="console-drawer-desc">Direct database administration. All updates sync immediately to client local storage.</p>
-            <div class="console-columns-grid">
-                <!-- Column 1: DB Tools -->
-                <div class="console-column">
-                    <h4 class="console-col-title">Showcase Data Tools</h4>
-                    <div class="console-actions-grid">
-                        <button class="console-btn btn-danger" id="console-reset-btn">
-                            <i data-lucide="rotate-ccw"></i>
-                            <span>Reset Default Showcase</span>
-                        </button>
-                        <button class="console-btn btn-primary" id="console-export-btn">
-                            <i data-lucide="download"></i>
-                            <span>Export JSON Database</span>
-                        </button>
-                        <div class="console-import-wrapper">
-                            <label for="console-import-file" class="console-btn btn-secondary">
-                                <i data-lucide="upload"></i>
-                                <span>Import JSON Database</span>
-                            </label>
-                            <input type="file" id="console-import-file" accept=".json" class="hidden">
-                        </div>
-                    </div>
-                    <!-- Text editing is always active in CMS mode -->
-                    <!-- Firebase Cloud Sync Controls -->
-                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 8px;">
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <label for="console-firebase-url" style="font-size: 0.55rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Firebase DB URL</label>
-                            <input type="text" id="console-firebase-url" placeholder="https://your-project-default-rtdb.firebaseio.com" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: #fff; padding: 6px; border-radius: 4px; font-size: 0.75rem; outline: none; width: 100%;">
-                        </div>
-                        <button type="button" class="console-btn btn-success" id="console-firebase-sync-btn" style="padding: 8px; width: 100%; margin: 0; background: var(--accent-cyan); color: var(--bg-primary); font-weight: 700; border: none; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 4px; cursor: pointer;">
-                            <i data-lucide="cloud-lightning"></i>
-                            <span>Sync to Cloud</span>
-                        </button>
-                    </div>
-                </div>
+<dialog id="lb" aria-label="Media viewer">
+  <div class="lb">
+    <button class="lb-x" id="lb-x" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <button class="lb-nav lb-prev" id="lb-prev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button>
+    <div class="lb-stage"><div class="lb-media" id="lb-media"></div><div class="lb-cap" id="lb-cap"></div></div>
+    <button class="lb-nav lb-next" id="lb-next" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
+  </div>
+</dialog>
 
-                <!-- Column 2: Studio Security Password -->
-                <div class="console-column">
-                    <h4 class="console-col-title">Studio Password Lock</h4>
-                    <form id="console-password-form" onsubmit="return false;" style="display: flex; flex-direction: column; gap: 8px;">
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <label for="console-pass-current" style="font-size: 0.55rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Current Password</label>
-                            <input type="password" id="console-pass-current" required placeholder="Current password" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: #fff; padding: 6px; border-radius: 4px; font-size: 0.75rem; outline: none;">
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <label for="console-pass-new" style="font-size: 0.55rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">New Password</label>
-                            <input type="password" id="console-pass-new" required placeholder="New password" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: #fff; padding: 6px; border-radius: 4px; font-size: 0.75rem; outline: none;">
-                        </div>
-                        <button type="submit" class="console-btn btn-primary" id="change-pass-submit" style="padding: 8px; margin-top: 4px; width: 100%;">
-                            <i data-lucide="key"></i> Save Password
-                        </button>
-                    </form>
-                </div>
+<script src="config.js"></script>
+<script src="data.js"></script>
+<script>
+const CFG = window.SITE_CONFIG, $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ICONS = {
+  ai:'<rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 9h6v6H9zM9 1v4M15 1v4M9 19v4M15 19v4M1 9h4M1 15h4M19 9h4M19 15h4"/>',
+  video:'<rect x="2" y="6" width="14" height="12" rx="2"/><path d="m16 10 6-3v10l-6-3"/>',
+  palette:'<circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2a10 10 0 0 0 0 20c1 0 1.7-.8 1.7-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.8-1.7 1.7-1.7h2A5.6 5.6 0 0 0 22 10.6C22 5.8 17.5 2 12 2z"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M1 12h3M20 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>'
+};
+const PLAY = '<span class="badge-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg></span>';
 
+// "yt:ID" | "media:ID" | URL/path (.mp4/.webm/.mov = video, else image)
+function kind(src = ""){
+  if (src.startsWith("yt:")) return {t:"yt", id:src.slice(3)};
+  if (src.startsWith("media:")) return {t:"media", id:src.slice(6)};
+  if (/\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(src)) return {t:"video", url:src};
+  return {t:"img", url:src};
+}
+// images uploaded from the admin live in Firebase as data URLs; fetch each one only when needed
+const mediaCache = {};
+function mediaUrl(id){
+  if (!mediaCache[id]) mediaCache[id] = fetch(`${CFG.dbUrl}/${CFG.mediaNode}/${encodeURIComponent(id)}.json`).then(r => r.json()).catch(() => "");
+  return mediaCache[id];
+}
 
+let D;            // current data
+let lists = {};   // visible items per category
+const STEP = matchMedia("(min-width:760px)").matches ? 20 : 12;
+let shown = 0;
 
-                <!-- Column 9: Graphics Batch Upload -->
-                <div class="console-column">
-                    <h4 class="console-col-title">Graphics Batch Upload</h4>
-                    <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 8px; line-height: 1.3;">Select and upload multiple graphic creation images instantly at once.</p>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label for="console-batch-graphics-file" class="console-btn btn-secondary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; padding: 10px;">
-                            <i data-lucide="images"></i> Select Multiple Images
-                        </label>
-                        <input type="file" id="console-batch-graphics-file" multiple accept="image/*" class="hidden">
-                        <div id="console-batch-status" style="font-size: 0.65rem; color: var(--accent-cyan); text-align: center; font-weight: 600;"></div>
-                        
-                        <!-- Batch progress bar container -->
-                        <div id="console-batch-progress-container" class="upload-progress-container hidden" style="margin-top: 4px; padding: 5px 0;">
-                            <div class="progress-bar-label" style="font-size: 0.65rem; margin-bottom: 4px; color: var(--text-muted); display: flex; justify-content: space-between;">
-                                <span>Processing Files</span>
-                                <span id="console-batch-percent-text">0%</span>
-                            </div>
-                            <div class="modal-progress-bg" style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden;">
-                                <div id="console-batch-progress-bar" class="modal-upload-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple)); transition: width 0.15s ease;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="console-drawer-footer" style="padding: 10px 18px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: center;">
-            <button type="button" id="btn-minimize-cms" class="cms-minimize-pill-btn" title="Minimize / Expand CMS Panel" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #fff; border-radius: 6px; padding: 6px 14px; font-size: 0.7rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; pointer-events: auto; transition: all 0.2s ease;">
-                <i data-lucide="chevron-down" id="cms-minimize-icon" style="width: 14px; height: 14px;"></i>
-                <span id="cms-minimize-text">Minimize Panel</span>
-            </button>
-        </div>
-    </div>
+function cardHTML(cat, it, i){
+  const k = kind(it.src), ai = it.ai ? '<span class="ai-tag">AI</span>' : "";
+  let m;
+  if (k.t === "yt") m = `<img src="https://i.ytimg.com/vi/${esc(k.id)}/hqdefault.jpg" alt="" loading="lazy" decoding="async">`;
+  else if (k.t === "video") m = `<video class="pv" data-src="${esc(k.url)}" muted loop playsinline preload="none"></video>`;
+  else if (k.t === "media") m = `<img data-media="${esc(k.id)}" alt="">`;
+  else m = `<img src="${esc(k.url)}" alt="" loading="lazy" decoding="async">`;
+  const style = cat === "graphics" ? ` style="--ar:1/${+it.r || 1}"` : "";
+  const label = cat === "graphics" ? `Graphic ${i+1}` : `Play video ${i+1}`;
+  return `<button class="card" data-cat="${cat}" data-i="${i}" aria-label="${label}"><div class="thumb"${style}>${m}${ai}${cat !== "graphics" ? PLAY : ""}</div></button>`;
+}
 
-    <!-- Full-Screen Graphics Gallery Modal -->
-    <div id="graphics-gallery-modal" class="project-editor-modal-overlay" style="z-index: 10000; overflow-y: auto;">
-        <div class="project-modal-container" style="max-width: 1200px; width: 95%; padding: 30px; border-radius: 12px; background: rgba(10, 11, 15, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); max-height: 90vh; overflow-y: auto;">
-            <div class="project-modal-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 15px;">
-                <h3 style="font-family: var(--font-heading); color: #fff; font-size: 1.5rem; display: flex; align-items: center; gap: 8px; margin: 0;">
-                    <i data-lucide="palette" style="color: var(--accent-cyan); width: 24px; height: 24px;"></i>
-                    <span>Graphics & Creative Design Gallery</span>
-                </h3>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <button type="button" id="modal-select-all-btn" class="console-btn btn-secondary" style="display: none; padding: 6px 12px; font-size: 0.7rem; gap: 6px; align-items: center; margin: 0;">
-                        <i data-lucide="check-square" style="width: 14px; height: 14px;"></i>
-                        <span id="modal-select-all-text">Select All</span>
-                    </button>
-                    <button type="button" id="modal-bulk-delete-btn" class="console-btn btn-danger" style="display: none; padding: 6px 12px; font-size: 0.7rem; gap: 6px; align-items: center; margin: 0;">
-                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
-                        <span>Delete Selected (<span id="modal-delete-count">0</span>)</span>
-                    </button>
-                    <button type="button" id="modal-graphics-add-btn" class="console-btn btn-primary" style="display: none; padding: 6px 14px; font-size: 0.75rem; gap: 6px; align-items: center; margin: 0 10px 0 0;">
-                        <i data-lucide="upload" style="width: 14px; height: 14px;"></i>
-                        <span>Add Image</span>
-                    </button>
-                    <input type="file" id="modal-graphics-file" accept="image/*" style="display: none;">
-                    <button type="button" id="graphics-gallery-close-btn" style="background: none; border: none; color: var(--text-muted); cursor: pointer; transition: color 0.2s; margin-left: 10px;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-muted)'">
-                        <i data-lucide="x" style="width: 24px; height: 24px;"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4;">
-                Browse the complete archive of marketing layouts, social media posts, UI/UX screens, and brand designs.
-            </p>
-            
-            <div class="portfolio-grid grid-graphics" id="modal-graphics-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px;">
-                <!-- Full grid rendered here dynamically -->
-            </div>
-        </div>
-    </div>
+function render(data){
+  D = data;
+  const s = data.settings || {};
+  document.querySelectorAll("[data-t]").forEach(el => { const k = el.dataset.t; el.textContent = k === "education" ? (data.education || "") : (s[k] || ""); });
+  const hrefs = { wa:`https://wa.me/${s.whatsapp}?text=${encodeURIComponent("Hi Amit, I saw your portfolio.")}`, cv:s.cv, mail:`mailto:${s.email}`, tel:`tel:${(s.phone||"").replace(/\s/g,"")}` };
+  document.querySelectorAll("[data-href]").forEach(a => a.href = hrefs[a.dataset.href] || "#");
+  $("copy").textContent = `© ${new Date().getFullYear()} ${s.name || ""} · ${s.location || ""}`;
 
-    <!-- Local Fast Vendor Libraries -->
-    <script src="vendor/gsap.min.js"></script>
-    <script src="vendor/ScrollTrigger.min.js"></script>
-    <script src="vendor/lucide.min.js"></script>
-    <script src="vendor/plyr.js"></script>
-    <script src="vendor/Sortable.min.js"></script>
-    
-    <!-- Baked default portfolio data (cloud projects) -->
-    <script src="data.js?v=7.0"></script>
-    <!-- Custom Application Logic -->
-    <script src="app.js?v=64.0"></script>
+  const sr = s.showreel || {}, reel = $("reel");
+  if (reel.getAttribute("src") !== sr.src){ reel.src = sr.src || ""; reel.poster = sr.poster || ""; }
+  $("reel-title").textContent = sr.title || "";
+  $("stats").innerHTML = (s.stats || []).map(x => `<div class="stat"><b>${esc(x.n)}</b><span>${esc(x.l)}</span></div>`).join("");
+
+  ["long","shorts"].forEach(cat => {
+    lists[cat] = (data[cat] || []).filter(x => !x.hidden);
+    $("g-" + cat).innerHTML = lists[cat].map((it,i) => cardHTML(cat, it, i)).join("");
+    $("c-" + cat).textContent = lists[cat].length;
+    $("b-" + cat).hidden = !lists[cat].length;
+  });
+  lists.graphics = (data.graphics || []).filter(x => !x.hidden);
+  $("c-graphics").textContent = lists.graphics.length;
+  $("b-graphics").hidden = !lists.graphics.length;
+  $("g-graphics").innerHTML = ""; shown = 0; moreGfx();
+
+  const brand = c => (String(c).toUpperCase() === "#FFFFFF" ? "var(--text)" : c);
+  $("sk-grid").innerHTML = (data.skills || []).map(g => `<div class="sk-card"><div class="sk-head" style="--c:${esc(g.color)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[g.icon] || ICONS.gear}</svg>${esc(g.name)}</div><div class="sk-list">${
+    (g.tools || []).map(t => `<div class="sk-row" style="--b:${esc(brand(t.c))}"><span class="logo">${t.i ? `<img src="${esc(t.i)}" alt="" loading="lazy">` : `<b>${esc((t.n||"?")[0])}</b>`}</span><span class="sk-name">${esc(t.n)}</span><span class="segs" role="img" aria-label="${t.l} of 5">${[1,2,3,4,5].map(k => `<i${k <= t.l ? ' class="on"' : ""}></i>`).join("")}</span></div>`).join("")
+  }</div></div>`).join("");
+
+  // the AI note only makes sense when something on the page carries the label
+  $("ai-note").hidden = ![...lists.long, ...lists.shorts, ...lists.graphics].some(x => x.ai);
+  $("xp").innerHTML =(data.experience || []).map(x => `<li><h3>${esc(x.role)}${x.now ? '<span class="now">Now</span>' : ""}</h3><time>${esc(x.time)}</time><span class="org">${esc(x.org)}</span></li>`).join("");
+  wire();
+}
+
+function moreGfx(){
+  const next = lists.graphics.slice(shown, shown + STEP);
+  $("g-graphics").insertAdjacentHTML("beforeend", next.map((it,j) => cardHTML("graphics", it, shown + j)).join(""));
+  shown += next.length;
+  $("more").parentElement.hidden = shown >= lists.graphics.length;
+  $("more").textContent = `Show more (${lists.graphics.length - shown})`;
+  wire();
+}
+$("more").onclick = moreGfx;
+
+// lazy work: uploaded images + muted auto-preview of direct videos (Cloudflare R2 etc.)
+const lb = $("lb");
+const near = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  const el = e.target; near.unobserve(el);
+  if (el.dataset.media) mediaUrl(el.dataset.media).then(u => { if (u) el.src = u; });
+  else if (el.dataset.src && !el.src){ el.preload = "metadata"; el.src = el.dataset.src; }
+}), {rootMargin:"300px"});
+const inView = new IntersectionObserver(es => es.forEach(e => {
+  const v = e.target;
+  if (e.isIntersecting && !lb.open){ if (!v.src && v.dataset.src) v.src = v.dataset.src; if (v.classList.contains("pv")) v.muted = true; v.play().catch(()=>{}); }
+  else v.pause();
+}), {threshold:.6});
+function wire(){
+  document.querySelectorAll("img[data-media]:not([data-w]),video.pv:not([data-w])").forEach(el => { el.dataset.w = 1; near.observe(el); if (el.tagName === "VIDEO") inView.observe(el); });
+}
+inView.observe($("reel"));
+const um = $("unmute");
+um.onclick = e => { e.stopPropagation(); const r = $("reel"); r.muted = !r.muted; if (!r.muted) { r.currentTime = 0; r.play(); } um.querySelector("span").textContent = r.muted ? "Sound" : "Mute"; };
+
+// viewer
+const lbm = $("lb-media"), cap = $("lb-cap");
+let cur = {cat:null, i:0};
+async function openItem(cat, i){
+  const list = cat === "reel" ? [{src:D.settings.showreel.src}] : lists[cat];
+  i = (i + list.length) % list.length; cur = {cat, i};
+  const k = kind(list[i].src);
+  lbm.className = "lb-media" + (cat === "shorts" ? " v" : cat === "graphics" ? " img" : "");
+  if (k.t === "yt") lbm.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${esc(k.id)}?autoplay=1&rel=0&modestbranding=1&playsinline=1" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="Video"></iframe>`;
+  else if (k.t === "video") lbm.innerHTML = `<video src="${esc(k.url)}" controls autoplay playsinline></video>`;
+  else { const u = k.t === "media" ? await mediaUrl(k.id) : k.url; lbm.innerHTML = `<img src="${esc(u)}" alt="">`; }
+  cap.textContent = cat === "reel" ? (D.settings.showreel.title || "") : `${i+1} / ${list.length}`;
+  $("lb-prev").hidden = $("lb-next").hidden = cat === "reel";
+  if (!lb.open){ document.querySelectorAll("video.pv,#reel").forEach(v => v.pause()); lb.showModal(); }
+}
+document.addEventListener("click", e => { const c = e.target.closest(".card"); if (c) openItem(c.dataset.cat, +c.dataset.i); });
+$("reel-box").addEventListener("click", () => openItem("reel", 0));
+$("lb-x").onclick = () => lb.close();
+$("lb-prev").onclick = () => openItem(cur.cat, cur.i - 1);
+$("lb-next").onclick = () => openItem(cur.cat, cur.i + 1);
+lb.addEventListener("close", () => {
+  lbm.innerHTML = "";
+  document.querySelectorAll("video.pv,#reel").forEach(v => { const r = v.getBoundingClientRect(); if (r.top < innerHeight && r.bottom > 0 && r.left < innerWidth && r.right > 0) v.play().catch(()=>{}); });
+});
+lb.addEventListener("click", e => { if (e.target.classList.contains("lb")) lb.close(); });
+document.addEventListener("keydown", e => { if (!lb.open || cur.cat === "reel") return; if (e.key === "ArrowRight") openItem(cur.cat, cur.i + 1); if (e.key === "ArrowLeft") openItem(cur.cat, cur.i - 1); });
+let sx = null;
+lb.addEventListener("touchstart", e => { sx = e.touches[0].clientX; }, {passive:true});
+lb.addEventListener("touchend", e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 60 && cur.cat !== "long" && cur.cat !== "reel") openItem(cur.cat, cur.i + (dx < 0 ? 1 : -1)); sx = null; }, {passive:true});
+
+// theme + menu
+const root = document.documentElement;
+$("theme").onclick = () => { root.dataset.theme = root.dataset.theme === "light" ? "dark" : "light"; try { localStorage.setItem("as-theme", root.dataset.theme); } catch(e) {} };
+const menuBtn = $("menu-btn"), menu = $("menu");
+menuBtn.onclick = () => { const o = menu.classList.toggle("open"); menuBtn.setAttribute("aria-expanded", o); };
+menu.addEventListener("click", e => { if (e.target.closest("a")) { menu.classList.remove("open"); menuBtn.setAttribute("aria-expanded", false); } });
+
+// data: draft preview → last cached → defaults; then refresh from Firebase quietly
+(function boot(){
+  const valid = d => !!(d && d.settings && d.settings.showreel);
+  const read = k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } };
+  if (/[?&]draft\b/.test(location.search)){
+    const d = read("as-draft");
+    if (valid(d)){ $("draft-bar").hidden = false; render(d); return; }
+  }
+  const cached = read("as-data");
+  render(valid(cached) ? cached : window.DEFAULT_DATA);
+  fetch(`${CFG.dbUrl}/${CFG.dataNode}.json`).then(r => r.ok ? r.json() : null).then(d => {
+    if (!valid(d)) return;
+    const s = JSON.stringify(d);
+    if (s === JSON.stringify(D)) return;
+    try { localStorage.setItem("as-data", s); } catch(e) {}
+    // only swap content if the visitor hasn't scrolled into the work yet — no jumps mid-scroll
+    if (scrollY < $("work").offsetTop - 100) render(d);
+  }).catch(() => {});
+})();
+</script>
 </body>
 </html>
-
-<!-- Triggering Vercel rebuild -->
