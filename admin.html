@@ -330,7 +330,7 @@ function skillsView(){
 function profileView(){
   const s = data.settings, f = (k, label, type = "text") => `<label class="f">${label}<input type="${type}" value="${esc(s[k])}" data-k="settings.${k}"></label>`;
   return `<div class="panel"><h2>Hero</h2><div class="fgrid two">
-      ${f("name","Name")}${f("role","Role badge")}${f("available","Availability")}${f("tags","Tags line")}</div></div>
+      ${f("name","Name")}${f("available","Availability")}${f("tags","Tags line")}</div></div>
     <div class="panel"><h2>Showreel (the only video with a title)</h2><div class="fgrid two">
       <label class="f">Title<input value="${esc(s.showreel.title)}" data-k="settings.showreel.title"></label>
       <label class="f">Video link (Cloudflare / mp4)<input value="${esc(s.showreel.src)}" data-k="settings.showreel.src" inputmode="url"></label>
