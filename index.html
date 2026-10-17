@@ -7,7 +7,9 @@
 <meta name="description" content="Amit Sharma, AI video editor in Surat, India: AI videos, explainers, ads and reels. Available in Surat or remote.">
 <meta property="og:title" content="Amit Sharma — AI Video Editor">
 <meta property="og:description" content="AI videos, explainers, ads and reels.">
-<meta property="og:image" content="https://amit-portfolio-fresh.vercel.app/assets/showreel_cover_compelling.png">
+<meta property="og:image" content="https://amit-portfolio-fresh.vercel.app/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#0a0a0b">
@@ -28,7 +30,8 @@
   --r:14px; --max:1200px; --pad:16px; --hdr:58px;
   /* glass */
   --glass:rgba(22,22,28,.58); --glass-strong:rgba(14,14,18,.78); --glass-line:rgba(255,255,255,.1);
-  --blob1:rgba(124,92,255,.30); --blob2:rgba(34,211,238,.16); --blob3:rgba(77,148,255,.20);
+  --blob1:rgba(124,92,255,.38); --blob2:rgba(34,211,238,.22); --blob3:rgba(77,148,255,.26);
+  --frame:linear-gradient(135deg,rgba(255,255,255,.15),rgba(255,255,255,.03) 42%,rgba(255,255,255,.08)); --shine:rgba(255,255,255,.16);
   color-scheme:dark;
 }
 [data-theme="light"]{
@@ -39,6 +42,7 @@
   --seg-off:rgba(0,0,0,.08);
   --glass:rgba(255,255,255,.62); --glass-strong:rgba(250,249,246,.82); --glass-line:rgba(0,0,0,.08);
   --blob1:rgba(124,92,255,.16); --blob2:rgba(34,211,238,.14); --blob3:rgba(77,148,255,.12);
+  --frame:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,255,255,.45) 42%,rgba(255,255,255,.75)); --shine:rgba(255,255,255,.9);
   color-scheme:light;
 }
 /* fixed, static colour field behind everything (cheap: gradients only, nothing moves) */
@@ -48,6 +52,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
              radial-gradient(38% 30% at 6% 34%,var(--blob2),transparent 72%),
              radial-gradient(46% 36% at 72% 88%,var(--blob3),transparent 72%)}
 *{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--hdr) + 8px)}
 body{background:transparent;color:var(--text);font:400 16px/1.5 "Inter Tight",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
 img,video{display:block;max-width:100%}
@@ -94,6 +99,8 @@ header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px s
 .avail i{width:7px;height:7px;border-radius:50%;background:var(--ok)}
 .hero h1{font-size:clamp(36px,9vw,64px);line-height:1;letter-spacing:-.04em;font-weight:700}
 .hero .tags{color:var(--muted);font-size:15px;margin-top:8px}
+.hero-id{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hero3d{width:96px;height:96px;flex:none;margin:-14px -6px -14px 0;pointer-events:none}
 .hero-cta{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .reel{margin-top:18px;position:relative;border-radius:var(--r);overflow:hidden;aspect-ratio:16/9;background:#000;border:1px solid var(--line);cursor:pointer}
 .reel video{width:100%;height:100%;object-fit:cover}
@@ -125,10 +132,12 @@ header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px s
 .thumb img,.thumb video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .badge-play{position:absolute;right:9px;bottom:9px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.94);display:grid;place-items:center}
 .badge-play svg{width:13px;height:13px;color:#000;margin-left:2px}
-.ai-tag{position:absolute;left:9px;top:9px;font-size:10.5px;font-weight:800;letter-spacing:.08em;padding:3px 8px;border-radius:6px;color:#fff;background:linear-gradient(90deg,var(--ai1),var(--ai2))}
+.ai-tag{position:absolute;left:9px;bottom:16px;font-size:10.5px;font-weight:800;letter-spacing:.08em;padding:3px 8px;border-radius:6px;color:#fff;background:linear-gradient(90deg,var(--ai1),var(--ai2))}
 .gfx{columns:2;column-gap:10px}
 .gfx .card{margin-bottom:10px;break-inside:avoid;border-radius:10px}
 .gfx .thumb{aspect-ratio:var(--ar)}
+.thumb img.gfx-in{animation:gfx-in .9s ease}
+@keyframes gfx-in{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
 .more{display:flex;justify-content:center;margin-top:14px}
 .more .btn{width:100%;max-width:320px}
 
@@ -194,6 +203,7 @@ dialog::backdrop{background:rgba(5,5,7,.95)}
   .hero{padding:44px 0 0}
   .hero-top{flex-direction:row;align-items:flex-end;justify-content:space-between;gap:30px}
   .hero-cta{display:flex}
+  .hero3d{width:170px;height:170px;margin:-40px 0 -40px 16px}
   .reel{margin-top:28px;border-radius:20px;aspect-ratio:16/8}
   .reel-bar{left:16px;right:16px;bottom:16px}
   .stats{margin-top:18px}
@@ -226,6 +236,7 @@ dialog::backdrop{background:rgba(5,5,7,.95)}
   .links a:hover{color:var(--text);background:var(--card)}
   .btn-primary:hover{opacity:.88}.btn-ghost:hover,.icon-btn:hover{background:var(--card)}
   .card .thumb img{transition:transform .5s ease}.card:hover .thumb img{transform:scale(1.04)}
+  .grid-long .card,.grid-v .card{transition:transform .25s ease-out}
   .way:hover{border-color:var(--line-2)}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
@@ -236,6 +247,37 @@ header,.menu{background:var(--glass-strong)}
 .skills{background:color-mix(in srgb,var(--bg-2) 35%,transparent);border-color:var(--glass-line)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   header,.menu,.stats,.sk-card,.way,.ai-note,.avail{background:var(--glass-strong)}
+}
+/* glass frames around the work: frosted edge + shine line; no blur on the frames themselves, so 40 cards still scroll smoothly */
+.card,.reel{padding:5px;background:var(--frame);border-color:var(--glass-line);box-shadow:inset 0 1px 0 var(--shine),0 14px 34px -18px rgba(0,0,0,.55)}
+.card .thumb,.reel video{border-radius:calc(var(--r) - 5px)}
+.gfx .card .thumb{border-radius:6px}
+.badge-play{background:rgba(12,12,16,.38);border:1px solid rgba(255,255,255,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.35);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.badge-play svg{color:#fff}
+.chip-dark{background:rgba(12,12,16,.36);border-color:rgba(255,255,255,.24);-webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%)}
+.btn-ghost,.icon-btn{background:var(--glass);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.lb-x,.lb-nav{-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.18)}
+@media (min-width:760px){ .reel video{border-radius:15px} }
+
+/* skills, experience and contact: lift a little and glow on hover (on phones: while tapped) */
+.sk-card,.sk-row,.xp li,.way,.logo{transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease,background-color .25s ease}
+.sk-row{border-radius:10px}
+.xp li{position:relative;isolation:isolate}
+.xp li::before{content:"";position:absolute;inset:0 -12px;z-index:-1;border-radius:12px;border:1px solid transparent;transition:background-color .25s ease,box-shadow .25s ease,border-color .25s ease}
+.way{--g:var(--accent)} .way.wa{--g:#25d366}
+@media (hover:hover){
+  .sk-card:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--c) 55%,transparent);box-shadow:0 16px 38px -14px color-mix(in srgb,var(--c) 60%,transparent),0 0 22px -6px color-mix(in srgb,var(--c) 35%,transparent)}
+  .sk-row:hover{transform:translateY(-2px);background:color-mix(in srgb,var(--b) 10%,transparent)}
+  .sk-row:hover .logo{box-shadow:0 0 16px -2px color-mix(in srgb,var(--b) 70%,transparent)}
+  .xp li:hover{transform:translateY(-3px)}
+  .xp li:hover::before{background:var(--glass);border-color:var(--glass-line);box-shadow:0 12px 30px -12px color-mix(in srgb,var(--ai1) 60%,transparent),0 0 18px -6px color-mix(in srgb,var(--ai2) 40%,transparent)}
+  .way:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--g) 55%,transparent);box-shadow:0 14px 32px -12px color-mix(in srgb,var(--g) 60%,transparent),0 0 20px -6px color-mix(in srgb,var(--g) 40%,transparent)}
+}
+@media (hover:none){
+  .sk-card:active{transform:translateY(-3px);border-color:color-mix(in srgb,var(--c) 55%,transparent);box-shadow:0 14px 32px -14px color-mix(in srgb,var(--c) 60%,transparent)}
+  .xp li:active{transform:translateY(-2px)}
+  .xp li:active::before{background:var(--glass);border-color:var(--glass-line);box-shadow:0 10px 26px -12px color-mix(in srgb,var(--ai1) 60%,transparent)}
+  .way:active{transform:translateY(-2px);border-color:color-mix(in srgb,var(--g) 55%,transparent);box-shadow:0 12px 28px -12px color-mix(in srgb,var(--g) 60%,transparent)}
 }
 </style>
 </head>
@@ -267,12 +309,18 @@ header,.menu{background:var(--glass-strong)}
   <section class="hero">
     <div class="wrap">
       <div class="hero-top">
-        <div>
+        <div class="hero-main">
           <div class="badges">
-            <span class="avail"><i></i><span data-t="available"></span></span>
+            <span class="role"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.3L20.5 10.5l-6.3 2.2L12 19l-2.2-6.3L3.5 10.5l6.3-2.2z"/></svg><span data-t="role">AI Video Editor</span></span>
+            <span class="avail"><i></i><span data-t="available">Available · Surat or Remote</span></span>
           </div>
-          <h1 data-t="name"></h1>
-          <p class="tags" data-t="tags"></p>
+          <div class="hero-id">
+            <div>
+              <h1 data-t="name">Amit Sharma</h1>
+              <p class="tags" data-t="tags">AI videos · Explainers · Ads · Reels</p>
+            </div>
+            <canvas class="hero3d" id="hero3d" aria-hidden="true"></canvas>
+          </div>
         </div>
         <div class="hero-cta">
           <a target="_blank" rel="noopener" class="btn btn-wa" data-href="wa">WhatsApp</a>
@@ -280,7 +328,7 @@ header,.menu{background:var(--glass-strong)}
         </div>
       </div>
       <div class="reel" id="reel-box">
-        <video id="reel" muted autoplay loop playsinline preload="metadata"></video>
+        <video id="reel" muted loop playsinline preload="metadata"></video>
         <div class="reel-bar">
           <span class="chip-dark"><span class="ai-tag">AI</span><span id="reel-title"></span></span>
           <button class="chip-dark" id="unmute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 5 6 9H2v6h4l5 4zM23 9l-6 6M17 9l6 6"/></svg><span>Sound</span></button>
@@ -394,19 +442,20 @@ function cardHTML(cat, it, i){
   const k = kind(it.src), ai = it.ai ? '<span class="ai-tag">AI</span>' : "";
   let m;
   if (k.t === "yt") m = `<img src="https://i.ytimg.com/vi/${esc(k.id)}/hqdefault.jpg" alt="" loading="lazy" decoding="async">`;
-  else if (k.t === "video") m = `<video class="pv" data-src="${esc(k.url)}" muted loop playsinline preload="none"></video>`;
+  // R2 videos: the card loops the small silent preview (pv) when there is one; the poster shows until it plays
+  else if (k.t === "video") m = `<video class="pv" data-src="${esc(it.pv || k.url)}"${it.poster ? ` poster="${esc(it.poster)}"` : ""} muted loop playsinline preload="none"></video>`;
   else if (k.t === "media") m = `<img data-media="${esc(k.id)}" alt="">`;
   else m = `<img src="${esc(k.url)}" alt="" loading="lazy" decoding="async">`;
   const style = cat === "graphics" ? ` style="--ar:1/${+it.r || 1}"` : "";
   const label = cat === "graphics" ? `Graphic ${i+1}` : `Play video ${i+1}`;
-  return `<button class="card" data-cat="${cat}" data-i="${i}" aria-label="${label}"><div class="thumb"${style}>${m}${ai}${cat !== "graphics" ? PLAY : ""}</div></button>`;
+  return `<button class="card" data-cat="${cat}" data-i="${i}"${cat === "graphics" ? ` data-shape="${(+it.r || 1).toFixed(2)}"` : ""} aria-label="${label}"><div class="thumb"${style}>${m}${ai}${cat !== "graphics" ? PLAY : ""}</div></button>`;
 }
 
 function render(data){
   D = data;
   const s = data.settings || {};
   document.querySelectorAll("[data-t]").forEach(el => { const k = el.dataset.t; el.textContent = k === "education" ? (data.education || "") : (s[k] || ""); });
-  const hrefs = { wa:`https://wa.me/${s.whatsapp}?text=${encodeURIComponent("Hi Amit, I saw your portfolio.")}`, cv:s.cv, mail:`mailto:${s.email}`, tel:`tel:${(s.phone||"").replace(/\s/g,"")}` };
+  const hrefs = { wa:`https://wa.me/${s.whatsapp}?text=${encodeURIComponent("Hi Amit, I saw your portfolio.")}`, cv:/^(https?:\/\/|assets\/|\/)/.test(s.cv || "") ? s.cv : "#", mail:`mailto:${s.email}`, tel:`tel:${(s.phone||"").replace(/\s/g,"")}` };
   document.querySelectorAll("[data-href]").forEach(a => a.href = hrefs[a.dataset.href] || "#");
   $("copy").textContent = `© ${new Date().getFullYear()} ${s.name || ""} · ${s.location || ""}`;
 
@@ -426,8 +475,8 @@ function render(data){
   $("g-graphics").innerHTML = ""; shown = 0; moreGfx();
 
   const brand = c => (String(c).toUpperCase() === "#FFFFFF" ? "var(--text)" : c);
-  $("sk-grid").innerHTML = (data.skills || []).map(g => `<div class="sk-card"><div class="sk-head" style="--c:${esc(g.color)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[g.icon] || ICONS.gear}</svg>${esc(g.name)}</div><div class="sk-list">${
-    (g.tools || []).map(t => `<div class="sk-row" style="--b:${esc(brand(t.c))}"><span class="logo">${t.i ? `<img src="${esc(t.i)}" alt="" loading="lazy">` : `<b>${esc((t.n||"?")[0])}</b>`}</span><span class="sk-name">${esc(t.n)}</span><span class="segs" role="img" aria-label="${t.l} of 5">${[1,2,3,4,5].map(k => `<i${k <= t.l ? ' class="on"' : ""}></i>`).join("")}</span></div>`).join("")
+  $("sk-grid").innerHTML = (data.skills || []).map(g => `<div class="sk-card" style="--c:${esc(g.color)}"><div class="sk-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[g.icon] || ICONS.gear}</svg>${esc(g.name)}</div><div class="sk-list">${
+    (g.tools || []).map(t => `<div class="sk-row" style="--b:${esc(brand(t.c))}"><span class="logo">${t.i ? `<img src="${esc(t.i)}" alt="" loading="lazy">` : `<b>${esc((t.n||"?")[0])}</b>`}</span><span class="sk-name">${esc(t.n)}</span><span class="segs" role="img" aria-label="${+t.l || 0} of 5">${[1,2,3,4,5].map(k => `<i${k <= t.l ? ' class="on"' : ""}></i>`).join("")}</span></div>`).join("")
   }</div></div>`).join("");
 
   // the AI note only makes sense when something on the page carries the label
@@ -437,14 +486,50 @@ function render(data){
 }
 
 function moreGfx(){
-  const next = lists.graphics.slice(shown, shown ? undefined : FIRST_GFX);
-  $("g-graphics").insertAdjacentHTML("beforeend", next.map((it,j) => cardHTML("graphics", it, shown + j)).join(""));
-  shown += next.length;
+  // first call shows the opening tiles; "View more" rebuilds the grid in order, which also puts slideshow tiles back
+  const n = shown ? lists.graphics.length : Math.min(FIRST_GFX, lists.graphics.length);
+  $("g-graphics").innerHTML = lists.graphics.slice(0, n).map((it, i) => cardHTML("graphics", it, i)).join("");
+  shown = n;
   $("more").parentElement.hidden = shown >= lists.graphics.length;
   $("more").textContent = `View more (${lists.graphics.length - shown})`;
   wire();
+  gfxStart();
 }
 $("more").onclick = moreGfx;
+
+// graphics slideshow: each tile on show swaps to a random hidden graphic of the same shape (so nothing moves),
+// after 4 s and then at its own random moment; runs only while the section is on screen
+let gfxOn = false, gfxTimers = [];
+const gfxStill = matchMedia("(prefers-reduced-motion:reduce)").matches;
+function gfxStop(){ gfxTimers.forEach(clearTimeout); gfxTimers = []; }
+function gfxStart(){
+  gfxStop();
+  if (!gfxOn || document.hidden || shown >= lists.graphics.length) return;
+  $("g-graphics").querySelectorAll(".card").forEach(gfxQueue);
+}
+function gfxQueue(c){ gfxTimers.push(setTimeout(() => gfxSwap(c), 4000 + Math.random() * 4000)); }
+async function gfxSwap(c){
+  if (!gfxOn || !c.isConnected || shown >= lists.graphics.length) return;
+  if (lb.open || document.hidden) return gfxQueue(c);
+  const onShow = new Set([...$("g-graphics").querySelectorAll(".card")].map(x => +x.dataset.i));
+  const pool = lists.graphics.map((it, i) => i).filter(i => !onShow.has(i) && (+lists.graphics[i].r || 1).toFixed(2) === c.dataset.shape);
+  if (!pool.length) return;
+  const i = pool[Math.floor(Math.random() * pool.length)], it = lists.graphics[i], k = kind(it.src);
+  const img = new Image(); img.alt = "";
+  img.src = k.t === "media" ? await mediaUrl(k.id) : k.url;
+  try { await img.decode(); } catch(e) { return gfxQueue(c); }
+  if (!c.isConnected || shown >= lists.graphics.length) return;
+  const th = c.querySelector(".thumb"), old = th.querySelector("img");
+  if (!gfxStill) img.className = "gfx-in";
+  old ? old.after(img) : th.prepend(img);
+  setTimeout(() => old?.remove(), 950);
+  th.querySelector(".ai-tag")?.remove();
+  if (it.ai) th.insertAdjacentHTML("beforeend", '<span class="ai-tag">AI</span>');
+  c.dataset.i = i; c.setAttribute("aria-label", `Graphic ${i + 1}`);
+  gfxQueue(c);
+}
+new IntersectionObserver(([e]) => { gfxOn = e.isIntersecting; gfxOn ? gfxStart() : gfxStop(); }).observe($("g-graphics"));
+document.addEventListener("visibilitychange", () => document.hidden ? gfxStop() : gfxStart());
 
 // lazy work: uploaded images + muted auto-preview of direct videos (Cloudflare R2 etc.)
 const lb = $("lb");
@@ -454,15 +539,47 @@ const near = new IntersectionObserver(es => es.forEach(e => {
   if (el.dataset.media) mediaUrl(el.dataset.media).then(u => { if (u) el.src = u; });
   else if (el.dataset.src && !el.src){ el.preload = "metadata"; el.src = el.dataset.src; }
 }), {rootMargin:"300px"});
-const inView = new IntersectionObserver(es => es.forEach(e => {
-  const v = e.target;
-  if (e.isIntersecting && !lb.open){ if (!v.src && v.dataset.src) v.src = v.dataset.src; if (v.classList.contains("pv")) v.muted = true; v.play().catch(()=>{}); }
-  else v.pause();
-}), {threshold:.6});
-function wire(){
-  document.querySelectorAll("img[data-media]:not([data-w]),video.pv:not([data-w])").forEach(el => { el.dataset.w = 1; near.observe(el); if (el.tagName === "VIDEO") inView.observe(el); });
+// only the row nearest the middle of the screen plays (every video in it); everything else stays paused
+let playing = [];
+function playRow(list){
+  playing.forEach(v => { if (!list.includes(v)) v.pause(); });
+  playing = list;
+  list.forEach(v => {
+    if (!v.getAttribute("src") && v.dataset.src) v.src = v.dataset.src;
+    if (v.classList.contains("pv")) v.muted = true;
+    if (v.paused) v.play().catch(() => {});
+  });
 }
-inView.observe($("reel"));
+function pick(){
+  if (lb.open) return;
+  const mid = innerHeight / 2; let best = [], bestD = Infinity;
+  document.querySelectorAll("#reel,video.pv").forEach(v => {
+    const r = v.getBoundingClientRect();
+    if (!r.height || r.bottom <= 0 || r.top >= innerHeight) return;
+    const d = r.top <= mid && r.bottom >= mid ? 0 : Math.min(Math.abs(r.top - mid), Math.abs(r.bottom - mid));
+    if (d < bestD - 2){ bestD = d; best = [v]; } else if (Math.abs(d - bestD) <= 2) best.push(v);
+  });
+  playRow(bestD < innerHeight * .2 ? best : []);
+}
+let ticking = false;
+addEventListener("scroll", () => { if (!ticking){ ticking = true; requestAnimationFrame(() => { ticking = false; pick(); }); } }, {passive:true});
+addEventListener("resize", pick);
+function wire(){
+  document.querySelectorAll("img[data-media]:not([data-w]),video.pv:not([data-w])").forEach(el => { el.dataset.w = 1; near.observe(el); });
+  pick();
+}
+
+// desktop: cards tilt slightly in 3D under the mouse
+if (matchMedia("(hover:hover) and (pointer:fine)").matches && !matchMedia("(prefers-reduced-motion:reduce)").matches){
+  let tilted = null;
+  document.addEventListener("pointermove", e => {
+    const c = e.target.closest?.(".grid-long .card,.grid-v .card");
+    if (tilted && tilted !== c) tilted.style.transform = "";
+    tilted = c; if (!c) return;
+    const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+    c.style.transform = `perspective(800px) rotateX(${(-y * 6).toFixed(2)}deg) rotateY(${(x * 8).toFixed(2)}deg)`;
+  }, {passive:true});
+}
 const um = $("unmute");
 um.onclick = e => { e.stopPropagation(); const r = $("reel"); r.muted = !r.muted; if (!r.muted) { r.currentTime = 0; r.play(); } um.querySelector("span").textContent = r.muted ? "Sound" : "Mute"; };
 
@@ -475,11 +592,11 @@ async function openItem(cat, i){
   const k = kind(list[i].src);
   lbm.className = "lb-media" + (cat === "shorts" ? " v" : cat === "graphics" ? " img" : "");
   if (k.t === "yt") lbm.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${esc(k.id)}?autoplay=1&rel=0&modestbranding=1&playsinline=1" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="Video"></iframe>`;
-  else if (k.t === "video") lbm.innerHTML = `<video src="${esc(k.url)}" controls autoplay playsinline></video>`;
+  else if (k.t === "video") lbm.innerHTML = `<video src="${esc(k.url)}"${list[i].poster ? ` poster="${esc(list[i].poster)}"` : ""} controls autoplay playsinline></video>`;
   else { const u = k.t === "media" ? await mediaUrl(k.id) : k.url; lbm.innerHTML = `<img src="${esc(u)}" alt="">`; }
   cap.textContent = cat === "reel" ? (D.settings.showreel.title || "") : `${i+1} / ${list.length}`;
   $("lb-prev").hidden = $("lb-next").hidden = cat === "reel";
-  if (!lb.open){ document.querySelectorAll("video.pv,#reel").forEach(v => v.pause()); lb.showModal(); }
+  if (!lb.open){ playRow([]); lb.showModal(); }
 }
 document.addEventListener("click", e => { const c = e.target.closest(".card"); if (c) openItem(c.dataset.cat, +c.dataset.i); });
 $("reel-box").addEventListener("click", () => openItem("reel", 0));
@@ -488,13 +605,16 @@ $("lb-prev").onclick = () => openItem(cur.cat, cur.i - 1);
 $("lb-next").onclick = () => openItem(cur.cat, cur.i + 1);
 lb.addEventListener("close", () => {
   lbm.innerHTML = "";
-  document.querySelectorAll("video.pv,#reel").forEach(v => { const r = v.getBoundingClientRect(); if (r.top < innerHeight && r.bottom > 0 && r.left < innerWidth && r.right > 0) v.play().catch(()=>{}); });
+  pick();
 });
 lb.addEventListener("click", e => { if (e.target.classList.contains("lb")) lb.close(); });
 document.addEventListener("keydown", e => { if (!lb.open || cur.cat === "reel") return; if (e.key === "ArrowRight") openItem(cur.cat, cur.i + 1); if (e.key === "ArrowLeft") openItem(cur.cat, cur.i - 1); });
 let sx = null;
 lb.addEventListener("touchstart", e => { sx = e.touches[0].clientX; }, {passive:true});
 lb.addEventListener("touchend", e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 60 && cur.cat !== "long" && cur.cat !== "reel") openItem(cur.cat, cur.i + (dx < 0 ? 1 : -1)); sx = null; }, {passive:true});
+
+// iOS only applies :active (tap glow on skills/experience/contact) when the page listens for touches
+document.addEventListener("touchstart", () => {}, {passive:true});
 
 // theme + menu
 const root = document.documentElement;
@@ -522,6 +642,74 @@ menu.addEventListener("click", e => { if (e.target.closest("a")) { menu.classLis
     if (scrollY < $("work").offsetTop - 100) render(d);
   }).catch(() => {});
 })();
+</script>
+
+<!-- 3D play button next to the name: three.js from a CDN, paused whenever it is off screen -->
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+const cv = document.getElementById("hero3d");
+const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let renderer;
+try { renderer = new THREE.WebGLRenderer({canvas:cv, alpha:true, antialias:true, powerPreference:"low-power"}); } catch(e) { cv.hidden = true; }
+
+if (renderer){
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(30, 1, .1, 50);
+  cam.position.set(0, 0, 8);
+  scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
+
+  // rounded "play" triangle, extruded with a soft bevel
+  const pts = [new THREE.Vector2(-.75, 1), new THREE.Vector2(-.75, -1), new THREE.Vector2(1.05, 0)], rad = .32;
+  const shape = new THREE.Shape();
+  pts.forEach((p, i) => {
+    const a = pts[(i + 2) % 3], b = pts[(i + 1) % 3];
+    const p1 = p.clone().lerp(a, rad / p.distanceTo(a)), p2 = p.clone().lerp(b, rad / p.distanceTo(b));
+    i ? shape.lineTo(p1.x, p1.y) : shape.moveTo(p1.x, p1.y);
+    shape.quadraticCurveTo(p.x, p.y, p2.x, p2.y);
+  });
+  const geo = new THREE.ExtrudeGeometry(shape, {depth:.4, bevelEnabled:true, bevelThickness:.2, bevelSize:.16, bevelSegments:10, curveSegments:28});
+  geo.center();
+  const play = new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({color:0x7c5cff, metalness:.3, roughness:.18, clearcoat:1, clearcoatRoughness:.12}));
+
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1.9, .05, 20, 180),
+    new THREE.MeshStandardMaterial({color:0x22d3ee, emissive:0x22d3ee, emissiveIntensity:.45, metalness:.5, roughness:.25}));
+  [0x22d3ee, 0xff5fd2, 0xffffff].forEach((c, i) => {
+    const o = new THREE.Mesh(new THREE.SphereGeometry(.12, 24, 16), new THREE.MeshStandardMaterial({color:c, emissive:c, emissiveIntensity:.7, roughness:.3}));
+    const a = i * 2.094; o.position.set(Math.cos(a) * 1.9, Math.sin(a) * 1.9, 0); ring.add(o);
+  });
+  const tiltRing = new THREE.Group(); tiltRing.rotation.set(1.15, .35, 0); tiltRing.add(ring);
+  const g = new THREE.Group(); g.add(play, tiltRing); scene.add(g);
+
+  const l1 = new THREE.PointLight(0x22d3ee, 60, 30); l1.position.set(3.5, 2.5, 4);
+  const l2 = new THREE.PointLight(0xff5fd2, 40, 30); l2.position.set(-3.5, -2, 3);
+  scene.add(l1, l2, new THREE.AmbientLight(0xffffff, .35));
+
+  const fit = () => { const w = cv.clientWidth || 96, h = cv.clientHeight || 96; renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); };
+  new ResizeObserver(fit).observe(cv); fit();
+
+  let px = 0, py = 0;
+  addEventListener("pointermove", e => { px = e.clientX / innerWidth - .5; py = e.clientY / innerHeight - .5; }, {passive:true});
+
+  const frame = t => {
+    g.position.y = Math.sin(t * 1.3) * .14;
+    play.rotation.y = Math.sin(t * .8) * .55 + px * .7;
+    play.rotation.x = Math.sin(t * .5) * .12 + py * .45;
+    ring.rotation.z = t * .6;
+    renderer.render(scene, cam);
+  };
+  let on = true, raf = 0; const clock = new THREE.Clock();
+  const loop = () => { cancelAnimationFrame(raf); const step = () => { if (!on || document.hidden) return; frame(clock.getElapsedTime()); raf = requestAnimationFrame(step); }; step(); };
+  if (still) frame(.6);
+  else {
+    new IntersectionObserver(([e]) => { on = e.isIntersecting; if (on) loop(); }).observe(cv);
+    document.addEventListener("visibilitychange", () => { if (!document.hidden && on) loop(); });
+    loop();
+  }
+}
 </script>
 </body>
 </html>
